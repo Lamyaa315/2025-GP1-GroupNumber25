@@ -1,4 +1,4 @@
-# Awtad – Smart EMG-Based Muscle Imbalance Detection System
+# Awtad – Smart EMG-Based Muscle Activation Imbalance Detection System
 
 Graduation Project – 2025-GP1-GroupNumber25  
 Department of Information Technology – King Saud University  
