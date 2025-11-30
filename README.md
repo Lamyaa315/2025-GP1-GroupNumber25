@@ -54,6 +54,7 @@ For Sprint-1, we use the open-access dataset:
 This dataset includes synchronized EMG, IMU, motion capture, and ground reaction forces
 for multiple cyclic and non-cyclic tasks (squats, jumps, stair climbing, etc.) with
 bilateral lower-limb recordings.
+The dataset can be found in the Awtad_Dataset folder
 
 ### 3.3 High-Level Architecture
 
