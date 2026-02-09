@@ -495,6 +495,64 @@
       this.querySelector('i').classList.toggle('fa-eye');
       this.querySelector('i').classList.toggle('fa-eye-slash');
     });
+
+document.getElementById('login-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  // 1. جلب البيانات من النموذج
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const userType = document.querySelector('input[name="userType"]:checked').value;
+  const loginBtn = document.querySelector('.login-btn');
+
+  // تغيير حالة الزر أثناء المعالجة
+  loginBtn.innerText = "جاري التحقق...";
+  loginBtn.disabled = true;
+
+  try {
+    // 2. محاولة تسجيل الدخول عبر Supabase Auth
+    const { data, error: authError } = await window.supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+
+    if (authError) throw authError;
+
+    if (data.user) {
+      // 3. التحقق هل المستخدم موجود في الجدول الصحيح (Client أو Coach)؟
+      const tableName = (userType === 'coach') ? 'Coach' : 'Client';
+      const idCol = (userType === 'coach') ? 'coach_id' : 'client_id';
+
+      const { data: profile, error: dbError } = await window.supabase
+        .from(tableName)
+        .select('*')
+        .eq(idCol, data.user.id)
+        .single();
+
+      if (dbError || !profile) {
+        // إذا نجح الـ Auth ولكن لم يجد البيانات في الجدول المختار (مثلاً مدرب يحاول الدخول كلاعب)
+        await window.supabase.auth.signOut();
+        throw new Error(`عذراً، هذا الحساب غير مسجل كـ ${userType === 'coach' ? 'مدرب' : 'عميل'}.`);
+      }
+
+      // 4. توجيه المستخدم حسب نوعه في حال النجاح
+      alert("تم تسجيل الدخول بنجاح!");
+      if (userType === 'coach') {
+        window.location.href = "coach_dashboard.html"; // صفحة المدرب
+      } else {
+        window.location.href = "client_dashboard.html"; // صفحة العميل
+      }
+    }
+  } catch (err) {
+    alert("خطأ في تسجيل الدخول: " + err.message);
+  } finally {
+    loginBtn.innerText = "Log In";
+    loginBtn.disabled = false;
+  }
+});
+
+
+
   </script>
 </body>
 </html>

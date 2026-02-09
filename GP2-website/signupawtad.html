@@ -6,49 +6,48 @@
   <title>AWTAD - Sign Up</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* كل الـ CSS الخاص بك يبقى كما هو بدون تغيير */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { margin: 0; min-height: 100vh; background: #4B3A57; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; }
     body::before { content: ""; position: fixed; inset: 0; background: radial-gradient(circle at 30% 25%, rgba(255, 182, 193, 0.35), transparent 70%), radial-gradient(circle at 70% 40%, rgba(255, 160, 160, 0.3), transparent 70%), radial-gradient(circle at 50% 80%, rgba(255, 200, 180, 0.25), transparent 75%); z-index: -1; }
+    
     .navbar { position: static; top: 0; width: 100%; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: rgba(75, 58, 87, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 182, 163, 0.2); }
     .logo { display: flex; align-items: center; height: 100px; margin: -15px 0; }
     .logo img { height: 100%; width: auto; max-height: 100px; object-fit: contain; }
     .nav-links { display: flex; gap: 30px; }
-    .nav-links a { color: white; text-decoration: none; font-weight: 300; transition: all 0.3s ease; position: relative; }
+    .nav-links a { color: white; text-decoration: none; font-weight: 300; transition: all 0.3s x; position: relative; }
     .nav-links a:hover { color: #ffccbb; }
-    .nav-links a::after { content: ''; position: absolute; width: 0; height: 1px; bottom: -5px; left: 0; background-color: #ffccbb; transition: width 0.3s ease; }
-    .nav-links a:hover::after { width: 100%; }
+
     .signup-container { display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 160px); padding: 40px; }
     .signup-card { background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 40px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); width: 100%; max-width: 500px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
     .signup-header { text-align: center; margin-bottom: 30px; }
     .signup-title { font-size: 2.2rem; font-weight: 300; margin-bottom: 10px; color: #ffccbb; }
-    .signup-subtitle { font-size: 1rem; opacity: 0.7; font-weight: 300; }
+    
     .form-group { margin-bottom: 20px; }
     .form-label { display: block; margin-bottom: 8px; font-weight: 400; }
     .form-input { width: 100%; padding: 12px 15px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white; font-size: 1rem; transition: all 0.3s ease; }
-    .form-input:focus { outline: none; border-color: rgba(255, 182, 163, 0.5); box-shadow: 0 0 0 2px rgba(255, 182, 163, 0.2); }
-    .form-input.error { border-color: rgba(255, 100, 100, 0.5); }
-    .form-input.success { border-color: rgba(100, 255, 100, 0.5); }
+    .form-input:focus { outline: none; border-color: rgba(255, 182, 163, 0.5); }
+
+    /* التنسيقات الخاصة بنوع الحساب */
+    .user-type-container { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .user-type-options { display: flex; gap: 15px; margin-top: 10px; }
+    .user-type-option { flex: 1; text-align: center; }
+    .user-type-option input[type="radio"] { display: none; }
+    .user-type-option label { display: block; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; cursor: pointer; transition: 0.3s; }
+    .user-type-option input[type="radio"]:checked + label { background: rgba(255, 182, 163, 0.3); border-color: #ffccbb; color: #ffccbb; }
+
+    /* حقل التخصص المخفي افتراضياً */
+    #specialty-group { display: none; }
+
     .password-container { position: relative; }
-    .password-toggle { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255, 255, 255, 0.7); cursor: pointer; }
-    .error-message { color: #ff6b6b; font-size: 0.85rem; margin-top: 5px; display: none; }
-    .password-requirements { margin-top: 10px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; font-size: 0.85rem; opacity: 0.8; display: none; }
+    .password-toggle { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: white; cursor: pointer; }
+    .password-requirements { margin-top: 10px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; font-size: 0.85rem; display: none; }
     .password-requirements.show { display: block; }
     .requirement { display: flex; align-items: center; margin-bottom: 5px; color: #ff6b6b; }
     .requirement.valid { color: #8dd3a1; }
-    .requirement i { margin-right: 8px; font-size: 0.8rem; width: 15px; }
-    .user-type-container { margin: 25px 0; }
-    .user-type-label { display: block; margin-bottom: 10px; font-weight: 400; }
-    .user-type-options { display: flex; gap: 15px; }
-    .user-type-option { flex: 1; text-align: center; }
-    .user-type-option input[type="radio"] { display: none; }
-    .user-type-option label { display: block; padding: 12px 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
-    .user-type-option input[type="radio"]:checked + label { background: rgba(255, 182, 163, 0.3); border-color: rgba(255, 182, 163, 0.5); color: #ffccbb; }
-    .signup-btn { width: 100%; padding: 14px; background: rgba(255, 182, 163, 0.8); border: none; border-radius: 8px; color: #4B3A57; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-bottom: 20px; }
+
+    .signup-btn { width: 100%; padding: 14px; background: rgba(255, 182, 163, 0.8); border: none; border-radius: 8px; color: #4B3A57; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
     .signup-btn:hover { background: rgba(255, 182, 163, 1); transform: translateY(-3px); }
-    .login-link { text-align: center; font-size: 1rem; }
-    .login-link a { color: #ffb6a3; text-decoration: none; font-weight: 500; }
-    footer { text-align: center; padding: 40px; border-top: 1px solid rgba(255, 255, 255, 0.1); opacity: 0.7; }
+    footer { text-align: center; padding: 40px; opacity: 0.7; }
   </style>
 </head>
 <body>
@@ -70,6 +69,25 @@
       </div>
 
       <form id="signup-form">
+        <div class="user-type-container">
+          <label class="form-label">I am signing up as:</label>
+          <div class="user-type-options">
+            <div class="user-type-option">
+              <input type="radio" id="client" name="userType" value="client" checked>
+              <label for="client"><i class="fas fa-user"></i> Client</label>
+            </div>
+            <div class="user-type-option">
+              <input type="radio" id="coach" name="userType" value="coach">
+              <label for="coach"><i class="fas fa-chalkboard-teacher"></i> Coach</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" id="specialty-group">
+          <label class="form-label" for="specialty">Specialty</label>
+          <input type="text" id="specialty" class="form-input" placeholder="e.g. Physiotherapy, Fitness">
+        </div>
+
         <div class="form-group">
           <label class="form-label" for="fullname">Full Name</label>
           <input type="text" id="fullname" class="form-input" placeholder="Enter full name" required>
@@ -83,16 +101,14 @@
         <div class="form-group">
           <label class="form-label" for="phone">Phone Number</label>
           <input type="tel" id="phone" class="form-input" placeholder="10-digit phone" required maxlength="10">
-          <div class="error-message" id="phoneError"></div>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="password">Password</label>
           <div class="password-container">
             <input type="password" id="password" class="form-input" placeholder="Create password" required>
-            <button type="button" class="password-toggle" id="togglePassword"><i class="fas fa-eye"></i></button>
+            <button type="button" class="password-toggle"><i class="fas fa-eye"></i></button>
           </div>
-          <div class="error-message" id="passwordError"></div>
           <div class="password-requirements" id="passwordRequirements">
             <div class="requirement" id="lengthReq"><i class="fas fa-times"></i> 12+ characters</div>
             <div class="requirement" id="lowercaseReq"><i class="fas fa-times"></i> Lowercase letter</div>
@@ -105,27 +121,12 @@
           <label class="form-label" for="confirm-password">Confirm Password</label>
           <div class="password-container">
             <input type="password" id="confirm-password" class="form-input" placeholder="Confirm password" required>
-            <button type="button" class="password-toggle" id="toggleConfirmPassword"><i class="fas fa-eye"></i></button>
-          </div>
-          <div class="error-message" id="confirmPasswordError"></div>
-        </div>
-
-        <div class="user-type-container">
-          <label class="user-type-label">Account Type:</label>
-          <div class="user-type-options">
-            <div class="user-type-option">
-              <input type="radio" id="client" name="userType" value="client" checked>
-              <label for="client"><i class="fas fa-user"></i> Client</label>
-            </div>
-            <div class="user-type-option">
-              <input type="radio" id="coach" name="userType" value="coach">
-              <label for="coach"><i class="fas fa-chalkboard-teacher"></i> Coach</label>
-            </div>
+            <button type="button" class="password-toggle"><i class="fas fa-eye"></i></button>
           </div>
         </div>
 
         <button type="submit" class="signup-btn" id="submitBtn">Create Account</button>
-        <div class="login-link">Already have an account? <a href="loginawtad.html">Log in</a></div>
+        <div style="text-align: center; margin-top: 20px;">Already have an account? <a href="loginawtad.html" style="color: #ffb6a3; text-decoration: none;">Log in</a></div>
       </form>
     </div>
   </section>
@@ -138,18 +139,30 @@
   <script src="supabase-config.js"></script>
 
   <script>
-    // --- منطق الواجهة (UI Logic) ---
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirm-password');
-    const phoneInput = document.getElementById('phone');
-    const passwordRequirements = document.getElementById('passwordRequirements');
+    const specialtyGroup = document.getElementById('specialty-group');
+    const specialtyInput = document.getElementById('specialty');
+    const userTypeRadios = document.querySelectorAll('input[name="userType"]');
+
+    // إظهار/إخفاء حقل التخصص بناءً على الاختيار
+    userTypeRadios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        if (e.target.value === 'coach') {
+          specialtyGroup.style.display = 'block';
+          specialtyInput.required = true;
+        } else {
+          specialtyGroup.style.display = 'none';
+          specialtyInput.required = false;
+        }
+      });
+    });
 
     // إظهار وإخفاء كلمة المرور
     document.querySelectorAll('.password-toggle').forEach(btn => {
       btn.addEventListener('click', function() {
         const input = this.previousElementSibling;
-        const type = input.type === 'password' ? 'text' : 'password';
-        input.type = type;
+        input.type = input.type === 'password' ? 'text' : 'password';
         this.querySelector('i').classList.toggle('fa-eye');
         this.querySelector('i').classList.toggle('fa-eye-slash');
       });
@@ -158,7 +171,7 @@
     // التحقق من قوة كلمة المرور
     passwordInput.addEventListener('input', function() {
       const val = this.value;
-      passwordRequirements.classList.add('show');
+      document.getElementById('passwordRequirements').classList.add('show');
       updateReq('lengthReq', val.length >= 12);
       updateReq('lowercaseReq', /[a-z]/.test(val));
       updateReq('digitReq', /\d/.test(val));
@@ -171,29 +184,26 @@
       el.querySelector('i').className = isValid ? 'fas fa-check' : 'fas fa-times';
     }
 
-    // --- منطق الربط مع Supabase (The Magic) ---
+    // منطق التسجيل
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
 
-      // 1. جلب القيم
       const fullName = document.getElementById('fullname').value;
       const email = document.getElementById('email').value;
       const password = passwordInput.value;
       const userType = document.querySelector('input[name="userType"]:checked').value;
+      const specialty = specialtyInput.value;
       const submitBtn = document.getElementById('submitBtn');
 
-      // 2. تحقق سريع من التطابق
       if (password !== confirmPasswordInput.value) {
         alert("Passwords do not match!");
         return;
       }
 
-      // 3. بدء عملية التسجيل
       submitBtn.innerText = "Processing...";
       submitBtn.disabled = true;
 
       try {
-        // أ. التسجيل في نظام الـ Auth
         const { data, error: authError } = await supabase.auth.signUp({
           email: email,
           password: password,
@@ -206,18 +216,25 @@
           const fname = nameParts[0];
           const lname = nameParts.slice(1).join(' ') || '';
 
-          // ب. الإدخال في الجدول المخصص (Coach أو Client)
           const tableName = (userType === 'coach') ? 'Coach' : 'Client';
           const idCol = (userType === 'coach') ? 'coach_id' : 'client_id';
 
+          // تجهيز البيانات للإرسال
+          const insertData = {
+            [idCol]: data.user.id,
+            Fname: fname,
+            Lname: lname,
+            email: email
+          };
+
+          // إذا كان كوتش، أضف حقل التخصص (تأكد أن اسم العمود في قاعدة البيانات هو Specialty)
+          if (userType === 'coach') {
+            insertData.Specialty = specialty;
+          }
+
           const { error: dbError } = await supabase
             .from(tableName)
-            .insert([{
-              [idCol]: data.user.id,
-              Fname: fname,
-              Lname: lname,
-              email: email
-            }]);
+            .insert([insertData]);
 
           if (dbError) throw dbError;
 
