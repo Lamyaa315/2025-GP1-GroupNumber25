@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWTAD - Log In</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #4B3A57;
+      overflow-x: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+
+    /* طبقة الإضاءة */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255, 182, 193, 0.35), transparent 70%),
+        radial-gradient(circle at 70% 40%, rgba(255, 160, 160, 0.3), transparent 70%),
+        radial-gradient(circle at 50% 80%, rgba(255, 200, 180, 0.25), transparent 75%);
+      z-index: -1;
+    }
+
+    /* شريط التنقل */
+    .navbar {
+      position: static;
+      top: 0;
+      width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      background: rgba(75, 58, 87, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 182, 163, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      height: 100px;
+      margin: -15px 0;
+    }
+
+    .logo img {
+      height: 100%;
+      width: auto;
+      max-height: 100px;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 300;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a:hover {
+      color: #ffccbb;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 1px;
+      bottom: -5px;
+      left: 0;
+      background-color: #ffccbb;
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* قسم تسجيل الدخول */
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 160px);
+      padding: 40px;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-title {
+      font-size: 2.2rem;
+      font-weight: 300;
+      margin-bottom: 10px;
+      color: #ffccbb;
+    }
+
+    .login-subtitle {
+      font-size: 1rem;
+      opacity: 0.7;
+      font-weight: 300;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 400;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: rgba(255, 182, 163, 0.5);
+      box-shadow: 0 0 0 2px rgba(255, 182, 163, 0.2);
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .password-container {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+    }
+
+    /* User Type Selection */
+    .user-type-container {
+      margin: 25px 0;
+    }
+
+    .user-type-label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 400;
+    }
+
+    .user-type-options {
+      display: flex;
+      gap: 15px;
+    }
+
+    .user-type-option {
+      flex: 1;
+      text-align: center;
+    }
+
+    .user-type-option input[type="radio"] {
+      display: none;
+    }
+
+    .user-type-option label {
+      display: block;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 400;
+    }
+
+    .user-type-option input[type="radio"]:checked + label {
+      background: rgba(255, 182, 163, 0.3);
+      border-color: rgba(255, 182, 163, 0.5);
+      color: #ffccbb;
+    }
+
+    .user-type-option label:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .user-type-icon {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 1.2rem;
+    }
+
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .remember-me input {
+      margin: 0;
+    }
+
+    .remember-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .forgot-password {
+      color: #ffb6a3;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .forgot-password:hover {
+      text-decoration: underline;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      background: rgba(255, 182, 163, 0.8);
+      border: none;
+      border-radius: 8px;
+      color: #4B3A57;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+    }
+
+    .login-btn:hover {
+      background: rgba(255, 182, 163, 1);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
+    }
+
+    .login-divider {
+      display: flex;
+      align-items: center;
+      margin: 25px 0;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .login-divider span {
+      padding: 0 15px;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    .social-login {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .social-btn {
+      flex: 1;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .social-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      border-color: rgba(255, 182, 163, 0.3);
+    }
+
+    .signup-link {
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    .signup-link a {
+      color: #ffb6a3;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* التذييل */
+    footer {
+      text-align: center;
+      padding: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-weight: 300;
+      opacity: 0.7;
+      font-size: 1rem;
+    }
+
+    /* التجاوب مع الشاشات المختلفة */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 15px 20px;
+      }
+
+      .nav-links {
+        gap: 15px;
+      }
+
+      .login-container {
+        padding: 20px;
+      }
+
+      .login-card {
+        padding: 30px 25px;
+      }
+
+      .user-type-options {
+        flex-direction: column;
+      }
+
+      .social-login {
+        flex-direction: column;
+      }
+
+      .remember-forgot {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .login-title {
+        font-size: 1.8rem;
+      }
+      
+      .navbar {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .nav-links {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- شريط التنقل -->
+  <nav class="navbar">
+    <div class="logo"><img src="awtadlogo1.png" alt="Awtad Logo"></div>
+    <div class="nav-links">
+      <a href="awtadhp.html">Home</a>
+      <a href="signupawtad.html">Sign up</a>
+    </div>
+  </nav>
+
+  <!-- قسم تسجيل الدخول -->
+  <section class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1 class="login-title">Welcome Back</h1>
+        <p class="login-subtitle">Log in to continue tracking your muscle activation imbalance</p>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input type="email" id="email" class="form-input" placeholder="Enter your email" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="password-container">
+            <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+            <button type="button" class="password-toggle" id="togglePassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- User Type Selection -->
+        <div class="user-type-container">
+          <label class="user-type-label">Login as:</label>
+          <div class="user-type-options">
+            <div class="user-type-option">
+              <input type="radio" id="client" name="userType" value="client" checked>
+              <label for="client">
+                <span class="user-type-icon"><i class="fas fa-user"></i></span>
+                Client
+              </label>
+            </div>
+            <div class="user-type-option">
+              <input type="radio" id="coach" name="userType" value="coach">
+              <label for="coach">
+                <span class="user-type-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                Coach
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="remember-forgot">
+          <div class="remember-me">
+            <input type="checkbox" id="remember">
+            <label for="remember" class="remember-label">Remember me</label>
+          </div>
+          <a href="#" class="forgot-password">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="login-btn">
+          Log In
+        </button>
+
+        <div class="signup-link">
+          Don't have an account? <a href="signupawtad.html">Sign up</a>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- التذييل -->
+  <footer>
+    <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
+  </footer>
+
+  <script>
+    // Simple JavaScript for password toggle only
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.querySelector('i').classList.toggle('fa-eye');
+      this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+  </script>
+</body>
+</html>

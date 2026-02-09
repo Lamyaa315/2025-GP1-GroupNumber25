@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWTAD - Schedule</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #4B3A57;
+      overflow-x: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+
+    /* Simplified background */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 182, 163, 0.25), transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 209, 179, 0.2), transparent 50%);
+      z-index: -1;
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      position: static;
+      top: 0;
+      width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      background: rgba(75, 58, 87, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 182, 163, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      height: 100px;
+      margin: -15px 0;
+    }
+
+    .logo img {
+      height: 100%;
+      width: auto;
+      max-height: 100px;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 300;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a:hover {
+      color: #ffccbb;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 1px;
+      bottom: -5px;
+      left: 0;
+      background-color: #ffccbb;
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* Logout Button */
+    .logout-btn {
+      background: rgba(255, 182, 163, 0.3);
+      border: 1px solid rgba(255, 182, 163, 0.5);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 182, 163, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
+    }
+
+    /* Main Container */
+    .container {
+      padding: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 40px;
+    }
+
+    .page-title {
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: #ffccbb;
+      margin-bottom: 10px;
+    }
+
+    .page-subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+
+    /* Schedule Navigation */
+    .schedule-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .date-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 182, 163, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .current-date {
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: #ffccbb;
+      min-width: 200px;
+      text-align: center;
+    }
+
+    .view-tabs {
+      display: flex;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 5px;
+      border-radius: 30px;
+    }
+
+    .view-tab {
+      padding: 10px 25px;
+      border: none;
+      background: transparent;
+      color: white;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .view-tab.active {
+      background: rgba(255, 182, 163, 0.3);
+      color: #ffccbb;
+    }
+
+    /* Schedule Grid */
+    .schedule-grid {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      min-height: 400px;
+    }
+
+    /* Day Schedule */
+    .day-schedule {
+      display: none;
+    }
+
+    .day-schedule.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .day-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .day-title {
+      font-size: 1.5rem;
+      color: #ffccbb;
+      margin-bottom: 5px;
+    }
+
+    .day-date {
+      font-size: 1.1rem;
+      opacity: 0.8;
+    }
+
+    .sessions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .session-card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .session-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 182, 163, 0.4);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .session-card.completed {
+      opacity: 0.7;
+      border-color: rgba(141, 211, 161, 0.3);
+    }
+
+    .session-card.upcoming {
+      border-color: rgba(255, 209, 179, 0.4);
+    }
+
+    .session-card.cancelled {
+      opacity: 0.5;
+      border-color: rgba(255, 107, 107, 0.3);
+    }
+
+    .session-time {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #ffccbb;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .session-time i {
+      font-size: 0.9rem;
+    }
+
+    .session-client {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .client-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 182, 163, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: #ffccbb;
+    }
+
+    .client-name {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #ffccbb;
+    }
+
+    .session-type {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      margin-bottom: 10px;
+      padding-left: 55px;
+    }
+
+    .session-status {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: inline-block;
+      margin-left: 55px;
+    }
+
+    .status-confirmed {
+      background: rgba(141, 211, 161, 0.2);
+      color: #8dd3a1;
+    }
+
+    .status-upcoming {
+      background: rgba(255, 209, 179, 0.2);
+      color: #ffd1b3;
+    }
+
+    .status-completed {
+      background: rgba(255, 182, 163, 0.2);
+      color: #ffb6a3;
+    }
+
+    .status-cancelled {
+      background: rgba(255, 107, 107, 0.2);
+      color: #ff6b6b;
+    }
+
+    /* Weekly Schedule */
+    .weekly-schedule {
+      display: none;
+    }
+
+    .weekly-schedule.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .week-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .day-column {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 15px;
+      min-height: 100px;
+    }
+
+    .day-column.active {
+      background: rgba(255, 182, 163, 0.1);
+      border: 1px solid rgba(255, 182, 163, 0.3);
+    }
+
+    .day-name {
+      text-align: center;
+      font-weight: 500;
+      color: #ffccbb;
+      margin-bottom: 5px;
+    }
+
+    .day-number {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .day-sessions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .day-session {
+      background: rgba(255, 182, 163, 0.2);
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 182, 163, 0.3);
+    }
+
+    .day-session:hover {
+      transform: scale(1.02);
+      background: rgba(255, 182, 163, 0.3);
+    }
+
+    .session-time-small {
+      font-weight: 600;
+      color: #ffccbb;
+      margin-bottom: 2px;
+    }
+
+    .session-client-small {
+      font-size: 0.8rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Today's Sessions */
+    .today-section {
+      margin-top: 40px;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      color: #ffccbb;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* No Sessions */
+    .no-sessions {
+      text-align: center;
+      padding: 60px 20px;
+      opacity: 0.7;
+    }
+
+    .no-sessions i {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: rgba(255, 182, 163, 0.5);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: rgba(75, 58, 87, 0.95);
+      border-radius: 15px;
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      border: 1px solid rgba(255, 182, 163, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      color: #ffccbb;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-info {
+      margin-bottom: 25px;
+    }
+
+    .info-item {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .info-label {
+      font-weight: 500;
+      color: #ffccbb;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+
+    .info-value {
+      font-size: 1.1rem;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: flex-end;
+    }
+
+    .modal-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+
+    .modal-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .modal-btn.start {
+      background: rgba(255, 182, 163, 0.3);
+      border-color: rgba(255, 182, 163, 0.5);
+    }
+
+    .modal-btn.start:hover {
+      background: rgba(255, 182, 163, 0.4);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      font-weight: 300;
+      opacity: 0.8;
+      font-size: 1rem;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 15px 20px;
+      }
+
+      .nav-links {
+        gap: 15px;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      .schedule-nav {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .date-controls {
+        justify-content: center;
+      }
+
+      .view-tabs {
+        justify-content: center;
+      }
+
+      .week-days {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .modal-buttons {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page-title {
+        font-size: 1.8rem;
+      }
+
+      .current-date {
+        font-size: 1.1rem;
+        min-width: 150px;
+      }
+
+      .view-tab {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+      }
+
+      .session-client {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .session-type, .session-status {
+        margin-left: 0;
+        padding-left: 0;
+      }
+
+      .week-days {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="awtadlogo1.png" alt="Awtad Logo">
+    </div>
+    <div class="nav-links">
+      <a href="#">Home</a>
+      <a href="coach-dashboard.html">Dashboard</a>
+      <a href="my-clients.html">Clients</a>
+      <a href="#" style="color: #ffccbb;">Schedule</a>
+      <button id="logoutBtn" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1 class="page-title">My Schedule</h1>
+      <p class="page-subtitle">View and manage your training sessions</p>
+    </div>
+
+    <!-- Schedule Navigation -->
+    <div class="schedule-nav">
+      <div class="date-controls">
+        <button class="nav-btn" id="prevDay">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="current-date" id="currentDate">Monday, December 9</div>
+        <button class="nav-btn" id="nextDay">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <button class="nav-btn" id="todayBtn">
+          Today
+        </button>
+      </div>
+
+      <div class="view-tabs">
+        <button class="view-tab active" data-view="day">Day</button>
+        <button class="view-tab" data-view="week">Week</button>
+      </div>
+    </div>
+
+    <!-- Schedule Grid -->
+    <div class="schedule-grid">
+      <!-- Day View -->
+      <div class="day-schedule active" id="dayView">
+        <div class="day-header">
+          <h2 class="day-title" id="dayTitle">Today</h2>
+          <div class="day-date" id="dayDate">December 9, 2024</div>
+        </div>
+
+        <div class="sessions-list" id="daySessionsList">
+          <!-- Sessions will be loaded here -->
+        </div>
+
+        <div class="no-sessions" id="dayNoSessions" style="display: none;">
+          <i class="fas fa-calendar-times"></i>
+          <p>No sessions scheduled for this day</p>
+        </div>
+      </div>
+
+      <!-- Week View -->
+      <div class="weekly-schedule" id="weekView">
+        <div class="week-days" id="weekDays">
+          <!-- Week days will be generated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's Sessions -->
+    <div class="today-section">
+      <h2 class="section-title">Today's Sessions</h2>
+      <div class="sessions-list" id="todaySessionsList">
+        <!-- Today's sessions will be loaded here -->
+      </div>
+      <div class="no-sessions" id="todayNoSessions" style="display: none;">
+        <i class="fas fa-calendar-check"></i>
+        <p>No sessions scheduled for today</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session Details Modal -->
+  <div class="modal" id="sessionModal">
+    <div class="modal-content">
+      <h3 class="modal-title">
+        <i class="fas fa-dumbbell"></i>
+        <span id="modalTitle">Session Details</span>
+      </h3>
+
+      <div class="modal-info">
+        <div class="info-item">
+          <div class="info-label">Client</div>
+          <div class="info-value" id="modalClient">Norah Al-Mutairi</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Time</div>
+          <div class="info-value" id="modalTime">10:00 AM - 11:00 AM</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Type</div>
+          <div class="info-value" id="modalType">Squat Analysis</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Status</div>
+          <div class="info-value">
+            <span class="status-confirmed session-status" id="modalStatus">Confirmed</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Notes</div>
+          <div class="info-value" id="modalNotes">Focus on VL muscle activation balance</div>
+        </div>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="modal-btn" id="closeModal">Close</button>
+        <button class="modal-btn start" id="startSession">Start Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
+  </footer>
+
+  <script>
+    // Sample sessions data
+    const sessions = [
+      {
+        id: 1,
+        client: "Norah Al-Mutairi",
+        clientInitials: "NA",
+        type: "Squat Analysis",
+        date: "2024-12-09",
+        startTime: "10:00",
+        endTime: "11:00",
+        status: "confirmed",
+        notes: "Focus on VL muscle activation balance"
+      },
+      {
+        id: 2,
+        client: "Ahmed Hassan",
+        clientInitials: "AH",
+        type: "Jump Analysis",
+        date: "2024-12-09",
+        startTime: "14:00",
+        endTime: "15:00",
+        status: "confirmed",
+        notes: "Check gastrocnemius imbalance"
+      },
+      {
+        id: 3,
+        client: "Sarah Johnson",
+        clientInitials: "SJ",
+        type: "VL Strengthening",
+        date: "2024-12-10",
+        startTime: "09:00",
+        endTime: "10:00",
+        status: "completed",
+        notes: "Follow-up session"
+      },
+      {
+        id: 4,
+        client: "Michael Chen",
+        clientInitials: "MC",
+        type: "Initial Assessment",
+        date: "2024-12-10",
+        startTime: "16:00",
+        endTime: "17:00",
+        status: "upcoming",
+        notes: "New client assessment"
+      },
+      {
+        id: 5,
+        client: "Elena Rodriguez",
+        clientInitials: "ER",
+        type: "Squat Analysis",
+        date: "2024-12-11",
+        startTime: "11:00",
+        endTime: "12:00",
+        status: "confirmed",
+        notes: "Progress check"
+      },
+      {
+        id: 6,
+        client: "David Wilson",
+        clientInitials: "DW",
+        type: "Advanced Analysis",
+        date: "2024-12-11",
+        startTime: "15:00",
+        endTime: "16:00",
+        status: "confirmed",
+        notes: "Full body analysis"
+      },
+      {
+        id: 7,
+        client: "James Miller",
+        clientInitials: "JM",
+        type: "Jump Analysis",
+        date: "2024-12-12",
+        startTime: "14:00",
+        endTime: "15:00",
+        status: "confirmed",
+        notes: "Power output tracking"
+      },
+      {
+        id: 8,
+        client: "Norah Al-Mutairi",
+        clientInitials: "NA",
+        type: "Follow-up",
+        date: "2024-12-13",
+        startTime: "09:00",
+        endTime: "10:00",
+        status: "confirmed",
+        notes: "Review progress"
+      }
+    ];
+
+    // Current date
+    let currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM elements
+      const prevDayBtn = document.getElementById('prevDay');
+      const nextDayBtn = document.getElementById('nextDay');
+      const todayBtn = document.getElementById('todayBtn');
+      const viewTabs = document.querySelectorAll('.view-tab');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const closeModal = document.getElementById('closeModal');
+      const startSessionBtn = document.getElementById('startSession');
+
+      // Event listeners
+      prevDayBtn.addEventListener('click', () => {
+        currentDate.setDate(currentDate.getDate() - 1);
+        updateDisplay();
+      });
+
+      nextDayBtn.addEventListener('click', () => {
+        currentDate.setDate(currentDate.getDate() + 1);
+        updateDisplay();
+      });
+
+      todayBtn.addEventListener('click', () => {
+        currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+        updateDisplay();
+      });
+
+      viewTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const view = tab.getAttribute('data-view');
+          switchView(view);
+          viewTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+        });
+      });
+
+      logoutBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to logout?')) {
+          window.location.href = 'loginawtad.html';
+        }
+      });
+
+      closeModal.addEventListener('click', () => {
+        document.getElementById('sessionModal').classList.remove('active');
+      });
+
+      startSessionBtn.addEventListener('click', () => {
+        const sessionId = document.getElementById('sessionModal').getAttribute('data-session-id');
+        const session = sessions.find(s => s.id == sessionId);
+        if (session) {
+          alert(`Starting session with ${session.client}...`);
+          // In real app, redirect to session page
+          window.location.href = 'start-session.html';
+        }
+      });
+
+      // Close modal when clicking outside
+      document.getElementById('sessionModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('sessionModal')) {
+          document.getElementById('sessionModal').classList.remove('active');
+        }
+      });
+
+      // Initial display
+      updateDisplay();
+    });
+
+    // Switch between day and week view
+    function switchView(view) {
+      document.getElementById('dayView').classList.remove('active');
+      document.getElementById('weekView').classList.remove('active');
+      document.getElementById(view + 'View').classList.add('active');
+      
+      if (view === 'week') {
+        loadWeekView();
+      } else {
+        loadDayView();
+      }
+    }
+
+    // Update all displays
+    function updateDisplay() {
+      updateCurrentDate();
+      loadDayView();
+      loadTodaySessions();
+    }
+
+    // Update current date display
+    function updateCurrentDate() {
+      const dateElement = document.getElementById('currentDate');
+      const options = { weekday: 'long', month: 'long', day: 'numeric' };
+      dateElement.textContent = currentDate.toLocaleDateString('en-US', options);
+      
+      // Update day title
+      const dayTitle = document.getElementById('dayTitle');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      if (currentDate.getTime() === today.getTime()) {
+        dayTitle.textContent = 'Today';
+      } else if (currentDate.getTime() === today.getTime() + 86400000) {
+        dayTitle.textContent = 'Tomorrow';
+      } else if (currentDate.getTime() === today.getTime() - 86400000) {
+        dayTitle.textContent = 'Yesterday';
+      } else {
+        dayTitle.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long' });
+      }
+      
+      // Update day date
+      document.getElementById('dayDate').textContent = currentDate.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+
+    // Load day view sessions
+    function loadDayView() {
+      const dateString = formatDate(currentDate);
+      const daySessions = sessions.filter(session => session.date === dateString);
+      const container = document.getElementById('daySessionsList');
+      const noSessions = document.getElementById('dayNoSessions');
+      
+      container.innerHTML = '';
+      
+      if (daySessions.length === 0) {
+        noSessions.style.display = 'block';
+        return;
+      }
+      
+      noSessions.style.display = 'none';
+      
+      // Sort sessions by time
+      daySessions.sort((a, b) => a.startTime.localeCompare(b.startTime));
+      
+      daySessions.forEach(session => {
+        const sessionCard = createSessionCard(session);
+        container.appendChild(sessionCard);
+      });
+    }
+
+    // Load week view
+    function loadWeekView() {
+      const weekDaysContainer = document.getElementById('weekDays');
+      weekDaysContainer.innerHTML = '';
+      
+      // Get start of week (Monday)
+      const startOfWeek = new Date(currentDate);
+      startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
+      
+      // Create columns for each day of the week
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(startOfWeek);
+        day.setDate(startOfWeek.getDate() + i);
+        const dateString = formatDate(day);
+        const daySessions = sessions.filter(session => session.date === dateString);
+        
+        const dayColumn = document.createElement('div');
+        dayColumn.className = 'day-column';
+        
+        // Highlight current day
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (day.getTime() === today.getTime()) {
+          dayColumn.classList.add('active');
+        }
+        
+        dayColumn.innerHTML = `
+          <div class="day-name">${day.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+          <div class="day-number">${day.getDate()}</div>
+          <div class="day-sessions">
+            ${daySessions.map(session => `
+              <div class="day-session" data-session-id="${session.id}">
+                <div class="session-time-small">${formatTime(session.startTime)}</div>
+                <div class="session-client-small">${session.client}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        
+        // Add click event to day column
+        dayColumn.addEventListener('click', () => {
+          currentDate = day;
+          switchView('day');
+          document.querySelectorAll('.view-tab').forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.getAttribute('data-view') === 'day') {
+              tab.classList.add('active');
+            }
+          });
+        });
+        
+        // Add click events to session items
+        dayColumn.querySelectorAll('.day-session').forEach(sessionEl => {
+          sessionEl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const sessionId = sessionEl.getAttribute('data-session-id');
+            const session = sessions.find(s => s.id == sessionId);
+            if (session) {
+              openSessionModal(session);
+            }
+          });
+        });
+        
+        weekDaysContainer.appendChild(dayColumn);
+      }
+    }
+
+    // Load today's sessions
+    function loadTodaySessions() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dateString = formatDate(today);
+      const todaySessions = sessions.filter(session => session.date === dateString);
+      const container = document.getElementById('todaySessionsList');
+      const noSessions = document.getElementById('todayNoSessions');
+      
+      container.innerHTML = '';
+      
+      if (todaySessions.length === 0) {
+        noSessions.style.display = 'block';
+        return;
+      }
+      
+      noSessions.style.display = 'none';
+      
+      // Sort sessions by time
+      todaySessions.sort((a, b) => a.startTime.localeCompare(b.startTime));
+      
+      todaySessions.forEach(session => {
+        const sessionCard = createSessionCard(session);
+        container.appendChild(sessionCard);
+      });
+    }
+
+    // Create session card element
+    function createSessionCard(session) {
+      const div = document.createElement('div');
+      div.className = `session-card ${session.status}`;
+      div.setAttribute('data-session-id', session.id);
+      
+      const statusClass = session.status === 'confirmed' ? 'status-confirmed' :
+                         session.status === 'completed' ? 'status-completed' :
+                         session.status === 'upcoming' ? 'status-upcoming' :
+                         'status-cancelled';
+      
+      div.innerHTML = `
+        <div class="session-time">
+          <i class="far fa-clock"></i>
+          ${formatTime(session.startTime)} - ${formatTime(session.endTime)}
+        </div>
+        <div class="session-client">
+          <div class="client-avatar">${session.clientInitials}</div>
+          <div class="client-name">${session.client}</div>
+        </div>
+        <div class="session-type">${session.type}</div>
+        <div class="session-status ${statusClass}">${session.status.charAt(0).toUpperCase() + session.status.slice(1)}</div>
+      `;
+      
+      div.addEventListener('click', () => {
+        openSessionModal(session);
+      });
+      
+      return div;
+    }
+
+    // Open session modal
+    function openSessionModal(session) {
+      const modal = document.getElementById('sessionModal');
+      const statusClass = session.status === 'confirmed' ? 'status-confirmed' :
+                         session.status === 'completed' ? 'status-completed' :
+                         session.status === 'upcoming' ? 'status-upcoming' :
+                         'status-cancelled';
+      
+      document.getElementById('modalTitle').textContent = `${session.type} Session`;
+      document.getElementById('modalClient').textContent = session.client;
+      document.getElementById('modalTime').textContent = `${formatTime(session.startTime)} - ${formatTime(session.endTime)}`;
+      document.getElementById('modalType').textContent = session.type;
+      document.getElementById('modalNotes').textContent = session.notes;
+      
+      const statusElement = document.getElementById('modalStatus');
+      statusElement.textContent = session.status.charAt(0).toUpperCase() + session.status.slice(1);
+      statusElement.className = `session-status ${statusClass}`;
+      
+      modal.setAttribute('data-session-id', session.id);
+      modal.classList.add('active');
+    }
+
+    // Helper functions
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function formatTime(timeString) {
+      const [hours, minutes] = timeString.split(':');
+      const hour = parseInt(hours);
+      const period = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour % 12 || 12;
+      return `${displayHour}:${minutes} ${period}`;
+    }
+  </script>
+</body>
+</html>

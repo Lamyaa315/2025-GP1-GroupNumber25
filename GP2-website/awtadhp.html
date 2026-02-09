@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWTAD - Advanced EMG Analysis</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #4B3A57;
+      overflow-x: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+
+    /* طبقة الإضاءة */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255, 182, 193, 0.35), transparent 70%),
+        radial-gradient(circle at 70% 40%, rgba(255, 160, 160, 0.3), transparent 70%),
+        radial-gradient(circle at 50% 80%, rgba(255, 200, 180, 0.25), transparent 75%);
+      z-index: -1;
+    }
+
+    /* شريط التنقل */
+    .navbar {
+      position: static;
+      top: 0;
+      width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      background: rgba(75, 58, 87, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 300;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a:hover {
+      color: #ffccbb;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 1px;
+      bottom: -5px;
+      left: 0;
+      background-color: #ffccbb;
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* القسم الرئيسي */
+    .hero {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      position: relative;
+      padding: 0 20px;
+    }
+
+    /* الحاوية الرئيسية للصورة والنص */
+    .main-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 80px;
+      max-width: 1400px;
+      width: 100%;
+    }
+
+    /* صورة الأعصاب */
+    .neural-image-container {
+      position: relative;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .neural-image {
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: 
+        url('nerves2.png') center/contain no-repeat;
+      box-shadow: 
+        0 0 80px rgba(255, 182, 193, 0.6),
+        inset 0 0 100px rgba(255, 182, 193, 0.4);
+      animation: pulse 8s infinite alternate;
+      filter: brightness(1.2) contrast(1.1);
+      position: relative;
+      z-index: 2;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 
+          0 0 80px rgba(255, 182, 193, 0.6),
+          inset 0 0 100px rgba(255, 182, 193, 0.4);
+        transform: scale(1);
+      }
+      100% {
+        box-shadow: 
+          0 0 120px rgba(255, 182, 193, 0.8),
+          inset 0 0 120px rgba(255, 182, 193, 0.5);
+        transform: scale(1.02);
+      }
+    }
+
+    /* النص حول الصورة */
+    .banner-text {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .text-item {
+      position: absolute;
+      color: white;
+      font-weight: 300;
+      font-size: 1rem;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards;
+      text-align: center;
+      width: 220px;
+      line-height: 1.5;
+      text-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+      background: rgba(75, 58, 87, 0.7);
+      padding: 15px;
+      border-radius: 10px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    .text-1 {
+      top: 15%;
+      left: -250px;
+      animation-delay: 0.8s;
+    }
+
+    .text-2 {
+      top: 15%;
+      right: -250px;
+      animation-delay: 1.2s;
+    }
+
+    .text-3 {
+      bottom: 15%;
+      left: -250px;
+      animation-delay: 1.6s;
+    }
+
+    .text-4 {
+      bottom: 15%;
+      right: -250px;
+      animation-delay: 2s;
+    }
+
+    .text-5 {
+      top: 50%;
+      left: -280px;
+      transform: translateY(-50%);
+      animation-delay: 2.4s;
+    }
+
+    .text-6 {
+      top: 50%;
+      right: -280px;
+      transform: translateY(-50%);
+      animation-delay: 2.8s;
+    }
+
+    /* النص الرئيسي */
+    .main-text {
+      max-width: 500px;
+      text-align: left;
+    }
+
+    .main-text h1 {
+      font-size: 2.8rem;
+      font-weight: 300;
+      margin-bottom: 25px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1.5s ease forwards;
+      animation-delay: 0.5s;
+      line-height: 1.2;
+    }
+
+    .main-text p {
+      font-size: 1.2rem;
+      font-weight: 300;
+      line-height: 1.7;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1.5s ease forwards;
+      animation-delay: 1s;
+      margin-bottom: 25px;
+    }
+      }
+
+      .logo {
+          display: flex;
+          align-items: center;
+          height: 100px; /* Desired logo size */
+          margin: -15px 0; /* Compensate by pulling logo outside navbar */
+      }
+
+          .logo img {
+              height: 100%;
+              width: auto;
+              max-height: 100px;
+              object-fit: contain;
+          }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* الأيقونات */
+    .icons {
+      display: flex;
+      gap: 30px;
+      margin: 30px 0;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards;
+      animation-delay: 1.5s;
+    }
+
+    .icon {
+      font-size: 2.5rem;
+      opacity: 0.7;
+      transition: all 0.3s ease;
+    }
+
+    .icon:hover {
+      opacity: 1;
+      transform: translateY(-5px);
+    }
+
+    /* زر الدعوة */
+    .cta-button {
+      margin-top: 20px;
+      padding: 15px 40px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      font-size: 1.1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      animation: fadeIn 1.5s ease forwards;
+      animation-delay: 2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 182, 193, 0.3);
+    }
+
+    /* قسم المعلومات */
+    .info-section {
+      padding: 120px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 50px;
+    }
+
+    .info-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 40px 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.5s ease;
+      text-align: center;
+    }
+
+    .info-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .info-card h3 {
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+      font-weight: 400;
+      color: #ffccbb;
+    }
+
+    .info-card p {
+      font-weight: 300;
+      line-height: 1.7;
+      font-size: 1.1rem;
+    }
+
+    /* التذييل */
+    footer {
+      text-align: center;
+      padding: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-weight: 300;
+      opacity: 0.7;
+      font-size: 1rem;
+    }
+
+    /* التجاوب مع الشاشات المختلفة */
+    @media (max-width: 1200px) {
+      .main-container {
+        gap: 60px;
+      }
+      
+      .neural-image {
+        width: 400px;
+        height: 400px;
+      }
+      
+      .text-1, .text-2, .text-3, .text-4, .text-5, .text-6 {
+        display: none;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .main-container {
+        flex-direction: column;
+        gap: 50px;
+        text-align: center;
+      }
+      
+      .main-text {
+        text-align: center;
+        max-width: 700px;
+      }
+      
+      .neural-image {
+        width: 350px;
+        height: 350px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 15px 20px;
+      }
+
+      .nav-links {
+        gap: 15px;
+      }
+
+      .neural-image {
+        width: 300px;
+        height: 300px;
+      }
+
+      .main-text h1 {
+        font-size: 2.2rem;
+      }
+
+      .main-text p {
+        font-size: 1.1rem;
+      }
+
+      .info-section {
+        padding: 80px 20px;
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .neural-image {
+        width: 250px;
+        height: 250px;
+      }
+      
+      .main-text h1 {
+        font-size: 1.8rem;
+      }
+      
+      .main-text p {
+        font-size: 1rem;
+      }
+      
+      .icons {
+        gap: 20px;
+      }
+      
+      .icon {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- شريط التنقل -->
+    <nav class="navbar">
+        <div class="logo"><img src="awtadlogo1.png" alt="Awtad Logo"></div>
+        <div class="nav-links">
+            <a href="awtadhp.html">Home</a>
+            <a href="loginawtad.html">Log In</a>
+            <a href="signupawtad.html">Sign In</a>
+        </div>
+    </nav>
+
+  <!-- القسم الرئيسي -->
+  <section class="hero">
+    <div class="main-container">
+      <!-- صورة الأعصاب مع النص المحيط -->
+      <div class="neural-image-container">
+        <div class="neural-image">
+          
+        </div>
+      </div>
+
+      <!-- النص الرئيسي -->
+      <div class="main-text">
+          <h1>Revolutionizing Muscle Imbalance Analysis</h1>
+          <p>AWTAD utilizes cutting-edge EMG sensor technology to precisely measure and analyze muscle activity, helping athletes and patients achieve optimal physical performance and recovery.</p>
+          <p>Our advanced neural signal processing algorithms detect even the slightest imbalances, providing actionable insights for targeted interventions.</p>
+
+
+
+          <!-- زر الدعوة -->
+          <!-- <button class="cta-button">Discover Our System</button>-->
+      </div>
+    </div>
+  </section>
+
+  <!-- قسم المعلومات -->
+  <section class="info-section">
+    <div class="info-card">
+  <h3>Data Analytics</h3>
+  <p>Comprehensive data analysis and visualization tools to track progress and identify patterns in muscle activity over time.</p>
+</div>
+
+<div class="info-card">
+  <h3>Wireless Connectivity</h3>
+  <p>Seamless wireless data transmission from sensors to our platform, allowing freedom of movement during assessments.</p>
+</div>
+
+<div class="info-card">
+  <h3>Customized Reports</h3>
+  <p>Generate detailed personalized reports with actionable recommendations based on individual muscle performance data.</p>
+</div>
+
+<div class="info-card">
+  <h3>Multi-Muscle Monitoring</h3>
+  <p>Simultaneously track multiple muscle groups to provide a complete picture of muscular coordination and balance.</p>
+</div>
+
+<div class="info-card">
+  <h3>Mobile Integration</h3>
+  <p>Access your muscle data anytime, anywhere through our mobile application with real-time notifications and alerts.</p>
+</div>
+
+<div class="info-card">
+  <h3>Clinical Validation</h3>
+  <p>Our technology is clinically validated and trusted by healthcare professionals and sports medicine experts worldwide.</p>
+</div>
+  </section>
+
+  <!-- التذييل -->
+  <footer>
+    <p>&copy; 2023 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
+  </footer>
+
+  <script>
+    // جعل بطاقات المعلومات تظهر عند التمرير
+    document.addEventListener('DOMContentLoaded', function() {
+      const infoCards = document.querySelectorAll('.info-card');
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.2 });
+      
+      infoCards.forEach(card => {
+        observer.observe(card);
+      });
+    });
+  </script>
+</body>
+</html>

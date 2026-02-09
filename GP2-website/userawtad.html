@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWTAD - Exercise Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #4B3A57;
+      overflow-x: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+
+    /* Simplified background */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 182, 163, 0.25), transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 209, 179, 0.2), transparent 50%);
+      z-index: -1;
+    }
+
+    /* شريط التنقل */
+    .navbar {
+      position: static;
+      top: 0;
+      width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      background: rgba(75, 58, 87, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 182, 163, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      height: 100px;
+      margin: -15px 0;
+    }
+
+    .logo img {
+      height: 100%;
+      width: auto;
+      max-height: 100px;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 300;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a:hover {
+      color: #ffccbb;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 1px;
+      bottom: -5px;
+      left: 0;
+      background-color: #ffccbb;
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* Logout Button */
+    .logout-btn {
+      background: rgba(255, 182, 163, 0.3);
+      border: 1px solid rgba(255, 182, 163, 0.5);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 182, 163, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
+    }
+
+    /* لوحة التحكم */
+    .dashboard {
+      padding: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .dashboard-header {
+      margin-bottom: 40px;
+    }
+
+    .welcome-section {
+      margin-bottom: 30px;
+    }
+
+    .welcome-title {
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: #ffccbb;
+      margin-bottom: 10px;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 25px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
+      border-color: rgba(255, 182, 163, 0.4);
+    }
+
+    .action-btn.primary {
+      background: rgba(255, 182, 163, 0.3);
+      border: 1px solid rgba(255, 182, 163, 0.5);
+    }
+
+    .action-btn.primary:hover {
+      background: rgba(255, 182, 163, 0.4);
+    }
+
+    .action-btn i {
+      font-size: 1.2rem;
+    }
+
+    /* تمرينات القسم */
+    .exercises-section {
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 400;
+      color: #ffccbb;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .exercises-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 30px;
+    }
+
+    .exercise-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .exercise-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      border-color: rgba(255, 182, 163, 0.4);
+    }
+
+    .exercise-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .exercise-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #ffccbb;
+    }
+
+    .exercise-icon {
+      font-size: 2.5rem;
+      color: #ffccbb;
+      opacity: 0.9;
+    }
+
+    .exercise-description {
+      margin-bottom: 25px;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    .muscle-target {
+      margin-bottom: 25px;
+    }
+
+    .muscle-target-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 10px;
+      color: #ffccbb;
+    }
+
+    .muscle-target-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .muscle-tag {
+      background: rgba(255, 182, 163, 0.25);
+      border: 1px solid rgba(255, 182, 163, 0.4);
+      color: #ffccbb;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    .exercise-btn {
+      margin-top: auto;
+      padding: 12px 20px;
+      background: rgba(255, 182, 163, 0.3);
+      border: 1px solid rgba(255, 182, 163, 0.5);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .exercise-btn:hover {
+      background: rgba(255, 182, 163, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
+    }
+
+    /* إحصائيات سريعة */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+      border-color: rgba(255, 182, 163, 0.3);
+    }
+
+    .stat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .stat-card-title {
+      font-size: 1.1rem;
+      font-weight: 400;
+      opacity: 0.9;
+    }
+
+    .stat-card-icon {
+      font-size: 1.5rem;
+      color: #ffccbb;
+      opacity: 0.9;
+    }
+
+    .stat-card-value {
+      font-size: 2rem;
+      font-weight: 300;
+      margin-bottom: 10px;
+      color: #ffccbb;
+    }
+
+    .stat-card-change {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    /* مخطط التقدم */
+    .progress-section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 40px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .progress-title {
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: #ffccbb;
+    }
+
+    .chart-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chart-btn {
+      padding: 8px 15px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .chart-btn.active {
+      background: rgba(255, 182, 163, 0.3);
+      border-color: rgba(255, 182, 163, 0.5);
+    }
+
+    .chart-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .chart-wrapper {
+      height: 300px;
+      position: relative;
+    }
+
+    /* Muscle Imbalance Section */
+    .imbalance-section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .imbalance-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .imbalance-title {
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: #ffccbb;
+    }
+
+    .imbalance-icon {
+      font-size: 2rem;
+      color: #ffccbb;
+      opacity: 0.9;
+    }
+
+    .imbalance-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .imbalance-text {
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    /* VL Activation Stages */
+    .vl-stages {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .stage-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .stage-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 182, 163, 0.4);
+      background: rgba(255, 182, 163, 0.1);
+    }
+
+    .stage-number {
+      font-size: 2rem;
+      font-weight: 300;
+      color: #ffccbb;
+      margin-bottom: 10px;
+    }
+
+    .stage-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 15px;
+      color: #ffccbb;
+    }
+
+    .stage-status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 15px;
+    }
+
+    .stage-status.balanced {
+      background: rgba(100, 255, 100, 0.2);
+      color: #8dd3a1;
+      border: 1px solid rgba(100, 255, 100, 0.3);
+    }
+
+    .stage-status.imbalanced {
+      background: rgba(255, 100, 100, 0.2);
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 100, 100, 0.3);
+    }
+
+    .stage-percentage {
+      font-size: 1.8rem;
+      font-weight: 300;
+      color: #ffccbb;
+      margin-bottom: 10px;
+    }
+
+    .stage-percentage-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 15px;
+    }
+
+    .stage-progress {
+      margin-top: 10px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .stage-progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1s ease;
+    }
+
+    .stage-progress-fill.balanced {
+      background: linear-gradient(90deg, #8dd3a1, #a8e6a3);
+    }
+
+    .stage-progress-fill.imbalanced {
+      background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+    }
+
+    .learn-more-btn {
+      padding: 12px 25px;
+      background: rgba(255, 182, 163, 0.3);
+      border: 1px solid rgba(255, 182, 163, 0.5);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .learn-more-btn:hover {
+      background: rgba(255, 182, 163, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
+    }
+
+    /* التذييل */
+    footer {
+      text-align: center;
+      padding: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      font-weight: 300;
+      opacity: 0.8;
+      font-size: 1rem;
+    }
+
+    /* Logout Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: rgba(75, 58, 87, 0.95);
+      border-radius: 15px;
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      border: 1px solid rgba(255, 182, 163, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: #ffccbb;
+    }
+
+    .modal-text {
+      margin-bottom: 25px;
+      line-height: 1.5;
+      opacity: 0.9;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .modal-btn.cancel {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+
+    .modal-btn.cancel:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .modal-btn.confirm {
+      background: rgba(255, 182, 163, 0.3);
+      color: white;
+      border: 1px solid rgba(255, 182, 163, 0.5);
+    }
+
+    .modal-btn.confirm:hover {
+      background: rgba(255, 182, 163, 0.4);
+    }
+
+    /* التجاوب مع الشاشات المختلفة */
+    @media (max-width: 1024px) {
+      .dashboard {
+        padding: 30px;
+      }
+      
+      .exercises-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .vl-stages {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 15px 20px;
+      }
+
+      .nav-links {
+        gap: 15px;
+      }
+
+      .dashboard {
+        padding: 20px;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .action-btn {
+        justify-content: center;
+      }
+      
+      .progress-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .chart-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .modal-buttons {
+        flex-direction: column;
+      }
+      
+      .imbalance-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .vl-stages {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .welcome-title {
+        font-size: 1.8rem;
+      }
+      
+      .exercises-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .exercise-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- شريط التنقل -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="awtadlogo1.png" alt="Awtad Logo">
+    </div>
+    <div class="nav-links">
+      <a href="awtadhp.html">Home</a>
+      <a href="userawtad.html" style="color: #ffccbb;">Dashboard</a>
+      <a href="sesstionsawtad.html">Sessions</a>
+      <a href="profileawtad.html">Profile</a>
+      <a href="#">Settings</a>
+      <button id="logoutBtn" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
+      </button>
+    </div>
+  </nav>
+
+  <!-- لوحة التحكم -->
+  <section class="dashboard">
+    <div class="dashboard-header">
+      <div class="welcome-section">
+        <h1 class="welcome-title">Welcome, Norah</h1>
+        <p class="welcome-subtitle">Your journey toward smarter, stronger, and more accurate movement continues—analyze your activation data and train with precision every session!</p>
+      </div>
+      
+      <div class="action-buttons">
+        <button class="action-btn primary" onclick="window.location.href='startsesstionawtad.html'">
+          <i class="fas fa-play-circle"></i>
+          Start Session
+        </button>
+        <button class="action-btn" onclick="window.location.href='lastsessionawtad.html'">
+          <i class="fas fa-history"></i>
+          Last Session
+        </button>
+        <button class="action-btn" onclick="window.location.href='profileawtad.html'">
+          <i class="fas fa-user"></i>
+          Profile 
+        </button>
+      </div>
+    </div>
+
+    <!-- تمرينات القسم -->
+    <div class="exercises-section">
+      <h2 class="section-title">Last Session Statistics</h2>
+      <div class="exercises-grid">
+        <div class="exercise-card">
+          <div class="exercise-header">
+            <h3 class="exercise-title">Squat Analysis</h3>
+            <div class="exercise-icon">
+              <i class="fas fa-running"></i>
+            </div>
+          </div>
+          <p class="exercise-description">
+            Your squat session showed excellent overall form with consistent muscle activation patterns.
+            Focus on maintaining equal pressure distribution during the concentric phase.
+          </p>
+          <div class="muscle-target">
+            <h4 class="muscle-target-title">VL Muscle Activation Imbalance</h4>
+            <div class="muscle-target-list">
+              <span class="muscle-tag">Imbalance: 8%</span>
+              <span class="muscle-tag">Right VL: 88%</span>
+              <span class="muscle-tag">Left VL: 80%</span>
+              <span class="muscle-tag">Target: ≤5%</span>
+            </div>
+          </div>
+          
+          <!-- VL Activation Stages -->
+          <div class="muscle-target">
+            <h4 class="muscle-target-title">VL Activation Stages</h4>
+            <div class="vl-stages">
+              <div class="stage-card">
+                <div class="stage-number">1</div>
+                <div class="stage-title">Descent Phase</div>
+                <div class="stage-status balanced">Balanced</div>
+                <div class="stage-percentage">3%</div>
+                <div class="stage-percentage-label">Imbalance Level</div>
+                <div class="stage-progress">
+                  <div class="stage-progress-fill balanced" style="width: 97%"></div>
+                </div>
+              </div>
+              <div class="stage-card">
+                <div class="stage-number">2</div>
+                <div class="stage-title">Bottom Position</div>
+                <div class="stage-status imbalanced">Imbalanced</div>
+                <div class="stage-percentage">12%</div>
+                <div class="stage-percentage-label">Imbalance Level</div>
+                <div class="stage-progress">
+                  <div class="stage-progress-fill imbalanced" style="width: 88%"></div>
+                </div>
+              </div>
+              <div class="stage-card">
+                <div class="stage-number">3</div>
+                <div class="stage-title">Ascent Phase</div>
+                <div class="stage-status imbalanced">Imbalanced</div>
+                <div class="stage-percentage">9%</div>
+                <div class="stage-percentage-label">Imbalance Level</div>
+                <div class="stage-progress">
+                  <div class="stage-progress-fill imbalanced" style="width: 91%"></div>
+                </div>
+              </div>
+              <div class="stage-card">
+                <div class="stage-number">4</div>
+                <div class="stage-title">Lockout Phase</div>
+                <div class="stage-status balanced">Balanced</div>
+                <div class="stage-percentage">2%</div>
+                <div class="stage-percentage-label">Imbalance Level</div>
+                <div class="stage-progress">
+                  <div class="stage-progress-fill balanced" style="width: 98%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <button class="exercise-btn" onclick="selectExercise('squat')">
+            View More
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Muscle Imbalance Information Section -->
+    <div class="imbalance-section">
+      <div class="imbalance-header">
+        <h2 class="imbalance-title">VL Muscle Activation Analysis</h2>
+        <div class="imbalance-icon">
+          <i class="fas fa-balance-scale"></i>
+        </div>
+      </div>
+      <div class="imbalance-content">
+        <div class="imbalance-text">
+          <p><strong>Vastus Lateralis (VL) Muscle</strong> is a key quadriceps muscle crucial for knee extension and stability. 
+          Balanced VL activation is essential for proper squat mechanics and injury prevention.</p>
+          
+          <p><strong>Current Status:</strong> Your VL activation shows an 8% overall imbalance favoring the right side.
+          This is an improvement from your previous 15% imbalance. Continue focusing on unilateral exercises to address this.</p>
+          
+          <p><strong>Stage Analysis:</strong> You have good balance in the descent and lockout phases, but need improvement in the bottom position and ascent phase.</p>
+        </div>
+        <button class="learn-more-btn" onclick="showImbalanceDetails()">
+          <i class="fas fa-book"></i>
+          Learn More About VL Activation Balance
+        </button>
+      </div>
+    </div>
+
+    <!-- إحصائيات سريعة -->
+    <div class="stats-section">
+      <h2 class="section-title">Your Progress</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <h3 class="stat-card-title">Sessions Completed</h3>
+            <div class="stat-card-icon">
+              <i class="fas fa-dumbbell"></i>
+            </div>
+          </div>
+          <div class="stat-card-value">24</div>
+          <div class="stat-card-change">
+            <i class="fas fa-check-circle"></i>
+            <span>Consistent training</span>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <h3 class="stat-card-title">VL Balance Improvement</h3>
+            <div class="stat-card-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+          </div>
+          <div class="stat-card-value">47%</div>
+          <div class="stat-card-change">
+            <i class="fas fa-arrow-up"></i>
+            <span>From 15% to 8%</span>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <h3 class="stat-card-title">Avg. Session Duration</h3>
+            <div class="stat-card-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+          </div>
+          <div class="stat-card-value">42m</div>
+          <div class="stat-card-change">
+            <i class="fas fa-check-circle"></i>
+            <span>Optimal training time</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- مخطط التقدم -->
+    <div class="progress-section">
+      <div class="progress-header">
+        <h2 class="progress-title">VL Muscle Balance Progress</h2>
+        <div class="chart-actions">
+          <button class="chart-btn active" onclick="changeChartPeriod('month')">1 Month</button>
+          <button class="chart-btn" onclick="changeChartPeriod('3months')">3 Months</button>
+          <button class="chart-btn" onclick="changeChartPeriod('6months')">6 Months</button>
+        </div>
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="progressChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <h3 class="modal-title">Confirm Logout</h3>
+      <p class="modal-text">Are you sure you want to log out? You'll need to log in again to access your account.</p>
+      <div class="modal-buttons">
+        <button id="cancelLogout" class="modal-btn cancel">Cancel</button>
+        <button id="confirmLogout" class="modal-btn confirm" onclick="window.location.href='loginawtad.html'">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VL Imbalance Details Modal -->
+  <div id="imbalanceModal" class="modal">
+    <div class="modal-content">
+      <h3 class="modal-title">VL Muscle Activation Details</h3>
+      <div class="modal-text" style="text-align: left;">
+        <p><strong>What is VL Muscle Imbalance?</strong></p>
+        <p>Unequal activation of the Vastus Lateralis muscles between legs during movement, often caused by:</p>
+        <ul style="margin: 10px 0 15px 20px;">
+          <li>Dominant leg preference</li>
+          <li>Previous knee injuries</li>
+          <li>Muscle tightness/weakness</li>
+          <li>Biomechanical asymmetries</li>
+        </ul>
+        
+        <p><strong>The 4 Activation Stages:</strong></p>
+        <ol style="margin: 10px 0 15px 20px;">
+          <li><strong>Descent Phase:</strong> Initial loading pattern (Balanced: ≤5% difference)</li>
+          <li><strong>Bottom Position:</strong> Maximum muscle engagement (Imbalanced: ≥8% difference)</li>
+          <li><strong>Ascent Phase:</strong> Power generation phase (Imbalanced: ≥8% difference)</li>
+          <li><strong>Lockout Phase:</strong> Full extension completion (Balanced: ≤5% difference)</li>
+        </ol>
+        
+        <p><strong>Recommended Exercises:</strong></p>
+        <ul style="margin: 10px 0 15px 20px;">
+          <li>Single-leg squats</li>
+          <li>Bulgarian split squats</li>
+          <li>Step-ups with focus on weaker side</li>
+          <li>Leg extensions with emphasis on control</li>
+        </ul>
+      </div>
+      <div class="modal-buttons">
+        <button id="closeImbalanceModal" class="modal-btn confirm">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- التذييل -->
+  <footer>
+    <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
+  </footer>
+
+  <script>
+    // ألوان الخوخ المطفأة
+    const peachColors = {
+      primary: '#ffb6a3',
+      secondary: '#ffd1b3',
+      tertiary: '#ffdfc4',
+      light: '#ffe8d6',
+      dark: '#e6a491'
+    };
+
+    // Logout Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutBtn = document.getElementById('logoutBtn');
+      const logoutModal = document.getElementById('logoutModal');
+      const cancelLogout = document.getElementById('cancelLogout');
+      const confirmLogout = document.getElementById('confirmLogout');
+      
+      // Muscle Imbalance Modal
+      const imbalanceModal = document.getElementById('imbalanceModal');
+      const closeImbalanceModal = document.getElementById('closeImbalanceModal');
+
+      // Show logout confirmation modal
+      logoutBtn.addEventListener('click', function() {
+        logoutModal.classList.add('active');
+      });
+
+      // Hide logout confirmation modal
+      cancelLogout.addEventListener('click', function() {
+        logoutModal.classList.remove('active');
+      });
+
+      // Handle logout confirmation
+      confirmLogout.addEventListener('click', function() {
+        logoutModal.classList.remove('active');
+      });
+
+      // Close imbalance modal
+      closeImbalanceModal.addEventListener('click', function() {
+        imbalanceModal.classList.remove('active');
+      });
+
+      // Close modals when clicking outside
+      [logoutModal, imbalanceModal].forEach(modal => {
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) {
+            modal.classList.remove('active');
+          }
+        });
+      });
+      
+      // Initialize chart
+      initializeProgressChart();
+    });
+
+    // Show muscle imbalance details
+    function showImbalanceDetails() {
+      document.getElementById('imbalanceModal').classList.add('active');
+    }
+
+    // مخطط التقدم
+    let progressChart;
+
+    function initializeProgressChart() {
+      const progressCtx = document.getElementById('progressChart').getContext('2d');
+      
+      progressChart = new Chart(progressCtx, {
+        type: 'line',
+        data: {
+          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+          datasets: [
+            {
+              label: 'VL Imbalance % (Lower is better)',
+              data: [15, 12, 10, 8],
+              borderColor: peachColors.primary,
+              backgroundColor: 'rgba(255, 182, 163, 0.15)',
+              tension: 0.3,
+              fill: true,
+              borderWidth: 3,
+              pointBackgroundColor: peachColors.primary,
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: 'white',
+                font: {
+                  size: 14,
+                  family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                }
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(75, 58, 87, 0.95)',
+              titleColor: peachColors.light,
+              bodyColor: 'white',
+              borderColor: peachColors.primary,
+              borderWidth: 1,
+              cornerRadius: 8,
+              callbacks: {
+                label: function(context) {
+                  return `VL Imbalance: ${context.raw}%`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 25,
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'white',
+                callback: function(value) {
+                  return value + '%';
+                },
+                font: {
+                  size: 12
+                }
+              },
+              title: {
+                display: true,
+                text: 'Imbalance Percentage',
+                color: 'white',
+                font: {
+                  size: 13,
+                  weight: 'normal'
+                }
+              }
+            },
+            x: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'white',
+                font: {
+                  size: 12
+                }
+              }
+            }
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          },
+          animations: {
+            tension: {
+              duration: 1000,
+              easing: 'linear'
+            }
+          }
+        }
+      });
+    }
+
+    function changeChartPeriod(period) {
+      // Update active button
+      document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      let labels, data;
+      
+      switch(period) {
+        case '3months':
+          labels = ['Month 1', 'Month 2', 'Month 3'];
+          data = [18, 13, 8];
+          break;
+        case '6months':
+          labels = ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6'];
+          data = [22, 19, 16, 13, 10, 8];
+          break;
+        default: // 1 month
+          labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+          data = [15, 12, 10, 8];
+      }
+      
+      progressChart.data.labels = labels;
+      progressChart.data.datasets[0].data = data;
+      progressChart.update();
+    }
+
+    // بدء الجلسة
+    function startSession() {
+      window.location.href = 'start-session.html';
+    }
+
+    // اختيار التمرين
+    function selectExercise(exerciseType) {
+      if (exerciseType === 'squat') {
+        window.location.href = 'session-detail.html?exercise=squat';
+      }
+    }
+
+    // إضافة تأثيرات للبطاقات عند التمرير
+    document.addEventListener('DOMContentLoaded', function() {
+      const cards = document.querySelectorAll('.exercise-card, .stat-card, .progress-section, .imbalance-section, .stage-card');
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      cards.forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(card);
+      });
+    });
+  </script>
+</body>
+</html>

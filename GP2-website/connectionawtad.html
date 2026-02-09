@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWTAD - Sensor Placement</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #4B3A57;
+      overflow-x: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+
+    /* Simplified background */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 182, 163, 0.25), transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 209, 179, 0.2), transparent 50%);
+      z-index: -1;
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      position: static;
+      top: 0;
+      width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      background: rgba(75, 58, 87, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 182, 163, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      height: 100px;
+      margin: -15px 0;
+    }
+
+    .logo img {
+      height: 100%;
+      width: auto;
+      max-height: 100px;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 300;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a:hover {
+      color: #ffccbb;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 1px;
+      bottom: -5px;
+      left: 0;
+      background-color: #ffccbb;
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* Logout Button */
+    .logout-btn {
+      background: rgba(255, 182, 163, 0.3);
+      border: 1px solid rgba(255, 182, 163, 0.5);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 182, 163, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
+    }
+
+    /* Dashboard */
+    .dashboard {
+      padding: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .dashboard-title {
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: #ffccbb;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 20px;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 25px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
+      border-color: rgba(255, 182, 163, 0.4);
+    }
+
+    .action-btn.primary {
+      background: rgba(255, 182, 163, 0.3);
+      border: 1px solid rgba(255, 182, 163, 0.5);
+    }
+
+    .action-btn.primary:hover {
+      background: rgba(255, 182, 163, 0.4);
+    }
+
+    .action-btn.stop {
+      background: rgba(255, 100, 100, 0.3);
+      border: 1px solid rgba(255, 100, 100, 0.5);
+    }
+
+    .action-btn.stop:hover {
+      background: rgba(255, 100, 100, 0.4);
+    }
+
+    .action-btn i {
+      font-size: 1.2rem;
+    }
+
+    /* Session Container */
+    .session-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 1024px) {
+      .session-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Session Info */
+    .session-info {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .info-header {
+      margin-bottom: 25px;
+    }
+
+    .info-title {
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: #ffccbb;
+      margin-bottom: 10px;
+    }
+
+    .info-description {
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .info-steps {
+      margin-top: 30px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .step-number {
+      background: rgba(255, 182, 163, 0.3);
+      border: 1px solid rgba(255, 182, 163, 0.5);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      color: white;
+    }
+
+    .step-content h4 {
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+      color: #ffccbb;
+    }
+
+    .step-content p {
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+
+    /* Exercise Instructions */
+    .exercise-instructions {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 30px;
+    }
+
+    .exercise-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .exercise-title {
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: #ffccbb;
+    }
+
+    .exercise-muscle {
+      padding: 5px 15px;
+      background: rgba(255, 182, 163, 0.25);
+      border-radius: 20px;
+      font-size: 0.9rem;
+      color: #ffccbb;
+    }
+
+    .exercise-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .exercise-details {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .exercise-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .exercise-step {
+      display: flex;
+      gap: 15px;
+    }
+
+    .exercise-step-number {
+      background: rgba(255, 255, 255, 0.15);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      color: white;
+    }
+
+    .exercise-step-content h4 {
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+      color: #ffccbb;
+    }
+
+    .exercise-step-content p {
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+
+    .exercise-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .exercise-image {
+      width: 100%;
+      max-width: 300px;
+      height: 200px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Sensor Placement */
+    .sensor-placement {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 30px;
+    }
+
+    .sensor-header {
+      margin-bottom: 25px;
+    }
+
+    .sensor-title {
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: #ffccbb;
+      margin-bottom: 10px;
+    }
+
+    .sensor-description {
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .sensor-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .sensor-image {
+      width: 100%;
+      max-width: 400px;
+      height: 250px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .sensor-positions {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .sensor-position {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sensor-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255, 182, 163, 0.8);
+      box-shadow: 0 0 10px rgba(255, 182, 163, 0.5);
+    }
+
+    .sensor-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    /* Connection Section */
+    .connection-section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 30px;
+    }
+
+    .connection-header {
+      margin-bottom: 25px;
+    }
+
+    .connection-title {
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: #ffccbb;
+      margin-bottom: 10px;
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ff9e9e;
+    }
+
+    .status-indicator.connected {
+      background: #8dd3a1;
+    }
+
+    .connection-controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    /* Live Signal Display */
+    .signal-display {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 40px;
+      display: none;
+    }
+
+    .signal-display.active {
+      display: block;
+    }
+
+    .signal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .signal-title {
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: #ffccbb;
+    }
+
+    .signal-canvas-container {
+      height: 300px;
+      position: relative;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .signal-canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .recording-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      color: rgba(255, 182, 163, 0.8);
+      display: none;
+    }
+
+    .recording-indicator.active {
+      display: block;
+    }
+
+    /* Session Controls */
+    .session-controls {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    /* Status Message */
+    .status-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      background: rgba(255, 182, 163, 0.9);
+      color: #4B3A57;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      z-index: 1001;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      max-width: 400px;
+    }
+
+    .status-message.active {
+      display: flex;
+      animation: fadeInOut 3s ease;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(-20px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-20px); }
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      font-weight: 300;
+      opacity: 0.8;
+      font-size: 1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .dashboard {
+        padding: 30px;
+      }
+      
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .action-buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 15px 20px;
+      }
+
+      .nav-links {
+        gap: 15px;
+      }
+
+      .dashboard {
+        padding: 20px;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .action-btn {
+        justify-content: center;
+      }
+      
+      .sensor-positions {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .session-controls {
+        flex-direction: column;
+      }
+
+      .status-message {
+        left: 20px;
+        right: 20px;
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dashboard-title {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Status Message -->
+  <div class="status-message" id="statusMessage">
+    <i class="fas fa-info-circle"></i>
+    <span id="messageText"></span>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+      <div class="logo"><img src="awtadlogo1.png" alt="Awtad Logo"></div>
+      <div class="nav-links">
+          <a href="awtadhp.html">Home</a>
+          <a href="userawtad.html">Dashboard</a>
+          <a href="sessionsawtad.html" style="color: #ffccbb;">Sessions</a>
+          <a href="profileawtad.html">Profile</a>
+          <!-- Added Logout Button -->
+          <button class="logout-btn">
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
+          </button>
+      </div>
+  </nav>
+
+  <!-- Dashboard -->
+  <section class="dashboard">
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">Sensor Placement & Connection</h1>
+      <div class="action-buttons">
+        <button class="action-btn" id="backBtn" onclick="window.location.href='startsesstionawtad.html'" >
+          <i class="fas fa-arrow-left"></i>
+          Back to Selection
+        </button>
+        <button class="action-btn">
+          <i class="fas fa-question-circle"></i>
+          Help
+        </button>
+      </div>
+    </div>
+
+    <!-- Exercise Instructions -->
+    <div class="exercise-instructions">
+      <div class="exercise-header">
+        <h2 class="exercise-title" id="exerciseTitle">Exercise: Squat Analysis</h2>
+        <div class="exercise-muscle" id="currentMuscle">Vastus Lateralis (VL)</div>
+      </div>
+      
+      <div class="exercise-details">
+        <div class="exercise-steps">
+          <div class="exercise-step">
+            <div class="exercise-step-number">1</div>
+            <div class="exercise-step-content">
+              <h4>Starting Position</h4>
+              <p>Stand with feet shoulder-width apart, toes pointing slightly outward.</p>
+            </div>
+          </div>
+          
+          <div class="exercise-step">
+            <div class="exercise-step-number">2</div>
+            <div class="exercise-step-content">
+              <h4>Movement Phase</h4>
+              <p>Lower your body by bending knees and hips, keeping chest up and back straight.</p>
+            </div>
+          </div>
+          
+          <div class="exercise-step">
+            <div class="exercise-step-number">3</div>
+            <div class="exercise-step-content">
+              <h4>Depth</h4>
+              <p>Descend until thighs are parallel to the ground or as deep as comfortable.</p>
+            </div>
+          </div>
+          
+          <div class="exercise-step">
+            <div class="exercise-step-number">4</div>
+            <div class="exercise-step-content">
+              <h4>Return</h4>
+              <p>Push through heels to return to starting position, squeezing glutes at the top.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="exercise-visual">
+          <div class="exercise-image">
+            <i class="fas fa-running"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sensor Placement -->
+    <div class="sensor-placement">
+      <div class="sensor-header">
+        <h2 class="sensor-title">Sensor Placement Guide</h2>
+        <p class="sensor-description">
+          Place the EMG sensors on both legs as shown below. Ensure the skin is clean and dry before application.
+        </p>
+      </div>
+      
+      <div class="sensor-visual">
+        <div class="sensor-image">
+          <i class="fas fa-user"></i>
+        </div>
+        
+        <div class="sensor-positions">
+          <div class="sensor-position">
+            <div class="sensor-dot"></div>
+            <div class="sensor-label">Left VL</div>
+          </div>
+          
+          <div class="sensor-position">
+            <div class="sensor-dot"></div>
+            <div class="sensor-label">Right VL</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connection Section -->
+    <div class="connection-section">
+      <div class="connection-header">
+        <h2 class="connection-title">Device Connection</h2>
+        <div class="connection-status">
+          <div class="status-indicator" id="statusIndicator"></div>
+          <span id="statusText">Disconnected - Place sensors and click Connect</span>
+        </div>
+      </div>
+      
+      <div class="connection-controls">
+        <button class="action-btn primary" id="connectBtn">
+          <i class="fas fa-plug"></i>
+          Connect Sensors
+        </button>
+      </div>
+      
+      <div class="info-steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Place Sensors Correctly</h4>
+            <p>Ensure sensors are firmly attached to clean, dry skin at the muscle belly.</p>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Connect to Device</h4>
+            <p>Click "Connect Sensors" to establish connection with the EMG sensors.</p>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Start Session</h4>
+            <p>Click "Start Session" to begin recording your muscle activity.</p>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h4>Perform Exercise</h4>
+            <p>Start performing the exercise for us to we analyze your muscle activation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Signal Display -->
+    <div class="signal-display" id="signalDisplay">
+      <div class="signal-header">
+        <h2 class="signal-title">signals recording</h2>
+      </div>
+      
+      <div class="signal-canvas-container">
+        <canvas class="signal-canvas" id="signalCanvas"></canvas>
+      </div>
+      
+      <!-- Session Controls -->
+      <div class="session-controls">
+        <button class="action-btn primary" id="startSessionBtn">
+          <i class="fas fa-play-circle"></i>
+          Start Session
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+   <footer>
+    <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
+  </footer>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const connectBtn = document.getElementById('connectBtn');
+      const statusIndicator = document.getElementById('statusIndicator');
+      const statusText = document.getElementById('statusText');
+      const signalDisplay = document.getElementById('signalDisplay');
+      const signalCanvas = document.getElementById('signalCanvas');
+      const startSessionBtn = document.getElementById('startSessionBtn');
+      const backBtn = document.getElementById('backBtn');
+      const exerciseTitle = document.getElementById('exerciseTitle');
+      const currentMuscle = document.getElementById('currentMuscle');
+      const statusMessage = document.getElementById('statusMessage');
+      const messageText = document.getElementById('messageText');
+      
+      let isConnected = false;
+      let isSessionActive = false;
+      let animationId;
+      
+      // Get URL parameters to determine selected exercise
+      const urlParams = new URLSearchParams(window.location.search);
+      const exercise = urlParams.get('exercise') || 'squat';
+      
+      // Exercise data
+      const exerciseData = {
+        squat: {
+          name: 'Squat Analysis',
+          muscle: 'Vastus Lateralis (VL)',
+          steps: [
+            'Stand with feet shoulder-width apart, toes pointing slightly outward.',
+            'Lower your body by bending knees and hips, keeping chest up and back straight.',
+            'Descend until thighs are parallel to the ground or as deep as comfortable.',
+            'Push through heels to return to starting position, squeezing glutes at the top.'
+          ],
+          sensorPositions: ['Left VL', 'Right VL']
+        },
+        jump: {
+          name: 'Jump Analysis',
+          muscle: 'Medial Gastrocnemius',
+          steps: [
+            'Stand with feet shoulder-width apart, arms at your sides.',
+            'Bend knees slightly and prepare for explosive movement.',
+            'Push through balls of feet and explode upward into a jump.',
+            'Land softly with bent knees to absorb impact.'
+          ],
+          sensorPositions: ['Left Calf', 'Right Calf']
+        }
+      };
+      
+      // Update page content based on selected exercise
+      if (exerciseData[exercise]) {
+        exerciseTitle.textContent = `Exercise: ${exerciseData[exercise].name}`;
+        currentMuscle.textContent = exerciseData[exercise].muscle;
+        
+        // Update sensor positions
+        const sensorPositions = document.querySelector('.sensor-positions');
+        sensorPositions.innerHTML = '';
+        exerciseData[exercise].sensorPositions.forEach(position => {
+          const sensorPosition = document.createElement('div');
+          sensorPosition.className = 'sensor-position';
+          sensorPosition.innerHTML = `
+            <div class="sensor-dot"></div>
+            <div class="sensor-label">${position}</div>
+          `;
+          sensorPositions.appendChild(sensorPosition);
+        });
+        
+        // Update exercise steps
+        const exerciseSteps = document.querySelector('.exercise-steps');
+        exerciseSteps.innerHTML = '';
+        exerciseData[exercise].steps.forEach((step, index) => {
+          const exerciseStep = document.createElement('div');
+          exerciseStep.className = 'exercise-step';
+          exerciseStep.innerHTML = `
+            <div class="exercise-step-number">${index + 1}</div>
+            <div class="exercise-step-content">
+              <h4>${['Starting Position', 'Movement Phase', 'Execution', 'Completion'][index] || 'Step ' + (index + 1)}</h4>
+              <p>${step}</p>
+            </div>
+          `;
+          exerciseSteps.appendChild(exerciseStep);
+        });
+      }
+      
+      // Show status message
+      function showMessage(text) {
+        messageText.textContent = text;
+        statusMessage.classList.add('active');
+        setTimeout(() => {
+          statusMessage.classList.remove('active');
+        }, 3000);
+      }
+      
+      // Connect sensors
+      connectBtn.addEventListener('click', function() {
+        if (!isConnected) {
+          // Simulate connection process
+          connectBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+          connectBtn.disabled = true;
+          
+          setTimeout(() => {
+            isConnected = true;
+            statusIndicator.classList.add('connected');
+            statusText.textContent = 'Connected - Ready to start session';
+            connectBtn.innerHTML = '<i class="fas fa-plug"></i> Disconnect';
+            connectBtn.disabled = false;
+            
+            // Show signal display
+            signalDisplay.classList.add('active');
+            
+            // Show success message
+            showMessage('Sensors connected successfully!');
+          }, 2000);
+        } else {
+          // Disconnect
+          isConnected = false;
+          isSessionActive = false;
+          statusIndicator.classList.remove('connected');
+          statusText.textContent = 'Disconnected - Place sensors and click Connect';
+          connectBtn.innerHTML = '<i class="fas fa-plug"></i> Connect Sensors';
+          signalDisplay.classList.remove('active');
+          startSessionBtn.innerHTML = '<i class="fas fa-play-circle"></i> Start Session';
+          startSessionBtn.classList.remove('stop');
+          startSessionBtn.classList.add('primary');
+          
+          // Stop signal visualization
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+          }
+          
+          // Show message
+          showMessage('Sensors disconnected.');
+        }
+      });
+      
+      // Start/Stop/Restart session
+      startSessionBtn.addEventListener('click', function() {
+        if (!isConnected) {
+          showMessage('Please connect sensors first.');
+          return;
+        }
+        
+        if (!isSessionActive) {
+          // Start session
+          isSessionActive = true;
+          startSessionBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Session';
+          startSessionBtn.classList.remove('primary');
+          startSessionBtn.classList.add('stop');
+          statusText.textContent = 'Session Active - Performing exercise';
+          
+          // Start signal visualization
+          startSignalVisualization();
+          
+          // Show message
+          showMessage('Session started! Perform the exercise while we monitor your muscle activity.');
+        } else {
+          // Stop session
+          isSessionActive = false;
+          startSessionBtn.innerHTML = '<i class="fas fa-redo"></i> Restart Session';
+          startSessionBtn.classList.remove('stop');
+          startSessionBtn.classList.add('primary');
+          statusText.textContent = 'Session Stopped - Ready to restart';
+          
+          // Stop signal visualization
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+          }
+          
+          // Show message
+          showMessage('Session stopped. You can restart the session.');
+        }
+      });
+      
+      // Back button
+      backBtn.addEventListener('click', function() {
+        window.location.href = 'startsesstionawtad.html';
+      });
+      
+      // Signal visualization
+      function startSignalVisualization() {
+        const canvas = signalCanvas;
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas dimensions
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Initialize signal data
+        let time = 0;
+        const leftSignal = [];
+        const rightSignal = [];
+        
+        // Draw function
+        function draw() {
+          ctx.clearRect(0, 0, width, height);
+          
+          // Draw grid
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+          ctx.lineWidth = 1;
+          
+          // Horizontal lines
+          for (let y = 0; y < height; y += height / 10) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(width, y);
+            ctx.stroke();
+          }
+          
+          // Vertical lines
+          for (let x = 0; x < width; x += width / 20) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+            ctx.stroke();
+          }
+          
+          // Generate new data points
+          time += 0.05;
+          
+          // Left signal (more active - simulating imbalance)
+          const leftAmplitude = 0.7 + 0.3 * Math.sin(time * 0.5);
+          const leftValue = Math.sin(time * 3) * leftAmplitude * (height / 4) + (height / 4);
+          leftSignal.push({ x: time, y: leftValue });
+          
+          // Right signal (less active - simulating imbalance)
+          const rightAmplitude = 0.4 + 0.2 * Math.sin(time * 0.3);
+          const rightValue = Math.sin(time * 3 + 0.5) * rightAmplitude * (height / 4) + (3 * height / 4);
+          rightSignal.push({ x: time, y: rightValue });
+          
+          // Remove old data points
+          if (leftSignal.length > 200) {
+            leftSignal.shift();
+            rightSignal.shift();
+          }
+          
+          // Draw left signal
+          ctx.strokeStyle = 'rgba(255, 182, 163, 0.8)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let i = 0; i < leftSignal.length; i++) {
+            const x = (i / leftSignal.length) * width;
+            const y = leftSignal[i].y;
+            
+            if (i === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+          }
+          ctx.stroke();
+          
+          // Draw right signal
+          ctx.strokeStyle = 'rgba(141, 211, 161, 0.8)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let i = 0; i < rightSignal.length; i++) {
+            const x = (i / rightSignal.length) * width;
+            const y = rightSignal[i].y;
+            
+            if (i === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+          }
+          ctx.stroke();
+          
+          // Continue animation
+          animationId = requestAnimationFrame(draw);
+        }
+        
+        // Start animation
+        draw();
+      }
+    });
+  </script>
+</body>
+</html>
