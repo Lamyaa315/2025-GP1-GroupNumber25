@@ -14,7 +14,7 @@
     .logo { display: flex; align-items: center; height: 100px; margin: -15px 0; }
     .logo img { height: 100%; width: auto; max-height: 100px; object-fit: contain; }
     .nav-links { display: flex; gap: 30px; }
-    .nav-links a { color: white; text-decoration: none; font-weight: 300; transition: all 0.3s x; position: relative; }
+    .nav-links a { color: white; text-decoration: none; font-weight: 300; transition: all 0.3s ease; position: relative; }
     .nav-links a:hover { color: #ffccbb; }
 
     .signup-container { display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 160px); padding: 40px; }
@@ -27,7 +27,6 @@
     .form-input { width: 100%; padding: 12px 15px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white; font-size: 1rem; transition: all 0.3s ease; }
     .form-input:focus { outline: none; border-color: rgba(255, 182, 163, 0.5); }
 
-    /* التنسيقات الخاصة بنوع الحساب */
     .user-type-container { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .user-type-options { display: flex; gap: 15px; margin-top: 10px; }
     .user-type-option { flex: 1; text-align: center; }
@@ -35,7 +34,6 @@
     .user-type-option label { display: block; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; cursor: pointer; transition: 0.3s; }
     .user-type-option input[type="radio"]:checked + label { background: rgba(255, 182, 163, 0.3); border-color: #ffccbb; color: #ffccbb; }
 
-    /* حقل التخصص المخفي افتراضياً */
     #specialty-group { display: none; }
 
     .password-container { position: relative; }
@@ -47,6 +45,7 @@
 
     .signup-btn { width: 100%; padding: 14px; background: rgba(255, 182, 163, 0.8); border: none; border-radius: 8px; color: #4B3A57; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
     .signup-btn:hover { background: rgba(255, 182, 163, 1); transform: translateY(-3px); }
+    .signup-btn:disabled { background: #ccc; cursor: not-allowed; }
     footer { text-align: center; padding: 40px; opacity: 0.7; }
   </style>
 </head>
@@ -145,7 +144,6 @@
     const specialtyInput = document.getElementById('specialty');
     const userTypeRadios = document.querySelectorAll('input[name="userType"]');
 
-    // إظهار/إخفاء حقل التخصص بناءً على الاختيار
     userTypeRadios.forEach(radio => {
       radio.addEventListener('change', (e) => {
         if (e.target.value === 'coach') {
@@ -158,7 +156,6 @@
       });
     });
 
-    // إظهار وإخفاء كلمة المرور
     document.querySelectorAll('.password-toggle').forEach(btn => {
       btn.addEventListener('click', function() {
         const input = this.previousElementSibling;
@@ -168,7 +165,6 @@
       });
     });
 
-    // التحقق من قوة كلمة المرور
     passwordInput.addEventListener('input', function() {
       const val = this.value;
       document.getElementById('passwordRequirements').classList.add('show');
@@ -180,16 +176,18 @@
 
     function updateReq(id, isValid) {
       const el = document.getElementById(id);
-      el.classList.toggle('valid', isValid);
-      el.querySelector('i').className = isValid ? 'fas fa-check' : 'fas fa-times';
+      if (el) {
+        el.classList.toggle('valid', isValid);
+        el.querySelector('i').className = isValid ? 'fas fa-check' : 'fas fa-times';
+      }
     }
 
-    // منطق التسجيل
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const fullName = document.getElementById('fullname').value;
       const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value; // جلب رقم الهاتف
       const password = passwordInput.value;
       const userType = document.querySelector('input[name="userType"]:checked').value;
       const specialty = specialtyInput.value;
@@ -204,7 +202,10 @@
       submitBtn.disabled = true;
 
       try {
-        const { data, error: authError } = await supabase.auth.signUp({
+        // تأكدي أن window.supabase معرف في ملف supabase-config.js
+        const client = window.supabase ;
+        
+        const { data, error: authError } = await client.auth.signUp({
           email: email,
           password: password,
         });
@@ -219,26 +220,27 @@
           const tableName = (userType === 'coach') ? 'Coach' : 'Client';
           const idCol = (userType === 'coach') ? 'coach_id' : 'client_id';
 
-          // تجهيز البيانات للإرسال
+          // تجهيز البيانات مع عمود Phone_Number
           const insertData = {
             [idCol]: data.user.id,
             Fname: fname,
             Lname: lname,
-            email: email
+            email: email,
+            Phone_Number: phone // إضافة رقم الهاتف هنا
           };
 
-          // إذا كان كوتش، أضف حقل التخصص (تأكد أن اسم العمود في قاعدة البيانات هو Specialty)
           if (userType === 'coach') {
             insertData.Specialty = specialty;
           }
+          
 
-          const { error: dbError } = await supabase
+          const { error: dbError } = await client
             .from(tableName)
             .insert([insertData]);
 
           if (dbError) throw dbError;
 
-          alert("Success! Check your email for verification.");
+          alert("Success! Account created and profile saved.");
           window.location.href = "loginawtad.html";
         }
       } catch (err) {
