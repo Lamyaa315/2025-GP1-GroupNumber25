@@ -4,17 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AWTAD - Coach Dashboard</title>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="CoachAwtad.js"></script>
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      margin: 0;
       min-height: 100vh;
       background: #4B3A57;
       overflow-x: hidden;
@@ -22,50 +21,36 @@
       color: white;
     }
 
-    /* Simplified background khgykmtjty*/
     body::before {
       content: "";
       position: fixed;
       inset: 0;
-      background: 
+      background:
         radial-gradient(circle at 20% 30%, rgba(255, 182, 163, 0.25), transparent 50%),
         radial-gradient(circle at 80% 70%, rgba(255, 209, 179, 0.2), transparent 50%);
       z-index: -1;
     }
 
-    /* Navigation Bar helloooo */
+    /* NAV */
     .navbar {
-      position: static;
-      top: 0;
       width: 100%;
-      padding: 20px 40px;
+      padding: 18px 36px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      z-index: 1000;
       background: rgba(75, 58, 87, 0.95);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(255, 182, 163, 0.2);
     }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      height: 100px;
-      margin: -15px 0;
-    }
-
-    .logo img {
-      height: 100%;
-      width: auto;
-      max-height: 100px;
-      object-fit: contain;
-    }
+    .logo { display: flex; align-items: center; height: 80px; margin: -10px 0; }
+    .logo img { height: 100%; width: auto; max-height: 80px; object-fit: contain; }
 
     .nav-links {
       display: flex;
-      gap: 30px;
+      gap: 20px;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .nav-links a {
@@ -74,11 +59,11 @@
       font-weight: 300;
       transition: all 0.3s ease;
       position: relative;
+      opacity: 0.95;
     }
 
-    .nav-links a:hover {
-      color: #ffccbb;
-    }
+    .nav-links a:hover { color: #ffccbb; }
+    .nav-links a.active { color: #ffccbb; }
 
     .nav-links a::after {
       content: '';
@@ -90,18 +75,14 @@
       background-color: #ffccbb;
       transition: width 0.3s ease;
     }
+    .nav-links a:hover::after { width: 100%; }
 
-    .nav-links a:hover::after {
-      width: 100%;
-    }
-
-    /* Logout Button */
     .logout-btn {
       background: rgba(255, 182, 163, 0.3);
       border: 1px solid rgba(255, 182, 163, 0.5);
       color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
+      padding: 8px 14px;
+      border-radius: 999px;
       cursor: pointer;
       transition: all 0.3s ease;
       font-size: 0.9rem;
@@ -113,22 +94,22 @@
     .logout-btn:hover {
       background: rgba(255, 182, 163, 0.4);
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.25);
     }
 
-    /* Dashboard */
+    /* PAGE */
     .dashboard {
-      padding: 40px;
+      padding: 34px;
       max-width: 1600px;
       margin: 0 auto;
     }
 
     .dashboard-header {
-      margin-bottom: 40px;
-    }
-
-    .welcome-section {
-      margin-bottom: 30px;
+      margin-bottom: 26px;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 22px;
+      align-items: start;
     }
 
     .welcome-title {
@@ -139,36 +120,39 @@
     }
 
     .welcome-subtitle {
-      font-size: 1.2rem;
+      font-size: 1.05rem;
       opacity: 0.9;
       font-weight: 300;
+      line-height: 1.6;
+      max-width: 900px;
     }
 
     .action-buttons {
       display: flex;
-      gap: 20px;
-      margin-top: 30px;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
     }
 
     .action-btn {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 10px;
-      padding: 12px 25px;
+      padding: 12px 18px;
       background: rgba(255, 255, 255, 0.15);
       border: 1px solid rgba(255, 255, 255, 0.25);
       color: white;
-      border-radius: 30px;
+      border-radius: 999px;
       cursor: pointer;
       transition: all 0.3s ease;
-      font-size: 1rem;
+      font-size: 0.98rem;
     }
 
     .action-btn:hover {
       background: rgba(255, 255, 255, 0.2);
       transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
-      border-color: rgba(255, 182, 163, 0.4);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.18);
+      border-color: rgba(255, 182, 163, 0.35);
     }
 
     .action-btn.primary {
@@ -176,30 +160,68 @@
       border: 1px solid rgba(255, 182, 163, 0.5);
     }
 
-    .action-btn.primary:hover {
-      background: rgba(255, 182, 163, 0.4);
+    .action-btn.primary:hover { background: rgba(255, 182, 163, 0.4); }
+
+    /* Coach badge */
+    .coach-badge {
+      padding: 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      display: flex;
+      gap: 14px;
+      align-items: center;
     }
 
-    .action-btn i {
-      font-size: 1.2rem;
+    .coach-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: rgba(255, 182, 163, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffccbb;
+      font-size: 1.3rem;
+      border: 2px solid rgba(255, 182, 163, 0.35);
+      flex-shrink: 0;
     }
 
-    /* Quick Stats */
+    .coach-meta h3 {
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: #ffccbb;
+      margin-bottom: 4px;
+    }
+
+    .coach-meta p { font-size: 0.9rem; opacity: 0.9; line-height: 1.4; }
+
+    .pill {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 182, 163, 0.18);
+      border: 1px solid rgba(255, 182, 163, 0.35);
+      color: #ffccbb;
+      font-size: 0.85rem;
+    }
+
+    /* STATS */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 25px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
     }
 
     .stat-card {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 15px;
-      padding: 25px;
+      padding: 20px;
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      display: flex;
-      flex-direction: column;
       transition: all 0.3s ease;
     }
 
@@ -213,57 +235,35 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
-    .stat-card-title {
-      font-size: 1.1rem;
-      font-weight: 400;
-      opacity: 0.9;
-    }
+    .stat-card-title { font-size: 1.05rem; font-weight: 400; opacity: 0.9; }
+    .stat-card-icon { font-size: 1.4rem; color: #ffccbb; opacity: 0.9; }
+    .stat-card-value { font-size: 2rem; font-weight: 300; color: #ffccbb; margin-bottom: 8px; }
+    .stat-card-change { display: flex; gap: 7px; font-size: 0.9rem; opacity: 0.9; align-items: center; }
 
-    .stat-card-icon {
-      font-size: 1.5rem;
-      color: #ffccbb;
-      opacity: 0.9;
-    }
-
-    .stat-card-value {
-      font-size: 2rem;
-      font-weight: 300;
-      margin-bottom: 10px;
-      color: #ffccbb;
-    }
-
-    .stat-card-change {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.9rem;
-      opacity: 0.9;
-    }
-
-    /* Clients Section */
+    /* SECTIONS */
     .section-title {
-      font-size: 1.8rem;
+      font-size: 1.65rem;
       font-weight: 400;
       color: #ffccbb;
-      margin-bottom: 25px;
+      margin-bottom: 16px;
       padding-bottom: 10px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     }
 
     .clients-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 30px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 22px;
+      margin-bottom: 28px;
     }
 
     .client-card {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 15px;
-      padding: 30px;
+      padding: 22px;
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.15);
       transition: all 0.3s ease;
@@ -278,167 +278,26 @@
       border-color: rgba(255, 182, 163, 0.4);
     }
 
-    .client-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 20px;
-    }
-
-    .client-info {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-
-    .client-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: rgba(255, 182, 163, 0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      color: #ffccbb;
-      border: 2px solid rgba(255, 182, 163, 0.4);
-    }
-
-    .client-name {
-      font-size: 1.5rem;
-      font-weight: 500;
-      color: #ffccbb;
-      margin-bottom: 5px;
-    }
-
-    .client-since {
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
-
-    .client-stats {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .client-stat {
-      text-align: center;
-      flex: 1;
-      min-width: 100px;
-    }
-
-    .client-stat-value {
-      font-size: 1.5rem;
-      font-weight: 500;
-      color: #ffccbb;
-      margin-bottom: 5px;
-    }
-
-    .client-stat-label {
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
-
-    .client-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 25px;
-    }
-
-    .client-tag {
-      background: rgba(255, 182, 163, 0.25);
-      border: 1px solid rgba(255, 182, 163, 0.4);
-      color: #ffccbb;
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-    }
-
-    .client-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: auto;
-    }
-
-    .client-btn {
-      flex: 1;
-      padding: 10px 15px;
-      background: rgba(255, 182, 163, 0.3);
-      border: 1px solid rgba(255, 182, 163, 0.5);
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 0.9rem;
-      text-align: center;
-    }
-
-    .client-btn:hover {
-      background: rgba(255, 182, 163, 0.4);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 10px rgba(255, 182, 163, 0.3);
-    }
-
-    .client-btn.secondary {
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-    }
-
-    .client-btn.secondary:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-
-    /* Progress Charts */
+    /* Charts */
     .charts-section {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-      gap: 30px;
-      margin-bottom: 40px;
-    }
-
-    @media (max-width: 1100px) {
-      .charts-section {
-        grid-template-columns: 1fr;
-      }
+      grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
+      gap: 22px;
+      margin-bottom: 28px;
     }
 
     .chart-card {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 15px;
-      padding: 30px;
+      padding: 22px;
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      margin-bottom: 30px;
     }
 
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 25px;
-    }
+    .chart-title { font-size: 1.35rem; font-weight: 400; color: #ffccbb; margin-bottom: 14px; }
+    .chart-wrapper { height: 300px; position: relative; }
 
-    .chart-title {
-      font-size: 1.5rem;
-      font-weight: 400;
-      color: #ffccbb;
-    }
-
-    .chart-wrapper {
-      height: 300px;
-      position: relative;
-    }
-
-    /* Recent Sessions */
-    .sessions-section {
-      margin-bottom: 40px;
-    }
-
+    /* Table */
     .sessions-table {
       width: 100%;
       background: rgba(255, 255, 255, 0.1);
@@ -454,118 +313,38 @@
       border-bottom: 1px solid rgba(255, 182, 163, 0.3);
     }
 
-    .sessions-table th {
-      padding: 20px;
-      text-align: left;
-      font-weight: 500;
-      color: #ffccbb;
-    }
+    .sessions-table th { padding: 16px; text-align: left; font-weight: 500; color: #ffccbb; }
+    .sessions-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+    .sessions-table tr:last-child td { border-bottom: none; }
+    .sessions-table tr:hover { background: rgba(255, 255, 255, 0.05); }
 
-    .sessions-table td {
-      padding: 18px 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .sessions-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .sessions-table tr:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .session-client {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .session-client-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(255, 182, 163, 0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      color: #ffccbb;
-    }
-
-    .session-exercise {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .session-status {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-
-    .status-completed {
-      background: rgba(141, 211, 161, 0.2);
-      color: #8dd3a1;
-    }
-
-    .status-in-progress {
-      background: rgba(255, 209, 179, 0.2);
-      color: #ffd1b3;
-    }
-
-    .status-imbalanced {
-      background: rgba(255, 182, 163, 0.2);
-      color: #ffb6a3;
-    }
-
-    /* Modal Styles */
+    /* Modals */
     .modal {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       background: rgba(0, 0, 0, 0.7);
       z-index: 2000;
       justify-content: center;
       align-items: center;
       backdrop-filter: blur(5px);
+      padding: 18px;
     }
-
-    .modal.active {
-      display: flex;
-    }
+    .modal.active { display: flex; }
 
     .modal-content {
       background: rgba(75, 58, 87, 0.95);
       border-radius: 15px;
-      padding: 30px;
-      width: 90%;
+      padding: 28px;
+      width: 100%;
       max-width: 600px;
       border: 1px solid rgba(255, 182, 163, 0.3);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
+    .modal-title { font-size: 1.5rem; margin-bottom: 12px; color: #ffccbb; }
+    .modal-text { margin-bottom: 20px; line-height: 1.6; opacity: 0.9; }
 
-    .modal-title {
-      font-size: 1.5rem;
-      margin-bottom: 15px;
-      color: #ffccbb;
-    }
-
-    .modal-text {
-      margin-bottom: 25px;
-      line-height: 1.5;
-      opacity: 0.9;
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 15px;
-      justify-content: flex-end;
-    }
+    .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
 
     .modal-btn {
       padding: 10px 20px;
@@ -575,123 +354,55 @@
       font-weight: 500;
       transition: all 0.3s ease;
       border: 1px solid rgba(255, 255, 255, 0.25);
-    }
-
-    .modal-btn.cancel {
       background: rgba(255, 255, 255, 0.15);
       color: white;
     }
 
-    .modal-btn.cancel:hover {
-      background: rgba(255, 255, 255, 0.25);
-    }
-
     .modal-btn.confirm {
       background: rgba(255, 182, 163, 0.3);
-      color: white;
       border: 1px solid rgba(255, 182, 163, 0.5);
     }
 
-    .modal-btn.confirm:hover {
-      background: rgba(255, 182, 163, 0.4);
-    }
+    .modal-btn:hover { transform: translateY(-2px); }
 
-    /* Footer */
     footer {
       text-align: center;
-      padding: 40px;
+      padding: 34px;
       border-top: 1px solid rgba(255, 255, 255, 0.15);
       font-weight: 300;
-      opacity: 0.8;
+      opacity: 0.85;
       font-size: 1rem;
+      margin-top: 12px;
     }
 
-    /* Responsive Design */
-    @media (max-width: 1024px) {
-      .dashboard {
-        padding: 30px;
-      }
-      
-      .clients-grid {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      }
+    @media (max-width: 980px) {
+      .dashboard-header { grid-template-columns: 1fr; }
+      .charts-section { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 768px) {
-      .navbar {
-        padding: 15px 20px;
-      }
-
-      .nav-links {
-        gap: 15px;
-      }
-
-      .dashboard {
-        padding: 20px;
-      }
-      
-      .action-buttons {
-        flex-direction: column;
-      }
-      
-      .action-btn {
-        justify-content: center;
-      }
-      
-      .charts-section {
-        grid-template-columns: 1fr;
-      }
-      
-      .chart-card {
-        padding: 20px;
-      }
-      
-      .sessions-table {
-        display: block;
-        overflow-x: auto;
-      }
-      
-      .modal-buttons {
-        flex-direction: column;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .welcome-title {
-        font-size: 1.8rem;
-      }
-      
-      .clients-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .client-card {
-        padding: 20px;
-      }
-      
-      .client-stats {
-        flex-direction: column;
-        gap: 15px;
-      }
-      
-      .client-stat {
-        text-align: left;
-      }
+      .navbar { padding: 15px 18px; }
+      .dashboard { padding: 20px; }
+      .action-buttons { flex-direction: column; }
+      .action-btn { justify-content: center; width: 100%; }
+      .sessions-table { display: block; overflow-x: auto; }
     }
   </style>
 </head>
+
 <body>
   <!-- Navigation Bar -->
   <nav class="navbar">
     <div class="logo">
       <img src="awtadlogo1.png" alt="Awtad Logo">
     </div>
+
     <div class="nav-links">
       <a href="#">Home</a>
-      <a href="#" style="color: #ffccbb;">Coach Dashboard</a>
+      <a class="active" href="#">Coach Dashboard</a>
       <a href="#">Clients</a>
-      <a href="#">Reports</a>
       <a href="#">Schedule</a>
+
       <button id="logoutBtn" class="logout-btn">
         <i class="fas fa-sign-out-alt"></i>
         Logout
@@ -699,27 +410,37 @@
     </div>
   </nav>
 
-  <!-- Dashboard -->
   <section class="dashboard">
+
+    <!-- Header -->
     <div class="dashboard-header">
       <div class="welcome-section">
-        <h1 class="welcome-title">Coach Dashboard</h1>
-        <p class="welcome-subtitle">Monitor your clients' progress, track muscle imbalances, and optimize their training programs for maximum performance.</p>
+        <h1 class="welcome-title" id="welcomeTitle">Coach Dashboard</h1>
+        <p class="welcome-subtitle" id="welcomeSubtitle">
+          Monitor your clients' progress and optimize their training programs for maximum performance.
+        </p>
+
+        <div class="action-buttons">
+          <button class="action-btn primary" id="refreshBtn">
+            <i class="fas fa-rotate"></i>
+            Refresh
+          </button>
+
+          <button class="action-btn" id="viewScheduleBtn">
+            <i class="fas fa-calendar-alt"></i>
+            View Schedule
+          </button>
+        </div>
       </div>
-      
-      <div class="action-buttons">
-        <button class="action-btn primary" id="addClientBtn">
-          <i class="fas fa-user-plus"></i>
-          Add New Client
-        </button>
-        <button class="action-btn" id="generateReportBtn">
-          <i class="fas fa-chart-pie"></i>
-          Generate Report
-        </button>
-        <button class="action-btn" id="viewScheduleBtn">
-          <i class="fas fa-calendar-alt"></i>
-          View Schedule
-        </button>
+
+      <!-- Coach badge (JS fills) -->
+      <div class="coach-badge">
+        <div class="coach-avatar"><i class="fas fa-user-tie"></i></div>
+        <div class="coach-meta">
+          <h3 id="coachNameTop">Loading...</h3>
+          <p id="coachEmailTop">—</p>
+          <span class="pill" id="coachSpecialtyTop">Specialty: —</span>
+        </div>
       </div>
     </div>
 
@@ -728,83 +449,68 @@
       <div class="stat-card">
         <div class="stat-card-header">
           <h3 class="stat-card-title">Active Clients</h3>
-          <div class="stat-card-icon">
-            <i class="fas fa-users"></i>
-          </div>
+          <div class="stat-card-icon"><i class="fas fa-users"></i></div>
         </div>
-        <div class="stat-card-value">18</div>
+        <div class="stat-card-value" id="statActiveClients">0</div>
         <div class="stat-card-change">
-          <i class="fas fa-arrow-up"></i>
-          <span>2 new this month</span>
+          <i class="fas fa-check-circle"></i>
+          <span id="statActiveClientsSub">Connected clients</span>
         </div>
       </div>
-      
+
       <div class="stat-card">
         <div class="stat-card-header">
           <h3 class="stat-card-title">Sessions This Week</h3>
-          <div class="stat-card-icon">
-            <i class="fas fa-dumbbell"></i>
-          </div>
+          <div class="stat-card-icon"><i class="fas fa-dumbbell"></i></div>
         </div>
-        <div class="stat-card-value">47</div>
+        <div class="stat-card-value" id="statSessionsWeek">—</div>
         <div class="stat-card-change">
-          <i class="fas fa-check-circle"></i>
-          <span>92% completed</span>
+          <i class="fas fa-info-circle"></i>
+          <span>Hook this to Sessions later</span>
         </div>
       </div>
-      
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <h3 class="stat-card-title">Avg. Imbalance</h3>
-          <div class="stat-card-icon">
-            <i class="fas fa-balance-scale"></i>
-          </div>
-        </div>
-        <div class="stat-card-value">9.2%</div>
-        <div class="stat-card-change">
-          <i class="fas fa-arrow-down"></i>
-          <span>1.3% improvement</span>
-        </div>
-      </div>
-      
+
       <div class="stat-card">
         <div class="stat-card-header">
           <h3 class="stat-card-title">Client Satisfaction</h3>
-          <div class="stat-card-icon">
-            <i class="fas fa-star"></i>
-          </div>
+          <div class="stat-card-icon"><i class="fas fa-star"></i></div>
         </div>
-        <div class="stat-card-value">4.8</div>
+        <div class="stat-card-value" id="statSatisfaction">—</div>
         <div class="stat-card-change">
-          <i class="fas fa-check-circle"></i>
-          <span>Based on 42 reviews</span>
+          <i class="fas fa-info-circle"></i>
+          <span>Optional metric</span>
         </div>
       </div>
     </div>
 
-    <!-- Clients Section -->
+    <!-- ✅ Pending Requests (moved here, cleaner) -->
+    <div class="clients-section" id="pendingSection">
+      <h2 class="section-title">Pending Requests</h2>
+
+      <div id="pendingEmpty" style="opacity:.9; line-height:1.6; margin-bottom:14px;">
+        No pending requests right now.
+      </div>
+
+      <div class="clients-grid" id="pendingGrid"></div>
+    </div>
+
+    <!-- Clients -->
     <div class="clients-section">
       <h2 class="section-title">Your Clients</h2>
-      <div class="clients-grid" id="clientsGrid">
-        <!-- Client cards will be dynamically generated -->
-      </div>
+      <div class="clients-grid" id="clientsGrid"></div>
     </div>
 
-    <!-- Progress Charts -->
+    <!-- Charts (keep for now) -->
     <div class="charts-section">
       <div class="chart-card">
-        <div class="chart-header">
-          <h3 class="chart-title">Overall Muscle Balance Trends</h3>
-        </div>
+        <h3 class="chart-title">Overall Muscle Balance Trends</h3>
         <div class="chart-wrapper">
           <canvas id="balanceChart"></canvas>
         </div>
       </div>
-      
+
       <div class="chart-card">
-        <div class="chart-header">
-          <h3 class="chart-title">Client Progress Distribution</h3>
-        </div>
+        <h3 class="chart-title">Client Progress Distribution</h3>
         <div class="chart-wrapper">
           <canvas id="progressChart"></canvas>
         </div>
@@ -825,36 +531,11 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="sessionsTable">
-          <!-- Sessions will be dynamically generated -->
-        </tbody>
+        <tbody id="sessionsTable"></tbody>
       </table>
     </div>
-  </section>
 
-  <!-- Add Client Modal -->
-  <div id="addClientModal" class="modal">
-    <div class="modal-content">
-      <h3 class="modal-title">Add New Client</h3>
-      <div class="modal-text">
-        <p>Enter the details for the new client. They will receive an invitation to join the platform.</p>
-      </div>
-      <div style="margin-bottom: 20px;">
-        <input type="text" id="clientName" placeholder="Full Name" style="width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white;">
-        <input type="email" id="clientEmail" placeholder="Email Address" style="width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white;">
-        <select id="clientPlan" style="width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white;">
-          <option value="">Select Training Plan</option>
-          <option value="basic">Basic (3 sessions/week)</option>
-          <option value="premium">Premium (5 sessions/week)</option>
-          <option value="elite">Elite (Customized)</option>
-        </select>
-      </div>
-      <div class="modal-buttons">
-        <button id="cancelAddClient" class="modal-btn cancel">Cancel</button>
-        <button id="confirmAddClient" class="modal-btn confirm">Add Client</button>
-      </div>
-    </div>
-  </div>
+  </section>
 
   <!-- Logout Confirmation Modal -->
   <div id="logoutModal" class="modal">
@@ -862,501 +543,16 @@
       <h3 class="modal-title">Confirm Logout</h3>
       <p class="modal-text">Are you sure you want to log out? You'll need to log in again to access the coach dashboard.</p>
       <div class="modal-buttons">
-        <button id="cancelLogout" class="modal-btn cancel">Cancel</button>
+        <button id="cancelLogout" class="modal-btn">Cancel</button>
         <button id="confirmLogout" class="modal-btn confirm">Logout</button>
       </div>
     </div>
   </div>
 
-  <!-- Footer -->
   <footer>
     <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
   </footer>
 
-  <script>
-    // Peach color palette
-    const peachColors = {
-      primary: '#ffb6a3',
-      secondary: '#ffd1b3',
-      tertiary: '#ffdfc4',
-      light: '#ffe8d6',
-      dark: '#e6a491'
-    };
 
-    // Sample client data
-    const clients = [
-      {
-        id: 1,
-        name: "Norah Al-Mutairi",
-        initials: "NM",
-        since: "May 2024",
-        sessions: 24,
-        imbalance: 7,
-        improvement: 12,
-        status: "active",
-        tags: ["VL Focus", "Consistent", "Squat Dominant"]
-      },
-      {
-        id: 2,
-        name: "Ahmed Hassan",
-        initials: "AH",
-        since: "March 2024",
-        sessions: 32,
-        imbalance: 14,
-        improvement: 8,
-        status: "active",
-        tags: ["Jump Focus", "Needs Recovery", "Progressing"]
-      },
-      {
-        id: 3,
-        name: "Sarah Johnson",
-        initials: "SJ",
-        since: "January 2024",
-        sessions: 45,
-        imbalance: 5,
-        improvement: 15,
-        status: "active",
-        tags: ["Balanced", "Advanced", "Gastrocnemius Focus"]
-      },
-      {
-        id: 4,
-        name: "Michael Chen",
-        initials: "MC",
-        since: "April 2024",
-        sessions: 18,
-        imbalance: 22,
-        improvement: 5,
-        status: "needs_attention",
-        tags: ["High Imbalance", "New Program", "VL Weakness"]
-      },
-      {
-        id: 5,
-        name: "Elena Rodriguez",
-        initials: "ER",
-        since: "February 2024",
-        sessions: 28,
-        imbalance: 9,
-        improvement: 10,
-        status: "active",
-        tags: ["Consistent", "Good Progress", "Jump Focus"]
-      },
-      {
-        id: 6,
-        name: "David Wilson",
-        initials: "DW",
-        since: "December 2023",
-        sessions: 52,
-        imbalance: 4,
-        improvement: 18,
-        status: "active",
-        tags: ["Excellent Balance", "Long-term", "Advanced"]
-      }
-    ];
-
-    // Sample session data
-    const recentSessions = [
-      {
-        client: "Norah Al-Mutairi",
-        clientInitials: "NM",
-        exercise: "Squat Analysis",
-        date: "Dec 5, 2023",
-        imbalance: "7%",
-        status: "completed"
-      },
-      {
-        client: "Ahmed Hassan",
-        clientInitials: "AH",
-        exercise: "Jump Analysis",
-        date: "Dec 4, 2023",
-        imbalance: "14%",
-        status: "imbalanced"
-      },
-      {
-        client: "Sarah Johnson",
-        clientInitials: "SJ",
-        exercise: "Squat Analysis",
-        date: "Dec 3, 2023",
-        imbalance: "5%",
-        status: "completed"
-      },
-      {
-        client: "Michael Chen",
-        clientInitials: "MC",
-        exercise: "VL Strengthening",
-        date: "Dec 2, 2023",
-        imbalance: "22%",
-        status: "in-progress"
-      },
-      {
-        client: "Elena Rodriguez",
-        clientInitials: "ER",
-        exercise: "Jump Analysis",
-        date: "Dec 1, 2023",
-        imbalance: "9%",
-        status: "completed"
-      }
-    ];
-
-    // Initialize on DOM load
-    document.addEventListener('DOMContentLoaded', function() {
-      // Modal elements
-      const logoutBtn = document.getElementById('logoutBtn');
-      const logoutModal = document.getElementById('logoutModal');
-      const cancelLogout = document.getElementById('cancelLogout');
-      const confirmLogout = document.getElementById('confirmLogout');
-      const addClientBtn = document.getElementById('addClientBtn');
-      const addClientModal = document.getElementById('addClientModal');
-      const cancelAddClient = document.getElementById('cancelAddClient');
-      const confirmAddClient = document.getElementById('confirmAddClient');
-      const generateReportBtn = document.getElementById('generateReportBtn');
-      const viewScheduleBtn = document.getElementById('viewScheduleBtn');
-
-      // Show logout confirmation modal
-      logoutBtn.addEventListener('click', function() {
-        logoutModal.classList.add('active');
-      });
-
-      // Hide logout confirmation modal
-      cancelLogout.addEventListener('click', function() {
-        logoutModal.classList.remove('active');
-      });
-
-      // Handle logout confirmation
-      confirmLogout.addEventListener('click', function() {
-        // In a real application, this would log the user out
-        window.location.href = 'loginawtad.html';
-      });
-
-      // Show add client modal
-      addClientBtn.addEventListener('click', function() {
-        addClientModal.classList.add('active');
-      });
-
-      // Hide add client modal
-      cancelAddClient.addEventListener('click', function() {
-        addClientModal.classList.remove('active');
-      });
-
-      // Handle add client confirmation
-      confirmAddClient.addEventListener('click', function() {
-        const clientName = document.getElementById('clientName').value;
-        const clientEmail = document.getElementById('clientEmail').value;
-        const clientPlan = document.getElementById('clientPlan').value;
-        
-        if (clientName && clientEmail && clientPlan) {
-          alert(`Client ${clientName} added successfully! They will receive an invitation email.`);
-          addClientModal.classList.remove('active');
-          // Clear form
-          document.getElementById('clientName').value = '';
-          document.getElementById('clientEmail').value = '';
-          document.getElementById('clientPlan').value = '';
-        } else {
-          alert('Please fill in all fields');
-        }
-      });
-
-      // Generate report button
-      generateReportBtn.addEventListener('click', function() {
-        alert('Report generation started. You will receive an email with the comprehensive report shortly.');
-      });
-
-      // View schedule button
-      viewScheduleBtn.addEventListener('click', function() {
-        window.location.href = 'scheduleawtad.html';
-      });
-
-      // Close modals when clicking outside
-      [logoutModal, addClientModal].forEach(modal => {
-        modal.addEventListener('click', function(e) {
-          if (e.target === modal) {
-            modal.classList.remove('active');
-          }
-        });
-      });
-
-      // Render client cards
-      renderClientCards();
-      
-      // Render recent sessions
-      renderRecentSessions();
-      
-      // Initialize charts
-      initializeCharts();
-      
-      // Add scroll animations
-      addScrollAnimations();
-    });
-
-    // Render client cards
-    function renderClientCards() {
-      const clientsGrid = document.getElementById('clientsGrid');
-      clientsGrid.innerHTML = '';
-      
-      clients.forEach(client => {
-        const statusClass = client.status === 'needs_attention' ? 'status-imbalanced' : 'status-completed';
-        const statusText = client.status === 'needs_attention' ? 'Needs Attention' : 'Active';
-        
-        const clientCard = document.createElement('div');
-        clientCard.className = 'client-card';
-        clientCard.innerHTML = `
-          <div class="client-header">
-            <div class="client-info">
-              <div class="client-avatar">${client.initials}</div>
-              <div>
-                <h3 class="client-name">${client.name}</h3>
-                <div class="client-since">Client since ${client.since}</div>
-              </div>
-            </div>
-            <div class="${statusClass} session-status">${statusText}</div>
-          </div>
-          
-          <div class="client-stats">
-            <div class="client-stat">
-              <div class="client-stat-value">${client.sessions}</div>
-              <div class="client-stat-label">Sessions</div>
-            </div>
-            <div class="client-stat">
-              <div class="client-stat-value">${client.imbalance}%</div>
-              <div class="client-stat-label">Imbalance</div>
-            </div>
-            <div class="client-stat">
-              <div class="client-stat-value">${client.improvement}%</div>
-              <div class="client-stat-label">Improvement</div>
-            </div>
-          </div>
-          
-          <div class="client-tags">
-            ${client.tags.map(tag => `<span class="client-tag">${tag}</span>`).join('')}
-          </div>
-          
-          <div class="client-actions">
-            <button class="client-btn" onclick="viewClientDetails(${client.id})">
-              <i class="fas fa-chart-line"></i> View Progress
-            </button>
-            <button class="client-btn secondary" onclick="messageClient(${client.id})">
-              <i class="fas fa-envelope"></i> Message
-            </button>
-          </div>
-        `;
-        
-        clientsGrid.appendChild(clientCard);
-      });
-    }
-
-    // Render recent sessions
-    function renderRecentSessions() {
-      const sessionsTable = document.getElementById('sessionsTable');
-      sessionsTable.innerHTML = '';
-      
-      recentSessions.forEach(session => {
-        const statusClass = session.status === 'completed' ? 'status-completed' : 
-                           session.status === 'in-progress' ? 'status-in-progress' : 'status-imbalanced';
-        const statusText = session.status === 'completed' ? 'Completed' : 
-                          session.status === 'in-progress' ? 'In Progress' : 'Needs Review';
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>
-            <div class="session-client">
-              <div class="session-client-avatar">${session.clientInitials}</div>
-              <div>${session.client}</div>
-            </div>
-          </td>
-          <td>
-            <div class="session-exercise">
-              <i class="fas fa-running"></i>
-              <span>${session.exercise}</span>
-            </div>
-          </td>
-          <td>${session.date}</td>
-          <td>${session.imbalance}</td>
-          <td><span class="session-status ${statusClass}">${statusText}</span></td>
-          <td>
-            <button class="client-btn" style="padding: 6px 12px; font-size: 0.85rem;" onclick="viewSession('${session.client}', '${session.exercise}')">
-              <i class="fas fa-eye"></i> View
-            </button>
-          </td>
-        `;
-        
-        sessionsTable.appendChild(row);
-      });
-    }
-
-    // Initialize charts
-    function initializeCharts() {
-      // Balance Trends Chart
-      const balanceCtx = document.getElementById('balanceChart').getContext('2d');
-      const balanceChart = new Chart(balanceCtx, {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-          datasets: [
-            {
-              label: 'Average Imbalance',
-              data: [14.2, 13.5, 12.8, 11.9, 11.2, 10.5, 10.1, 9.8, 9.5, 9.3, 9.2, 9.0],
-              borderColor: peachColors.primary,
-              backgroundColor: 'rgba(255, 182, 163, 0.15)',
-              tension: 0.4,
-              fill: true,
-              borderWidth: 2
-            },
-            {
-              label: 'Top 25% Clients',
-              data: [8.5, 8.1, 7.8, 7.5, 7.2, 6.9, 6.7, 6.5, 6.3, 6.1, 5.9, 5.7],
-              borderColor: peachColors.secondary,
-              backgroundColor: 'rgba(255, 209, 179, 0.1)',
-              tension: 0.4,
-              fill: false,
-              borderWidth: 2,
-              borderDash: [5, 5]
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'top',
-              labels: {
-                color: 'white',
-                font: {
-                  size: 12
-                }
-              }
-            },
-            tooltip: {
-              backgroundColor: 'rgba(75, 58, 87, 0.9)',
-              titleColor: 'white',
-              bodyColor: 'white',
-              borderColor: peachColors.primary,
-              borderWidth: 1
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: false,
-              min: 0,
-              max: 20,
-              grid: {
-                color: 'rgba(255, 255, 255, 0.15)'
-              },
-              ticks: {
-                color: 'white',
-                callback: function(value) {
-                  return value + '%';
-                }
-              },
-              title: {
-                display: true,
-                text: 'Imbalance Percentage',
-                color: 'white'
-              }
-            },
-            x: {
-              grid: {
-                color: 'rgba(255, 255, 255, 0.15)'
-              },
-              ticks: {
-                color: 'white'
-              }
-            }
-          }
-        }
-      });
-
-      // Progress Distribution Chart
-      const progressCtx = document.getElementById('progressChart').getContext('2d');
-      const progressChart = new Chart(progressCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Excellent Progress', 'Good Progress', 'Needs Attention', 'New Clients'],
-          datasets: [{
-            data: [8, 6, 3, 1],
-            backgroundColor: [
-              'rgba(141, 211, 161, 0.8)', // Green
-              'rgba(255, 209, 179, 0.8)', // Light peach
-              'rgba(255, 182, 163, 0.8)', // Peach
-              'rgba(255, 255, 255, 0.3)'  // White
-            ],
-            borderColor: [
-              'rgba(141, 211, 161, 1)',
-              'rgba(255, 209, 179, 1)',
-              'rgba(255, 182, 163, 1)',
-              'rgba(255, 255, 255, 0.5)'
-            ],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                color: 'white',
-                font: {
-                  size: 12
-                }
-              }
-            },
-            tooltip: {
-              backgroundColor: 'rgba(75, 58, 87, 0.9)',
-              titleColor: 'white',
-              bodyColor: 'white',
-              borderColor: peachColors.primary,
-              borderWidth: 1
-            }
-          }
-        }
-      });
-    }
-
-    // Client actions
-    function viewClientDetails(clientId) {
-      const client = clients.find(c => c.id === clientId);
-      if (client) {
-        alert(`Opening detailed progress report for ${client.name}`);
-        // In a real app, this would navigate to the client's detailed page
-        // window.location.href = `client-details.html?id=${clientId}`;
-      }
-    }
-
-    function messageClient(clientId) {
-      const client = clients.find(c => c.id === clientId);
-      if (client) {
-        alert(`Opening messaging interface for ${client.name}`);
-        // In a real app, this would open a messaging modal or page
-      }
-    }
-
-    function viewSession(clientName, exercise) {
-      alert(`Viewing session details for ${clientName} - ${exercise}`);
-      // In a real app, this would navigate to the session details page
-      // window.location.href = `session-detail.html?client=${encodeURIComponent(clientName)}&exercise=${encodeURIComponent(exercise)}`;
-    }
-
-    // Add scroll animations
-    function addScrollAnimations() {
-      const cards = document.querySelectorAll('.client-card, .chart-card, .stat-card');
-      
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-          }
-        });
-      }, { threshold: 0.1 });
-      
-      cards.forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        observer.observe(card);
-      });
-    }
-  </script>
 </body>
 </html>
