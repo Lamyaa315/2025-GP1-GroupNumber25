@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWTAD - Find a Coach</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Supabase v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #4B3A57;
+      overflow-x: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255, 182, 163, 0.25), transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 209, 179, 0.2), transparent 50%);
+      z-index: -1;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: static;
+      top: 0;
+      width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      background: rgba(75, 58, 87, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 182, 163, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      height: 100px;
+      margin: -15px 0;
+    }
+
+    .logo img {
+      height: 100%;
+      width: auto;
+      max-height: 100px;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 300;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a:hover { color: #ffccbb; }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 1px;
+      bottom: -5px;
+      left: 0;
+      background-color: #ffccbb;
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after { width: 100%; }
+
+    .logout-btn {
+      background: rgba(255, 182, 163, 0.3);
+      border: 1px solid rgba(255, 182, 163, 0.5);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 182, 163, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
+    }
+
+    /* Page */
+    .page {
+      padding: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      margin-bottom: 30px;
+    }
+
+    .title {
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: #ffccbb;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .search {
+      flex: 1;
+      min-width: 260px;
+      padding: 12px 16px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.12);
+      color: white;
+      outline: none;
+    }
+    .search::placeholder { color: rgba(255,255,255,0.7); }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 22px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
+      border-color: rgba(255, 182, 163, 0.4);
+    }
+
+    .action-btn.primary {
+      background: rgba(255, 182, 163, 0.3);
+      border: 1px solid rgba(255, 182, 163, 0.5);
+    }
+
+    .action-btn.primary:hover { background: rgba(255, 182, 163, 0.4); }
+
+    .action-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Grid */
+    .status-line {
+      margin: 20px 0 15px;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 25px;
+    }
+
+    .coach-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 26px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .coach-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      border-color: rgba(255, 182, 163, 0.4);
+    }
+
+    .coach-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .coach-name {
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: #ffccbb;
+      margin-bottom: 6px;
+    }
+
+    .coach-meta {
+      opacity: 0.9;
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    .badge {
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.08);
+      white-space: nowrap;
+    }
+
+    .badge.available { color: #ffccbb; border-color: rgba(255,182,163,0.45); }
+    .badge.pending { color: #ffd1b3; border-color: rgba(255,209,179,0.55); }
+    .badge.connected { color: #8dd3a1; border-color: rgba(100,255,100,0.35); }
+    .badge.rejected { color: #ff6b6b; border-color: rgba(255,100,100,0.35); }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tag {
+      background: rgba(255, 182, 163, 0.25);
+      border: 1px solid rgba(255, 182, 163, 0.4);
+      color: #ffccbb;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    .connect-btn {
+      margin-top: auto;
+      padding: 12px 20px;
+      background: rgba(255, 182, 163, 0.3);
+      border: 1px solid rgba(255, 182, 163, 0.5);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .connect-btn:hover {
+      background: rgba(255, 182, 163, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.3);
+    }
+
+    .connect-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .empty {
+      margin-top: 16px;
+      padding: 25px;
+      border-radius: 15px;
+      border: 1px dashed rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.08);
+      opacity: 0.9;
+      font-weight: 300;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: rgba(75, 58, 87, 0.95);
+      border-radius: 15px;
+      padding: 30px;
+      width: 90%;
+      max-width: 450px;
+      border: 1px solid rgba(255, 182, 163, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: #ffccbb;
+    }
+
+    .modal-text {
+      margin-bottom: 25px;
+      line-height: 1.6;
+      opacity: 0.9;
+      font-weight: 300;
+      text-align: left;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .modal-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      min-width: 140px;
+    }
+
+    .modal-btn.cancel {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+
+    .modal-btn.cancel:hover { background: rgba(255, 255, 255, 0.25); }
+
+    .modal-btn.confirm {
+      background: rgba(255, 182, 163, 0.3);
+      color: white;
+      border: 1px solid rgba(255, 182, 163, 0.5);
+    }
+
+    .modal-btn.confirm:hover { background: rgba(255, 182, 163, 0.4); }
+
+    @media (max-width: 768px) {
+      .navbar { padding: 15px 20px; }
+      .nav-links { gap: 15px; }
+      .page { padding: 20px; }
+      .grid { grid-template-columns: 1fr; }
+      .modal-buttons { flex-direction: column; }
+      .modal-btn { width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="awtadlogo1.png" alt="Awtad Logo">
+    </div>
+
+    <div class="nav-links">
+      <a href="userawtad.html">Dashboard</a>
+      <a href="FindCoach.html" style="color: #ffccbb;">Find a Coach</a>
+      <a href="sesstionsawtad.html">Sessions</a>
+      <a href="profileawtad.html">Profile</a>
+
+      <button id="logoutBtn" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
+      </button>
+    </div>
+  </nav>
+
+  <!-- Page -->
+  <section class="page">
+    <div class="header">
+      <h1 class="title">Find a Coach</h1>
+      <p class="subtitle">
+        Browse all registered coaches and send a connection request.
+        Once the coach accepts, your Profile will show your coach details and feedback access.
+      </p>
+
+      <div class="controls">
+        <input id="searchInput" class="search" type="text" placeholder="Search by name, email, or specialty..." />
+        <button id="refreshBtn" class="action-btn"><i class="fas fa-rotate"></i> Refresh</button>
+        <button id="clearBtn" class="action-btn"><i class="fas fa-eraser"></i> Clear</button>
+      </div>
+    </div>
+
+    <div id="statusLine" class="status-line">Loading coaches...</div>
+
+    <!-- If connected -->
+    <div id="connectedBox" style="display:none;">
+      <div class="coach-card">
+        <div class="coach-top">
+          <div>
+            <div class="coach-name" id="connectedName">Your Coach</div>
+            <div class="coach-meta" id="connectedMeta"></div>
+          </div>
+          <div class="badge connected"><i class="fas fa-check"></i> Connected</div>
+        </div>
+        <div class="tags">
+          <span class="tag">You are already connected</span>
+          <span class="tag">Requests are disabled</span>
+        </div>
+        <button class="connect-btn" disabled>Connected</button>
+      </div>
+    </div>
+
+    <!-- Coaches list -->
+    <div id="coachGrid" class="grid"></div>
+    <div id="emptyState" class="empty" style="display:none;">
+      No coaches found.
+    </div>
+  </section>
+
+  <!-- Logout Modal -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <h3 class="modal-title">Confirm Logout</h3>
+      <p class="modal-text">Are you sure you want to log out? You'll need to log in again.</p>
+      <div class="modal-buttons">
+        <button id="cancelLogout" class="modal-btn cancel">Cancel</button>
+        <button id="confirmLogout" class="modal-btn confirm">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Request Modal -->
+  <div id="requestModal" class="modal">
+    <div class="modal-content">
+      <h3 class="modal-title">Send Request</h3>
+      <div class="modal-text" id="requestText"></div>
+      <div class="modal-buttons">
+        <button id="cancelRequest" class="modal-btn cancel">Cancel</button>
+        <button id="confirmRequest" class="modal-btn confirm">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /***********************************************************
+     * CONFIG — Put your Supabase keys here
+     ***********************************************************/
+    const SUPABASE_URL = "PUT_YOUR_SUPABASE_URL_HERE";
+    const SUPABASE_ANON_KEY = "PUT_YOUR_SUPABASE_ANON_KEY_HERE";
+
+    // Table/column assumptions:
+    // users: id, full_name, email, role, specialty (optional)
+    // coach_requests: id, client_id, coach_id, status ('pending','accepted','rejected'), created_at
+
+    const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // UI
+    const searchInput = document.getElementById("searchInput");
+    const coachGrid = document.getElementById("coachGrid");
+    const emptyState = document.getElementById("emptyState");
+    const statusLine = document.getElementById("statusLine");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    // Connected box
+    const connectedBox = document.getElementById("connectedBox");
+    const connectedName = document.getElementById("connectedName");
+    const connectedMeta = document.getElementById("connectedMeta");
+
+    // Logout modal
+    const logoutBtn = document.getElementById("logoutBtn");
+    const logoutModal = document.getElementById("logoutModal");
+    const cancelLogout = document.getElementById("cancelLogout");
+    const confirmLogout = document.getElementById("confirmLogout");
+
+    // Request modal
+    const requestModal = document.getElementById("requestModal");
+    const requestText = document.getElementById("requestText");
+    const cancelRequest = document.getElementById("cancelRequest");
+    const confirmRequest = document.getElementById("confirmRequest");
+
+    // State
+    let currentUser = null;
+    let coaches = [];
+    let myRequests = [];
+    let connectedCoach = null;
+
+    // Request modal selected coach
+    let pendingCoachToRequest = null;
+
+    function normalize(s) {
+      return (s || "").toString().trim().toLowerCase();
+    }
+
+    function escapeHtml(str) {
+      return (str || "")
+        .toString()
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function openModal(modal) { modal.classList.add("active"); }
+    function closeModal(modal) { modal.classList.remove("active"); }
+
+    function statusForCoach(coachId) {
+      const accepted = myRequests.find(r => r.coach_id === coachId && r.status === "accepted");
+      if (accepted) return "accepted";
+      const pending = myRequests.find(r => r.coach_id === coachId && r.status === "pending");
+      if (pending) return "pending";
+      const rejected = myRequests.find(r => r.coach_id === coachId && r.status === "rejected");
+      if (rejected) return "rejected";
+      return "none";
+    }
+
+    function setLoading(isLoading, msg) {
+      statusLine.textContent = msg || "";
+      refreshBtn.disabled = isLoading;
+      clearBtn.disabled = isLoading;
+      searchInput.disabled = isLoading;
+    }
+
+    async function ensureAuth() {
+      const { data, error } = await supa.auth.getUser();
+      if (error) throw error;
+
+      currentUser = data?.user || null;
+
+      if (!currentUser) {
+        // If you have a login page:
+        window.location.href = "loginawtad.html";
+        throw new Error("Not logged in");
+      }
+    }
+
+    async function loadRequests() {
+      const { data, error } = await supa
+        .from("coach_requests")
+        .select("id, client_id, coach_id, status, created_at")
+        .eq("client_id", currentUser.id);
+
+      if (error) throw error;
+      myRequests = data || [];
+    }
+
+    async function loadCoaches() {
+      const { data, error } = await supa
+        .from("users")
+        .select("id, full_name, email, role, specialty")
+        .eq("role", "coach")
+        .order("full_name", { ascending: true });
+
+      if (error) throw error;
+      coaches = data || [];
+    }
+
+    function detectConnectedCoach() {
+      const accepted = myRequests.find(r => r.status === "accepted");
+      if (!accepted) {
+        connectedCoach = null;
+        return;
+      }
+      connectedCoach = coaches.find(c => c.id === accepted.coach_id) || null;
+    }
+
+    function renderConnected() {
+      if (!connectedCoach) {
+        connectedBox.style.display = "none";
+        return;
+      }
+
+      connectedBox.style.display = "block";
+
+      const name = connectedCoach.full_name || "Coach";
+      const email = connectedCoach.email || "";
+      const spec = connectedCoach.specialty ? ` • ${connectedCoach.specialty}` : "";
+
+      connectedName.textContent = name;
+      connectedMeta.textContent = `${email}${spec}`;
+    }
+
+    function buildCoachCard(coach) {
+      const name = coach.full_name || "Coach";
+      const email = coach.email || "—";
+      const spec = coach.specialty || "Not specified";
+
+      const st = statusForCoach(coach.id);
+
+      let badgeText = "Available";
+      let badgeClass = "available";
+      let btnText = "Send Request";
+      let disabled = false;
+
+      if (st === "pending") {
+        badgeText = "Pending";
+        badgeClass = "pending";
+        btnText = "Request Sent";
+        disabled = true;
+      } else if (st === "accepted") {
+        badgeText = "Connected";
+        badgeClass = "connected";
+        btnText = "Connected";
+        disabled = true;
+      } else if (st === "rejected") {
+        badgeText = "Rejected";
+        badgeClass = "rejected";
+        btnText = "Send Again";
+        disabled = false;
+      }
+
+      // If already connected to another coach, disable all request buttons
+      if (connectedCoach && st !== "accepted") {
+        disabled = true;
+        btnText = "Already Connected";
+      }
+
+      const card = document.createElement("div");
+      card.className = "coach-card";
+      card.innerHTML = `
+        <div class="coach-top">
+          <div>
+            <div class="coach-name">${escapeHtml(name)}</div>
+            <div class="coach-meta">
+              <div><i class="fas fa-envelope"></i> ${escapeHtml(email)}</div>
+              <div style="margin-top:6px;"><i class="fas fa-award"></i> ${escapeHtml(spec)}</div>
+            </div>
+          </div>
+          <div class="badge ${badgeClass}">${badgeText}</div>
+        </div>
+
+        <div class="tags">
+          <span class="tag">Role: Coach</span>
+          <span class="tag">Specialty: ${escapeHtml(spec)}</span>
+        </div>
+
+        <button class="connect-btn" data-coach-id="${coach.id}" ${disabled ? "disabled" : ""}>
+          <i class="fas fa-link"></i> ${btnText}
+        </button>
+      `;
+      return card;
+    }
+
+    function renderList() {
+      const q = normalize(searchInput.value);
+
+      // If connected, still show list but disabled (or you can hide it completely)
+      // Here: we keep list visible so they can browse, but buttons disabled.
+      const filtered = coaches.filter(c => {
+        const hay = [
+          c.full_name, c.email, c.specialty
+        ].map(normalize).join(" ");
+        return hay.includes(q);
+      });
+
+      coachGrid.innerHTML = "";
+      emptyState.style.display = filtered.length ? "none" : "block";
+
+      filtered.forEach(coach => {
+        coachGrid.appendChild(buildCoachCard(coach));
+      });
+
+      statusLine.textContent = `Showing ${filtered.length} coach(es)`;
+    }
+
+    async function refreshAll() {
+      setLoading(true, "Loading coaches...");
+      await ensureAuth();
+      await loadRequests();
+      await loadCoaches();
+      detectConnectedCoach();
+
+      renderConnected();
+      renderList();
+
+      setLoading(false, "");
+    }
+
+    function wireEvents() {
+      // Logout modal
+      logoutBtn.addEventListener("click", () => openModal(logoutModal));
+      cancelLogout.addEventListener("click", () => closeModal(logoutModal));
+      confirmLogout.addEventListener("click", async () => {
+        try {
+          await supa.auth.signOut();
+        } catch (e) {}
+        window.location.href = "loginawtad.html";
+      });
+
+      // Close on outside click
+      [logoutModal, requestModal].forEach(modal => {
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) closeModal(modal);
+        });
+      });
+
+      // Search / clear / refresh
+      searchInput.addEventListener("input", renderList);
+      clearBtn.addEventListener("click", () => {
+        searchInput.value = "";
+        renderList();
+      });
+      refreshBtn.addEventListener("click", refreshAll);
+
+      // Request modal buttons
+      cancelRequest.addEventListener("click", () => {
+        pendingCoachToRequest = null;
+        closeModal(requestModal);
+      });
+
+      confirmRequest.addEventListener("click", async () => {
+        if (!pendingCoachToRequest) return;
+        confirmRequest.disabled = true;
+
+        try {
+          await sendRequest(pendingCoachToRequest.id);
+          pendingCoachToRequest = null;
+          closeModal(requestModal);
+          await refreshAll();
+        } catch (err) {
+          alert(err?.message || "Request failed");
+        } finally {
+          confirmRequest.disabled = false;
+        }
+      });
+
+      // Event delegation for connect buttons
+      coachGrid.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-coach-id]");
+        if (!btn) return;
+        const coachId = btn.getAttribute("data-coach-id");
+        const coach = coaches.find(c => c.id === coachId);
+        if (!coach) return;
+
+        // If already connected, block
+        if (connectedCoach) return;
+
+        // open confirm modal
+        pendingCoachToRequest = coach;
+        requestText.innerHTML = `
+          <p>Send a connection request to:</p>
+          <p style="margin-top:10px;">
+            <strong>${escapeHtml(coach.full_name || "Coach")}</strong><br/>
+            <span style="opacity:.9;">${escapeHtml(coach.email || "")}</span><br/>
+            <span style="opacity:.9;">Specialty: ${escapeHtml(coach.specialty || "Not specified")}</span>
+          </p>
+        `;
+        openModal(requestModal);
+      });
+    }
+
+    async function sendRequest(coachId) {
+      // Prevent duplicates quickly
+      const st = statusForCoach(coachId);
+      if (st === "pending") throw new Error("Request already pending.");
+      if (st === "accepted") throw new Error("You are already connected.");
+
+      const { error } = await supa
+        .from("coach_requests")
+        .insert([{
+          client_id: currentUser.id,
+          coach_id: coachId,
+          status: "pending"
+        }]);
+
+      if (error) throw error;
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      wireEvents();
+      try {
+        await refreshAll();
+      } catch (e) {
+        console.error(e);
+        statusLine.textContent = "Could not load coaches. Check Supabase keys / RLS policies.";
+      }
+    });
+  </script>
+</body>
+</html>
