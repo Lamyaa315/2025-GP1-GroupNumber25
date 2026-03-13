@@ -11,528 +11,858 @@
   <script src="CoachAwtad.js"></script>
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+  --sidebar-width: 220px;
+  --primary-accent: #ffd2c2;
+  --primary-strong: #ffb59c;
+  --bg-dark: #4B3A57;
+  --card-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.22);
+  --shadow-glow: 0 0 30px rgba(255, 181, 156, 0.12);
+  --success: #8dd3a1;
+  --danger: #ff6b6b;
+}
 
-    body {
-      min-height: 100vh;
-      background: #4B3A57;
-      overflow-x: hidden;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: white;
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  min-width: 0;
+}
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at 20% 30%, rgba(255, 182, 163, 0.25), transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(255, 209, 179, 0.2), transparent 50%);
-      z-index: -1;
-    }
+body {
+  min-height: 100vh;
+  background: #4B3A57;
+  overflow-x: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: white;
+  position: relative;
+}
 
-    /* NAV */
-    .navbar {
-      width: 100%;
-      padding: 18px 36px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(75, 58, 87, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 182, 163, 0.2);
-    }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.30), transparent 42%),
+    radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.22), transparent 48%),
+    radial-gradient(circle at 55% 45%, rgba(255, 160, 140, 0.10), transparent 50%);
+  z-index: -2;
+}
 
-    .logo { display: flex; align-items: center; height: 80px; margin: -10px 0; }
-    .logo img { height: 100%; width: auto; max-height: 80px; object-fit: contain; }
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: -1;
+}
 
-    .nav-links {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-width);
+  height: calc(100vh - 24px);
+  margin: 12px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 16px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-soft), var(--shadow-glow);
+  border-radius: 26px;
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  z-index: 1000;
+  overflow: hidden;
+}
 
-    .nav-links a {
-      color: white;
-      text-decoration: none;
-      font-weight: 300;
-      transition: all 0.3s ease;
-      position: relative;
-      opacity: 0.95;
-    }
+.sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.02) 35%,
+      rgba(255, 255, 255, 0.01) 100%
+    );
+  pointer-events: none;
+}
 
-    .nav-links a:hover { color: #ffccbb; }
-    .nav-links a.active { color: #ffccbb; }
+.sidebar-brand {
+  text-align: center;
+  padding-bottom: 26px;
+  position: relative;
+  z-index: 1;
+}
 
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 1px;
-      bottom: -5px;
-      left: 0;
-      background-color: #ffccbb;
-      transition: width 0.3s ease;
-    }
-    .nav-links a:hover::after { width: 100%; }
+.sidebar-brand img {
+  width: 105px;
+  filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.2));
+}
 
-    .logout-btn {
-      background: rgba(255, 182, 163, 0.3);
-      border: 1px solid rgba(255, 182, 163, 0.5);
-      color: white;
-      padding: 8px 14px;
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+.coach-profile-mini {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  padding: 14px;
+  border-radius: 18px;
+  margin-bottom: 18px;
+}
 
-    .logout-btn:hover {
-      background: rgba(255, 182, 163, 0.4);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.25);
-    }
+.coach-profile-mini h4 {
+  color: var(--primary-accent);
+  font-size: 0.92rem;
+  margin-bottom: 4px;
+}
 
-    /* PAGE */
-    .dashboard {
-      padding: 34px;
-      max-width: 1600px;
-      margin: 0 auto;
-    }
+.coach-profile-mini p {
+  font-size: 0.76rem;
+  opacity: 0.72;
+  line-height: 1.5;
+}
 
-    .dashboard-header {
-      margin-bottom: 26px;
-      display: grid;
-      grid-template-columns: 1fr 360px;
-      gap: 22px;
-      align-items: start;
-    }
+.sidebar-nav {
+  flex-grow: 1;
+  position: relative;
+  z-index: 1;
+}
 
-    .welcome-title {
-      font-size: 2.2rem;
-      font-weight: 300;
-      color: #ffccbb;
-      margin-bottom: 10px;
-    }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  text-decoration: none;
+  color: rgba(255,255,255,0.72);
+  border-radius: 14px;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
 
-    .welcome-subtitle {
-      font-size: 1.05rem;
-      opacity: 0.9;
-      font-weight: 300;
-      line-height: 1.6;
-      max-width: 900px;
-    }
+.nav-item i {
+  width: 18px;
+  text-align: center;
+  font-size: 0.95rem;
+}
 
-    .action-buttons {
-      display: flex;
-      gap: 12px;
-      margin-top: 18px;
-      flex-wrap: wrap;
-    }
+.nav-item:hover,
+.nav-item.active {
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 204, 187, 0.18),
+    rgba(255, 255, 255, 0.06)
+  );
+  border: 1px solid rgba(255, 210, 194, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 0 18px rgba(255, 181, 156, 0.10);
+}
 
-    .action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 18px;
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      color: white;
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 0.98rem;
-    }
+.nav-item:hover {
+  transform: translateX(2px);
+}
 
-    .action-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(255, 182, 163, 0.18);
-      border-color: rgba(255, 182, 163, 0.35);
-    }
+.nav-item.active i,
+.nav-item:hover i {
+  color: var(--primary-accent);
+}
 
-    .action-btn.primary {
-      background: rgba(255, 182, 163, 0.3);
-      border: 1px solid rgba(255, 182, 163, 0.5);
-    }
+/* MAIN */
+.main-content {
+  margin-left: calc(var(--sidebar-width) + 36px);
+  padding: 42px 28px 42px 20px;
+  width: calc(100% - var(--sidebar-width) - 48px);
+  max-width: none;
+}
 
-    .action-btn.primary:hover { background: rgba(255, 182, 163, 0.4); }
+.dashboard {
+  width: 100%;
+  max-width: 100%;
+}
 
-    /* Coach badge */
-    .coach-badge {
-      padding: 18px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.10);
-      border: 1px solid rgba(255,255,255,0.15);
-      backdrop-filter: blur(10px);
-      display: flex;
-      gap: 14px;
-      align-items: center;
-    }
+.dashboard-header {
+  margin-bottom: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+}
 
-    .coach-avatar {
-      width: 58px;
-      height: 58px;
-      border-radius: 50%;
-      background: rgba(255, 182, 163, 0.22);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffccbb;
-      font-size: 1.3rem;
-      border: 2px solid rgba(255, 182, 163, 0.35);
-      flex-shrink: 0;
-    }
+.welcome-section {
+  min-width: 0;
+}
 
-    .coach-meta h3 {
-      font-size: 1.05rem;
-      font-weight: 500;
-      color: #ffccbb;
-      margin-bottom: 4px;
-    }
+.welcome-title {
+  font-size: 2.25rem;
+  font-weight: 300;
+  color: white;
+  margin-bottom: 10px;
+  text-shadow: 0 0 18px rgba(255, 190, 170, 0.08);
+}
 
-    .coach-meta p { font-size: 0.9rem; opacity: 0.9; line-height: 1.4; }
+.welcome-subtitle {
+  font-size: 1.02rem;
+  opacity: 0.82;
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 900px;
+}
 
-    .pill {
-      display: inline-block;
-      margin-top: 8px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(255, 182, 163, 0.18);
-      border: 1px solid rgba(255, 182, 163, 0.35);
-      color: #ffccbb;
-      font-size: 0.85rem;
-    }
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
 
-    /* STATS */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 18px;
-      margin-bottom: 28px;
-    }
+.action-btn,
+.modal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: white;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  font-size: 0.95rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
 
-    .stat-card {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      padding: 20px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      transition: all 0.3s ease;
-    }
+.action-btn:hover,
+.modal-btn:hover {
+  background: rgba(255,255,255,0.08);
+  transform: translateY(-2px);
+  border-color: rgba(255, 210, 194, 0.18);
+}
 
-    .stat-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-      border-color: rgba(255, 182, 163, 0.3);
-    }
+.action-btn.primary,
+.modal-btn.confirm {
+  background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
+  color: #4B3A57;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 8px 18px rgba(255, 181, 156, 0.20);
+}
 
-    .stat-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
+.action-btn.primary:hover,
+.modal-btn.confirm:hover {
+  box-shadow: 0 12px 22px rgba(255, 181, 156, 0.24);
+}
 
-    .stat-card-title { font-size: 1.05rem; font-weight: 400; opacity: 0.9; }
-    .stat-card-icon { font-size: 1.4rem; color: #ffccbb; opacity: 0.9; }
-    .stat-card-value { font-size: 2rem; font-weight: 300; color: #ffccbb; margin-bottom: 8px; }
-    .stat-card-change { display: flex; gap: 7px; font-size: 0.9rem; opacity: 0.9; align-items: center; }
+/* shared glass cards */
+.coach-badge,
+.stat-card,
+.client-card,
+.chart-card,
+.modal-content,
+.sessions-table-wrap {
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.08) 0%,
+    rgba(255,255,255,0.05) 100%
+  );
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    var(--shadow-soft),
+    inset 0 1px 0 rgba(255,255,255,0.07);
+  backdrop-filter: blur(16px) saturate(135%);
+  -webkit-backdrop-filter: blur(16px) saturate(135%);
+}
 
-    /* SECTIONS */
-    .section-title {
-      font-size: 1.65rem;
-      font-weight: 400;
-      color: #ffccbb;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    }
+.coach-badge,
+.stat-card,
+.client-card,
+.chart-card {
+  position: relative;
+  overflow: hidden;
+}
 
-    .clients-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 22px;
-      margin-bottom: 28px;
-    }
+.coach-badge::before,
+.stat-card::before,
+.client-card::before,
+.chart-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.07) 0%,
+    transparent 42%
+  );
+  pointer-events: none;
+}
 
-    .client-card {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      padding: 22px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      transition: all 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
+.coach-badge {
+  padding: 18px;
+  border-radius: 22px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+}
 
-    .client-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-      border-color: rgba(255, 182, 163, 0.4);
-    }
+.coach-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 204, 187, 0.28),
+    rgba(255,255,255,0.08)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-accent);
+  font-size: 1.3rem;
+  border: 1px solid rgba(255, 210, 194, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.09),
+    0 0 18px rgba(255, 181, 156, 0.08);
+  flex-shrink: 0;
+}
 
-    /* Charts */
-    .charts-section {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
-      gap: 22px;
-      margin-bottom: 28px;
-    }
+.coach-meta {
+  min-width: 0;
+}
 
-    .chart-card {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      padding: 22px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-    }
+.coach-meta h3 {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--primary-accent);
+  margin-bottom: 4px;
+  word-break: break-word;
+}
 
-    .chart-title { font-size: 1.35rem; font-weight: 400; color: #ffccbb; margin-bottom: 14px; }
-    .chart-wrapper { height: 300px; position: relative; }
+.coach-meta p {
+  font-size: 0.9rem;
+  opacity: 0.88;
+  line-height: 1.45;
+  word-break: break-word;
+}
 
-    /* Table */
-    .sessions-table {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      border-collapse: collapse;
-      overflow: hidden;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-    }
+.pill {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  color: var(--primary-accent);
+  font-size: 0.78rem;
+  max-width: 100%;
+  white-space: normal;
+}
 
-    .sessions-table thead {
-      background: rgba(255, 182, 163, 0.2);
-      border-bottom: 1px solid rgba(255, 182, 163, 0.3);
-    }
+/* stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+  width: 100%;
+}
 
-    .sessions-table th { padding: 16px; text-align: left; font-weight: 500; color: #ffccbb; }
-    .sessions-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-    .sessions-table tr:last-child td { border-bottom: none; }
-    .sessions-table tr:hover { background: rgba(255, 255, 255, 0.05); }
+.stat-card {
+  border-radius: 22px;
+  padding: 22px;
+  transition: all 0.25s ease;
+  min-width: 0;
+}
 
-    /* Modals */
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 2000;
-      justify-content: center;
-      align-items: center;
-      backdrop-filter: blur(5px);
-      padding: 18px;
-    }
-    .modal.active { display: flex; }
+.stat-card:hover,
+.client-card:hover,
+.chart-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 210, 194, 0.24);
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.26),
+    0 0 28px rgba(255, 181, 156, 0.12),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
 
-    .modal-content {
-      background: rgba(75, 58, 87, 0.95);
-      border-radius: 15px;
-      padding: 28px;
-      width: 100%;
-      max-width: 600px;
-      border: 1px solid rgba(255, 182, 163, 0.3);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    }
-    .modal-title { font-size: 1.5rem; margin-bottom: 12px; color: #ffccbb; }
-    .modal-text { margin-bottom: 20px; line-height: 1.6; opacity: 0.9; }
+.stat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 10px;
+}
 
-    .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+.stat-card-title {
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
 
-    .modal-btn {
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      background: rgba(255, 255, 255, 0.15);
-      color: white;
-    }
+.stat-card-icon {
+  font-size: 1.4rem;
+  color: var(--primary-accent);
+  opacity: 0.9;
+  flex-shrink: 0;
+}
 
-    .modal-btn.confirm {
-      background: rgba(255, 182, 163, 0.3);
-      border: 1px solid rgba(255, 182, 163, 0.5);
-    }
+.stat-card-value {
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--primary-accent);
+  margin-bottom: 8px;
+  text-shadow: 0 0 16px rgba(255, 192, 170, 0.08);
+}
 
-    .modal-btn:hover { transform: translateY(-2px); }
+.stat-card-change {
+  display: flex;
+  gap: 7px;
+  font-size: 0.9rem;
+  opacity: 0.88;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
-    footer {
-      text-align: center;
-      padding: 34px;
-      border-top: 1px solid rgba(255, 255, 255, 0.15);
-      font-weight: 300;
-      opacity: 0.85;
-      font-size: 1rem;
-      margin-top: 12px;
-    }
+/* sections */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--primary-accent);
+  margin-bottom: 16px;
+  letter-spacing: 0.2px;
+}
 
-    @media (max-width: 980px) {
-      .dashboard-header { grid-template-columns: 1fr; }
-      .charts-section { grid-template-columns: 1fr; }
-    }
+.clients-section,
+.sessions-section {
+  margin-bottom: 32px;
+  min-width: 0;
+}
 
-    @media (max-width: 768px) {
-      .navbar { padding: 15px 18px; }
-      .dashboard { padding: 20px; }
-      .action-buttons { flex-direction: column; }
-      .action-btn { justify-content: center; width: 100%; }
-      .sessions-table { display: block; overflow-x: auto; }
-    }
+.clients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 22px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.client-card {
+  border-radius: 22px;
+  padding: 22px;
+  transition: all 0.28s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+
+#pendingEmpty {
+  opacity: .9;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+/* charts */
+.charts-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 22px;
+  margin-bottom: 32px;
+  width: 100%;
+  min-width: 0;
+}
+
+.chart-card {
+  border-radius: 22px;
+  padding: 22px;
+  transition: all 0.28s ease;
+  min-width: 0;
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--primary-accent);
+  margin-bottom: 14px;
+}
+
+.chart-wrapper {
+  height: 300px;
+  position: relative;
+  width: 100%;
+}
+
+/* table */
+.sessions-table-wrap {
+  border-radius: 22px;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.sessions-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.sessions-table thead {
+  background: rgba(255, 182, 163, 0.14);
+  border-bottom: 1px solid rgba(255, 182, 163, 0.20);
+}
+
+.sessions-table th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 500;
+  color: var(--primary-accent);
+  font-size: 0.95rem;
+}
+
+.sessions-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sessions-table tr:last-child td {
+  border-bottom: none;
+}
+
+.sessions-table tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* modal */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 14, 24, 0.58);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  padding: 18px;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  border-radius: 24px;
+  padding: 28px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  color: var(--primary-accent);
+}
+
+.modal-text {
+  margin-bottom: 20px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+footer {
+  text-align: center;
+  padding: 18px 0 0;
+  font-weight: 300;
+  opacity: 0.78;
+  font-size: 0.96rem;
+  margin-top: 6px;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-header {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 82px;
+  }
+
+  .sidebar {
+    padding: 18px 10px;
+    border-radius: 22px;
+  }
+
+  .sidebar-brand img,
+  .nav-text,
+  .coach-profile-mini {
+    display: none;
+  }
+
+  .main-content {
+    margin-left: calc(var(--sidebar-width) + 28px);
+    padding: 34px 20px;
+    width: calc(100% - var(--sidebar-width) - 40px);
+  }
+
+  .nav-item {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .nav-item i {
+    width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 110px 16px 24px;
+  }
+
+  .sidebar {
+    width: calc(100% - 24px);
+    height: auto;
+    position: fixed;
+    bottom: auto;
+    top: 12px;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+  }
+
+  .sidebar-brand {
+    padding-bottom: 0;
+  }
+
+  .sidebar-brand img {
+    display: block;
+    width: 82px;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-grow: 0;
+    gap: 8px;
+  }
+
+  .nav-item {
+    margin-bottom: 0;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .action-btn {
+    width: 100%;
+  }
+
+  .clients-grid,
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-buttons {
+    justify-content: stretch;
+  }
+
+  .modal-buttons .modal-btn {
+    width: 100%;
+  }
+}
   </style>
 </head>
 
 <body>
-  <!-- Navigation Bar -->
-  <nav class="navbar">
-    <div class="logo">
-      <img src="awtadlogo1.png" alt="Awtad Logo">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="awtadlogo1.png" alt="AWTAD">
     </div>
 
-    <div class="nav-links">
-      <a href="#">Home</a>
-      <a class="active" href="#">Coach Dashboard</a>
-      <a href="#">Clients</a>
-      <a href="#">Schedule</a>
-
-      <button id="logoutBtn" class="logout-btn">
-        <i class="fas fa-sign-out-alt"></i>
-        Logout
-      </button>
+    <div class="coach-profile-mini">
+      <h4 id="coachNameSide">Loading...</h4>
+      <p id="coachEmailSide">—</p>
     </div>
-  </nav>
 
-  <section class="dashboard">
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active">
+        <i class="fas fa-th-large"></i>
+        <span class="nav-text">Coach Dashboard</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-users"></i>
+        <span class="nav-text">Clients</span>
+      </a>
+      <a href="#" class="nav-item" id="viewScheduleBtnSide">
+        <i class="fas fa-calendar-alt"></i>
+        <span class="nav-text">Schedule</span>
+      </a>
+    </nav>
 
-    <!-- Header -->
-    <div class="dashboard-header">
-      <div class="welcome-section">
-        <h1 class="welcome-title" id="welcomeTitle">Coach Dashboard</h1>
-        <p class="welcome-subtitle" id="welcomeSubtitle">
-          Monitor your clients' progress and optimize their training programs for maximum performance.
-        </p>
+    <a href="#" id="logoutBtn" class="nav-item">
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="nav-text">Logout</span>
+    </a>
+  </aside>
 
-        <div class="action-buttons">
-          <button class="action-btn" id="viewScheduleBtn">
-            <i class="fas fa-calendar-alt"></i>
-            View Schedule
-          </button>
+  <main class="main-content">
+    <section class="dashboard">
+
+      <div class="dashboard-header">
+        <div class="welcome-section">
+          <h1 class="welcome-title" id="welcomeTitle">Coach Dashboard</h1>
+          <p class="welcome-subtitle" id="welcomeSubtitle">
+            Monitor your clients' progress and optimize their training programs for maximum performance.
+          </p>
+
+          <div class="action-buttons">
+            <button class="action-btn primary" id="viewScheduleBtn">
+              <i class="fas fa-calendar-alt"></i>
+              View Schedule
+            </button>
+          </div>
+        </div>
+
+        <div class="coach-badge">
+          <div class="coach-avatar"><i class="fas fa-user-tie"></i></div>
+          <div class="coach-meta">
+            <h3 id="coachNameTop">Loading...</h3>
+            <p id="coachEmailTop">—</p>
+            <span class="pill" id="coachSpecialtyTop">Specialty: —</span>
+          </div>
         </div>
       </div>
 
-      <!-- Coach badge (JS fills) -->
-      <div class="coach-badge">
-        <div class="coach-avatar"><i class="fas fa-user-tie"></i></div>
-        <div class="coach-meta">
-          <h3 id="coachNameTop">Loading...</h3>
-          <p id="coachEmailTop">—</p>
-          <span class="pill" id="coachSpecialtyTop">Specialty: —</span>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <h3 class="stat-card-title">Active Clients</h3>
+            <div class="stat-card-icon"><i class="fas fa-users"></i></div>
+          </div>
+          <div class="stat-card-value" id="statActiveClients">0</div>
+          <div class="stat-card-change">
+            <i class="fas fa-check-circle"></i>
+            <span id="statActiveClientsSub">Connected clients</span>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Quick Stats -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <h3 class="stat-card-title">Active Clients</h3>
-          <div class="stat-card-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <h3 class="stat-card-title">Sessions This Week</h3>
+            <div class="stat-card-icon"><i class="fas fa-dumbbell"></i></div>
+          </div>
+          <div class="stat-card-value" id="statSessionsWeek">—</div>
+          <div class="stat-card-change">
+            <i class="fas fa-info-circle"></i>
+            <span>Hook this to Sessions later</span>
+          </div>
         </div>
-        <div class="stat-card-value" id="statActiveClients">0</div>
-        <div class="stat-card-change">
-          <i class="fas fa-check-circle"></i>
-          <span id="statActiveClientsSub">Connected clients</span>
-        </div>
-      </div>
 
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <h3 class="stat-card-title">Sessions This Week</h3>
-          <div class="stat-card-icon"><i class="fas fa-dumbbell"></i></div>
-        </div>
-        <div class="stat-card-value" id="statSessionsWeek">—</div>
-        <div class="stat-card-change">
-          <i class="fas fa-info-circle"></i>
-          <span>Hook this to Sessions later</span>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <h3 class="stat-card-title">Client Satisfaction</h3>
-          <div class="stat-card-icon"><i class="fas fa-star"></i></div>
-        </div>
-        <div class="stat-card-value" id="statSatisfaction">—</div>
-        <div class="stat-card-change">
-          <i class="fas fa-info-circle"></i>
-          <span>Optional metric</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ✅ Pending Requests (moved here, cleaner) -->
-    <div class="clients-section" id="pendingSection">
-      <h2 class="section-title">Pending Requests</h2>
-
-      <div id="pendingEmpty" style="opacity:.9; line-height:1.6; margin-bottom:14px;">
-        No pending requests right now.
-      </div>
-
-      <div class="clients-grid" id="pendingGrid"></div>
-    </div>
-
-    <!-- Clients -->
-    <div class="clients-section">
-      <h2 class="section-title">Your Clients</h2>
-      <div class="clients-grid" id="clientsGrid"></div>
-    </div>
-
-    <!-- Charts (keep for now) -->
-    <div class="charts-section">
-      <div class="chart-card">
-        <h3 class="chart-title">Overall Muscle Balance Trends</h3>
-        <div class="chart-wrapper">
-          <canvas id="balanceChart"></canvas>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <h3 class="stat-card-title">Client Satisfaction</h3>
+            <div class="stat-card-icon"><i class="fas fa-star"></i></div>
+          </div>
+          <div class="stat-card-value" id="statSatisfaction">—</div>
+          <div class="stat-card-change">
+            <i class="fas fa-info-circle"></i>
+            <span>Optional metric</span>
+          </div>
         </div>
       </div>
 
-      <div class="chart-card">
-        <h3 class="chart-title">Client Progress Distribution</h3>
-        <div class="chart-wrapper">
-          <canvas id="progressChart"></canvas>
+      <div class="clients-section" id="pendingSection">
+        <h2 class="section-title">Pending Requests</h2>
+
+        <div id="pendingEmpty">
+          No pending requests right now.
+        </div>
+
+        <div class="clients-grid" id="pendingGrid"></div>
+      </div>
+
+      <div class="clients-section">
+        <h2 class="section-title">Your Clients</h2>
+        <div class="clients-grid" id="clientsGrid"></div>
+      </div>
+
+      <div class="charts-section">
+        <div class="chart-card">
+          <h3 class="chart-title">Overall Muscle Balance Trends</h3>
+          <div class="chart-wrapper">
+            <canvas id="balanceChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <h3 class="chart-title">Client Progress Distribution</h3>
+          <div class="chart-wrapper">
+            <canvas id="progressChart"></canvas>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Recent Sessions -->
-    <div class="sessions-section">
-      <h2 class="section-title">Recent Client Sessions</h2>
-      <table class="sessions-table">
-        <thead>
-          <tr>
-            <th>Client</th>
-            <th>Exercise</th>
-            <th>Date</th>
-            <th>Imbalance</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="sessionsTable"></tbody>
-      </table>
-    </div>
+      <div class="sessions-section">
+        <h2 class="section-title">Recent Client Sessions</h2>
+        <div class="sessions-table-wrap">
+          <table class="sessions-table">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Exercise</th>
+                <th>Date</th>
+                <th>Imbalance</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sessionsTable"></tbody>
+          </table>
+        </div>
+      </div>
 
-  </section>
+      <footer>
+        <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
+      </footer>
+    </section>
+  </main>
 
-  <!-- Logout Confirmation Modal -->
   <div id="logoutModal" class="modal">
     <div class="modal-content">
       <h3 class="modal-title">Confirm Logout</h3>
@@ -544,10 +874,16 @@
     </div>
   </div>
 
-  <footer>
-    <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
-  </footer>
+  <script>
+    const sideScheduleBtn = document.getElementById('viewScheduleBtnSide');
+    const topScheduleBtn = document.getElementById('viewScheduleBtn');
 
-
+    if (sideScheduleBtn && topScheduleBtn) {
+      sideScheduleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        topScheduleBtn.click();
+      });
+    }
+  </script>
 </body>
 </html>
