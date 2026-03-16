@@ -519,7 +519,7 @@
       const userType = document.querySelector('input[name="userType"]:checked').value;
       const loginBtn = document.querySelector('.login-btn');
 
-      loginBtn.innerText = "جاري التحقق...";
+      loginBtn.innerText = "Processing ...";
       loginBtn.disabled = true;
 
       try {
@@ -545,7 +545,7 @@
             throw new Error(`عذراً، هذا الحساب غير مسجل كـ ${userType === 'coach' ? 'مدرب' : 'عميل'}.`);
           }
 
-          alert("تم تسجيل الدخول بنجاح!");
+          alert("Logged in successfully!");
           if (userType === 'coach') {
             window.location.href = "coachawtad.html";
           } else {
