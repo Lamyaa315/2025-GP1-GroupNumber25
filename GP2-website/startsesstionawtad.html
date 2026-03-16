@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AWTAD - Start Session</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <style>
     :root {
       --sidebar-width: 190px;
@@ -31,7 +32,7 @@
 
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #4B3A57;
+      background: var(--bg-dark);
       color: white;
       min-height: 100vh;
       position: relative;
@@ -65,7 +66,7 @@
       left: 20px;
       width: 50px;
       height: 50px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
       border: 1px solid var(--glass-border);
       border-radius: 15px;
       display: flex;
@@ -129,13 +130,12 @@
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      background:
-        linear-gradient(
-          135deg,
-          rgba(255,255,255,0.12) 0%,
-          rgba(255,255,255,0.02) 35%,
-          rgba(255,255,255,0.01) 100%
-        );
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.12) 0%,
+        rgba(255,255,255,0.02) 35%,
+        rgba(255,255,255,0.01) 100%
+      );
       pointer-events: none;
     }
 
@@ -235,12 +235,7 @@
     }
 
     .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       margin-bottom: 34px;
-      flex-wrap: wrap;
-      gap: 20px;
     }
 
     .dashboard-title {
@@ -249,66 +244,20 @@
       color: white;
       letter-spacing: 0.2px;
       text-shadow: 0 0 18px rgba(255, 190, 170, 0.08);
+      margin-bottom: 8px;
     }
 
-    .action-buttons {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .action-btn,
-    .exercise-btn,
-    .modal-btn,
-    .start-btn {
-      transition: all 0.22s ease;
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    .action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 20px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.04);
-      color: white;
-      text-decoration: none;
-      font-size: 0.95rem;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .action-btn.primary,
-    .start-btn,
-    .exercise-btn {
-      background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
-      color: #4B3A57;
-      font-weight: 700;
-      border: none;
-      box-shadow: 0 8px 18px rgba(255, 181, 156, 0.20);
-    }
-
-    .action-btn:hover {
-      transform: translateY(-2px);
-      background: rgba(255,255,255,0.08);
-      border-color: rgba(255, 210, 194, 0.18);
-    }
-
-    .action-btn.primary:hover,
-    .start-btn:hover,
-    .exercise-btn:hover {
-      box-shadow: 0 12px 22px rgba(255, 181, 156, 0.24);
-      transform: translateY(-2px);
+    .dashboard-subtitle {
+      opacity: 0.78;
+      line-height: 1.7;
+      max-width: 820px;
     }
 
     .session-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 24px;
-      margin-bottom: 40px;
+      margin-bottom: 32px;
     }
 
     .session-info,
@@ -352,16 +301,22 @@
       font-weight: 400;
       color: var(--primary-accent);
       margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
     }
 
     .info-description,
     .selection-description {
       opacity: 0.9;
       line-height: 1.7;
+      position: relative;
+      z-index: 1;
     }
 
     .info-steps {
       margin-top: 28px;
+      position: relative;
+      z-index: 1;
     }
 
     .step {
@@ -372,8 +327,8 @@
     }
 
     .step-number {
-      background: rgba(255, 182, 163, 0.3);
-      border: 1px solid rgba(255, 182, 163, 0.5);
+      background: rgba(255, 182, 163, 0.25);
+      border: 1px solid rgba(255, 182, 163, 0.45);
       width: 30px;
       height: 30px;
       border-radius: 50%;
@@ -402,6 +357,8 @@
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 18px;
       margin-top: 22px;
+      position: relative;
+      z-index: 1;
     }
 
     .exercise-card {
@@ -473,12 +430,30 @@
       color: var(--primary-accent);
     }
 
+    .start-btn,
+    .exercise-btn,
+    .action-btn.primary {
+      background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
+      color: #4B3A57;
+      font-weight: 700;
+      border: none;
+      box-shadow: 0 8px 18px rgba(255, 181, 156, 0.20);
+    }
+
     .start-btn {
       margin-top: 28px;
       width: 100%;
       padding: 14px 18px;
       border-radius: 14px;
       font-size: 1rem;
+      transition: all 0.22s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .start-btn:hover:not(:disabled) {
+      box-shadow: 0 12px 22px rgba(255, 181, 156, 0.24);
+      transform: translateY(-2px);
     }
 
     .start-btn:disabled {
@@ -488,8 +463,43 @@
       box-shadow: none;
     }
 
+    .action-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: white;
+      text-decoration: none;
+      font-size: 0.95rem;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: all 0.22s ease;
+      cursor: pointer;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255, 210, 194, 0.18);
+    }
+
+    .action-btn.primary:hover {
+      box-shadow: 0 12px 22px rgba(255, 181, 156, 0.24);
+      transform: translateY(-2px);
+    }
+
     .selected-exercises {
-      margin-bottom: 40px;
+      margin-bottom: 32px;
       display: none;
     }
 
@@ -504,12 +514,16 @@
       margin-bottom: 24px;
       flex-wrap: wrap;
       gap: 12px;
+      position: relative;
+      z-index: 1;
     }
 
     .selected-list {
       display: flex;
       gap: 16px;
       flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
     }
 
     .selected-item {
@@ -537,7 +551,9 @@
     }
 
     @media (max-width: 1024px) {
-      :root { --sidebar-width: 82px; }
+      :root {
+        --sidebar-width: 82px;
+      }
 
       .sidebar {
         padding: 18px 10px;
@@ -602,19 +618,17 @@
 </head>
 <body>
 
-  <!-- Menu Button -->
   <div class="menu-btn" id="menuBtn">
     <i class="fas fa-bars"></i>
   </div>
 
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <img src="awtadlogo1.png" alt="AWTAD">
     </div>
 
     <div class="user-mini-card">
-      <h4>Norah</h4>
+      <h4 id="sidebarUserName">....</h4>
       <p>Performance Dashboard</p>
     </div>
 
@@ -646,31 +660,20 @@
     </a>
   </aside>
 
-  <!-- Main Content -->
   <main class="main-content" id="mainContent">
     <section class="dashboard-header">
       <h1 class="dashboard-title">Start New Session</h1>
-
-      <div class="action-buttons">
-        <button class="action-btn" onclick="window.location.href='lastsessionawtad.html'">
-          <i class="fas fa-history"></i>
-          Last Session
-        </button>
-
-        <button class="action-btn" onclick="window.location.href='profileawtad.html'">
-          <i class="fas fa-user"></i>
-          Profile
-        </button>
-      </div>
+      <p class="dashboard-subtitle">
+        Select the exercise you want to analyze, then continue to sensor placement to begin your EMG session.
+      </p>
     </section>
 
     <section class="session-container">
-      <!-- Session Info -->
       <div class="session-info">
         <div class="info-header">
           <h2 class="info-title">Exercise Analysis Session</h2>
           <p class="info-description">
-            Select exercises to analyze your movement patterns and muscle activation. Our EMG sensors will detect imbalances and provide insights for improvement.
+            Select the exercise you want to analyze for movement quality and muscle activation balance. The system will guide you through the session step by step.
           </p>
         </div>
 
@@ -679,7 +682,7 @@
             <div class="step-number">1</div>
             <div class="step-content">
               <h4>Choose Exercise</h4>
-              <p>Select the exercise you want to analyze for muscle imbalances and form.</p>
+              <p>Select the movement you want to analyze.</p>
             </div>
           </div>
 
@@ -687,7 +690,7 @@
             <div class="step-number">2</div>
             <div class="step-content">
               <h4>Attach Sensors</h4>
-              <p>Place EMG sensors on the targeted muscle groups for the selected exercise.</p>
+              <p>Place the EMG sensors correctly on the target muscles.</p>
             </div>
           </div>
 
@@ -695,26 +698,25 @@
             <div class="step-number">3</div>
             <div class="step-content">
               <h4>Perform Exercise</h4>
-              <p>Complete the exercise movements while we measure muscle activation patterns.</p>
+              <p>Complete the movement while the system records the muscle activation signal.</p>
             </div>
           </div>
 
           <div class="step">
             <div class="step-number">4</div>
             <div class="step-content">
-              <h4>Analyze Results</h4>
-              <p>Review detailed analysis of your muscle balance and movement efficiency.</p>
+              <h4>Review Results</h4>
+              <p>Get your balance insights and performance feedback immediately after the session.</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Exercise Selection -->
       <div class="exercise-selection">
         <div class="selection-header">
           <h2 class="selection-title">Select Exercise</h2>
           <p class="selection-description">
-            Choose an exercise to analyze for muscle imbalances and performance
+            Choose the exercise you want to start
           </p>
         </div>
 
@@ -725,23 +727,10 @@
             </div>
             <h3 class="exercise-name">Squat Analysis</h3>
             <p class="exercise-description">
-              Analyze your squat form and detect muscle imbalances in your lower body. Perfect for assessing quadriceps and glute activation patterns.
+              Analyze your squat mechanics and identify muscle activation imbalance in the lower body.
             </p>
             <div class="exercise-muscles">
-              <strong>Target Muscles:</strong> VL (Vastus Lateralis)
-            </div>
-          </div>
-
-          <div class="exercise-card" data-exercise="jump">
-            <div class="exercise-icon">
-              <i class="fas fa-arrows-alt-v"></i>
-            </div>
-            <h3 class="exercise-name">Jump Analysis</h3>
-            <p class="exercise-description">
-              Evaluate your jumping mechanics and calf muscle engagement. Ideal for assessing explosive power and lower leg symmetry.
-            </p>
-            <div class="exercise-muscles">
-              <strong>Target Muscles:</strong> Medial Gastrocnemius (Calves)
+              <strong>Target Muscle:</strong> Vastus Lateralis (VL)
             </div>
           </div>
         </div>
@@ -753,7 +742,6 @@
       </div>
     </section>
 
-    <!-- Selected Exercises -->
     <section class="selected-exercises" id="selectedExercises">
       <div class="selected-header">
         <h2 class="selected-title">Selected Exercise</h2>
@@ -766,7 +754,7 @@
 
       <div class="selected-list" id="selectedList"></div>
 
-      <div class="action-buttons" style="margin-top: 28px;">
+      <div class="action-buttons">
         <button class="action-btn primary" id="proceedSessionBtn">
           <i class="fas fa-forward"></i>
           Proceed to Sensor Placement
@@ -798,20 +786,10 @@
         squat: {
           name: 'Squat Analysis',
           icon: 'fas fa-running',
-          description: 'Analyze your squat form and detect muscle imbalances in your lower body.',
-          muscles: 'VL (Vastus Lateralis), Quadriceps, Glutes',
-          details: 'The squat is a fundamental movement pattern that engages multiple lower body muscle groups. This analysis focuses on detecting asymmetries between left and right leg activation, particularly in the vastus lateralis muscles which are crucial for knee stability.'
-        },
-        jump: {
-          name: 'Jump Analysis',
-          icon: 'fas fa-arrows-alt-v',
-          description: 'Evaluate your jumping mechanics and calf muscle engagement.',
-          muscles: 'Medial Gastrocnemius, Calves, Achilles',
-          details: 'Jump analysis measures explosive power and symmetry in calf muscle activation. This exercise monitors the medial gastrocnemius to identify imbalances that can affect athletic performance and injury risk during dynamic movements.'
+          details: 'The squat is a fundamental lower-body movement. This session focuses on detecting left-right activation imbalance in the Vastus Lateralis muscle to support better form and performance.'
         }
       };
 
-      // sidebar toggle
       menuBtn.addEventListener('click', function () {
         sidebar.classList.toggle('active');
         mainContent.classList.toggle('shifted');
@@ -830,7 +808,6 @@
         }
       });
 
-      // exercise select
       exerciseCards.forEach(card => {
         card.addEventListener('click', function () {
           const exerciseType = this.getAttribute('data-exercise');
@@ -853,13 +830,13 @@
           <i class="${exerciseData[selectedExercise].icon}"></i>
           <div>
             <strong>${exerciseData[selectedExercise].name}</strong>
-            <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px; line-height:1.6;">
+            <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 6px; line-height: 1.6;">
               ${exerciseData[selectedExercise].details}
             </div>
           </div>
         `;
-        selectedList.appendChild(exerciseItem);
 
+        selectedList.appendChild(exerciseItem);
         selectedExercisesSection.classList.add('active');
         selectedExercisesSection.scrollIntoView({ behavior: 'smooth' });
       });
@@ -877,6 +854,46 @@
         window.location.href = `connectionawtad.html?exercise=${selectedExercise}`;
       });
     });
+    document.addEventListener("DOMContentLoaded", async function () {
+  try {
+    const supa = window.supabase;
+
+    // جيب المستخدم الحالي
+    const { data: { user }, error: userError } = await supa.auth.getUser();
+
+    if (userError || !user) {
+      console.error("No logged-in user found");
+      return;
+    }
+
+    // جيب الاسم الأول من جدول Client
+    const { data: client, error: clientError } = await supa
+      .from("Client")
+      .select("Fname")
+      .eq("client_id", user.id)
+      .single();
+
+    if (clientError) {
+      console.error("Error fetching client name:", clientError.message);
+      return;
+    }
+
+    // حط الاسم في الـ Welcome
+    const welcomeName = document.getElementById("welcomeName");
+    if (welcomeName) {
+      welcomeName.textContent = client.Fname || "User";
+    }
+
+    // حط الاسم في الـ Sidebar
+    const sidebarUserName = document.getElementById("sidebarUserName");
+    if (sidebarUserName) {
+      sidebarUserName.textContent = client.Fname || "User";
+    }
+
+  } catch (err) {
+    console.error("Unexpected error:", err);
+  }
+});
   </script>
 </body>
 </html>
