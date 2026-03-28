@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWTAD | Coach Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --sb-width-expanded: 260px;
+            --sb-width-collapsed: 80px;
+            --primary-accent: #ffd2c2;
+            --bg-dark: #4B3A57;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.14);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: var(--bg-dark);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: white;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed; inset: 0;
+            background: radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.15), transparent 45%),
+                        radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.1), transparent 45%);
+            z-index: -1;
+        }
+
+        /* --- SIDEBAR (Same as Find Coach) --- */
+        .sidebar {
+            width: var(--sb-width-expanded);
+            height: calc(100vh - 24px);
+            margin: 12px;
+            position: fixed;
+            left: 0; top: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 26px;
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+        .sidebar.collapsed { width: var(--sb-width-collapsed); padding: 20px 10px; }
+        .sb-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; padding: 0 10px; }
+        .sb-logo { width: 90px; transition: var(--transition); }
+        .sidebar.collapsed .sb-logo { opacity: 0; width: 0; }
+        #toggleSidebar { cursor: pointer; color: var(--primary-accent); transition: var(--transition); }
+        .user-profile-box { background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 18px; margin-bottom: 25px; overflow: hidden; }
+        .sidebar.collapsed .user-profile-box { opacity: 0; height: 0; margin: 0; padding: 0; }
+        .nav-item { display: flex; align-items: center; gap: 15px; padding: 14px; text-decoration: none; color: rgba(255,255,255,0.7); border-radius: 14px; margin-bottom: 8px; transition: var(--transition); }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: var(--primary-accent); }
+        .sidebar.collapsed .nav-text { display: none; }
+
+        /* --- MAIN WRAPPER --- */
+        .main-wrapper { flex: 1; margin-left: calc(var(--sb-width-expanded) + 24px); padding: 40px; transition: var(--transition); }
+        .main-wrapper.full { margin-left: calc(var(--sb-width-collapsed) + 24px); }
+
+        /* --- PROFILE DETAIL CARD --- */
+        .detail-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 900px;
+            margin: 0 auto;
+            backdrop-filter: blur(15px);
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 25px; left: 25px;
+            color: var(--primary-accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex; align-items: center; gap: 8px;
+            opacity: 0.7; transition: 0.3s;
+        }
+        .back-btn:hover { opacity: 1; }
+
+        .profile-left { text-align: center; flex: 1; }
+        .profile-right { flex: 2; }
+
+        .big-coach-img {
+            width: 180px; height: 180px;
+            border-radius: 40px;
+            object-fit: cover;
+            border: 3px solid var(--primary-accent);
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .coach-title-name { font-size: 2.5rem; margin-bottom: 5px; color: var(--primary-accent); }
+        .coach-title-spec { font-size: 1.2rem; opacity: 0.7; margin-bottom: 30px; letter-spacing: 1px; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .info-item {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .info-label { font-size: 0.75rem; text-transform: uppercase; opacity: 0.5; margin-bottom: 5px; }
+        .info-value { font-size: 1.05rem; font-weight: 500; }
+
+        .btn-large {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: var(--primary-accent);
+            color: #4B3A57;
+            text-align: center;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-large:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255,210,194,0.2); }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sb-header">
+            <img src="awtadlogo1.png" alt="AWTAD" class="sb-logo">
+            <i class="fas fa-chevron-left" id="toggleSidebar"></i>
+        </div>
+
+        <div class="user-profile-box">
+            <h4 id="userNameSide">Loading...</h4>
+            <p id="userEmailSide" style="font-size: 0.75rem; opacity: 0.6;">---</p>
+        </div>
+
+        <nav>
+            <a href="coachDashboardTRY.html" class="nav-item"><i class="fas fa-th-large"></i> <span class="nav-text">Dashboard</span></a>
+            <a href="FindCoach.html" class="nav-item active"><i class="fas fa-user-plus"></i> <span class="nav-text">Connect Coach</span></a>
+            <a href="profileawtad.html" class="nav-item"><i class="fas fa-user-circle"></i> <span class="nav-text">My Profile</span></a>
+        </nav>
+
+        <a href="loginawtad.html" id="logoutBtn" class="nav-item" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i> <span class="nav-text">Logout</span></a>
+    </aside>
+
+    <main class="main-wrapper" id="mainWrapper">
+        <div class="detail-card" id="coachDetailContent">
+            <a href="FindCoach.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Directory</a>
+            
+            <div style="padding: 100px; text-align: center; width: 100%;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Loading Coach Profile...</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
+        const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const sidebar = document.getElementById('sidebar');
+        const mainWrapper = document.getElementById('mainWrapper');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+
+        // Sidebar logic
+        toggleSidebar.onclick = () => {
+            sidebar.classList.toggle('collapsed');
+            mainWrapper.classList.toggle('full');
+            toggleSidebar.classList.toggle('fa-chevron-left');
+            toggleSidebar.classList.toggle('fa-chevron-right');
+        };
+
+        async function initDetails() {
+            // 1. Authenticate User
+            const { data: { user } } = await supa.auth.getUser();
+            if (!user) { window.location.href = "loginawtad.html"; return; }
+
+            // 2. Load sidebar profile info
+            const { data: client } = await supa.from('Client').select('*').eq('client_id', user.id).single();
+            if (client) {
+                document.getElementById('userNameSide').innerText = `${client.Fname} ${client.Lname}`;
+                document.getElementById('userEmailSide').innerText = client.email;
+            }
+
+            // 3. Get Coach ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const coachId = urlParams.get('id');
+
+            if (!coachId) {
+                document.getElementById('coachDetailContent').innerHTML = "<h2>Coach not found.</h2>";
+                return;
+            }
+
+            // 4. Fetch Coach Details from database
+            const { data: coach, error } = await supa.from('Coach').select('*').eq('coach_id', coachId).single();
+
+            if (error || !coach) {
+                document.getElementById('coachDetailContent').innerHTML = "<h2>Error loading coach info.</h2>";
+                return;
+            }
+
+            renderCoach(coach);
+        }
+
+        function renderCoach(coach) {
+            const container = document.getElementById('coachDetailContent');
+            const defaultImg = `https://ui-avatars.com/api/?name=${coach.Fname}+${coach.Lname}&background=ffd2c2&color=4B3A57&size=200`;
+            const profilePic = coach.profile_pic_url || defaultImg;
+
+            container.innerHTML = `
+                <a href="connect-coach.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Directory</a>
+                
+                <div class="profile-left">
+                    <img src="${profilePic}" class="big-coach-img" alt="Coach">
+                    <button class="btn-large" onclick="sendRequest('${coach.coach_id}', '${coach.Fname}')">
+                        Connect with ${coach.Fname}
+                    </button>
+                </div>
+
+                <div class="profile-right">
+                    <div class="coach-title-name">${coach.Fname} ${coach.Lname}</div>
+                    <div class="coach-title-spec">${coach.Specialty} Specialist</div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Email Address</div>
+                            <div class="info-value">${coach.email}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Phone Number</div>
+                            <div class="info-value">${coach.Phone_Number}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Status</div>
+                            <div class="info-value">Verified Coach</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Experience</div>
+                            <div class="info-value">Expert</div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-bottom:10px; opacity:0.8;">About the Coach</h4>
+                    <p style="line-height:1.6; opacity:0.7;">
+                        Coach ${coach.Fname} is a certified specialist in ${coach.Specialty}. 
+                        By connecting with this coach, they will be able to monitor your sEMG muscle 
+                        activation data, analyze symmetry indices, and provide direct feedback on 
+                        your training sessions to help prevent athlete muscle imbalance.
+                    </p>
+                </div>
+            `;
+        }
+
+        // Send Request Logic (Same as directory page)
+        async function sendRequest(coachId, coachName) {
+            if (!confirm(`Send a connection request to Coach ${coachName}?`)) return;
+
+            const { data: { user } } = await supa.auth.getUser();
+
+            // Insert into Relationship table
+            const { error: relError } = await supa.from('Client_Coach_Relationship').insert([
+                { client_id: user.id, coach_id: coachId, status: 'pending' }
+            ]);
+
+            // Update Client table
+            const { error: clientError } = await supa.from('Client').update({
+                coach_id: coachId,
+                request_status: 'pending'
+            }).eq('client_id', user.id);
+
+            if (!relError && !clientError) {
+                alert("Request Sent! Redirecting to status page...");
+                window.location.href = "FindCoach.html"; 
+            } else {
+                alert("Error sending request.");
+            }
+        }
+
+        window.onload = initDetails;
+    </script>
+</body>
+</html>

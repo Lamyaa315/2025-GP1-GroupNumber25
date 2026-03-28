@@ -1,327 +1,251 @@
 /*********************************
- * AWTAD - Coach Dashboard
- * Uses tables: "Coach" and "Client"
- * Client has: coach_id, request_status
+ * AWTAD - Professional Coach Dashboard
+ * Logic: Updated to use Client_Coach_Relationship table
  *********************************/
 
 const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
+const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Cache for current coach data
+let currentCoach = null;
+let coachRequestsChannel = null;
 
-// Tables / columns (match your schema)
-const TABLE_COACH = "Coach";
-const TABLE_CLIENT = "Client";
+/**
+ * 1. AUTH & INITIALIZATION
+ * Checks if a coach is logged in and loads their specific profile data.
+ */
+async function initDashboard() {
+    try {
+        const { data: { user }, error: authError } = await supa.auth.getUser();
+        if (authError || !user) {
+            window.location.href = "loginawtad.html";
+            return;
+        }
 
-const COACH_COLS = "coach_id,email,Fname,Lname,Specialty";
-const CLIENT_COLS = "client_id,email,Fname,Lname,Phone_Number,coach_id,request_status,profile_pic_url";
+        // # Fetch Coach Profile using their auth email
+        const { data: coach, error: coachError } = await supa
+            .from('Coach')
+            .select('*')
+            .eq('email', user.email)
+            .single();
 
-// Helpers
-const $ = (id) => document.getElementById(id);
-const norm = (s) => (s ? String(s).toLowerCase() : "none");
+        if (coachError || !coach) throw new Error("Coach profile not found.");
+        
+        currentCoach = coach;
+        
+        // # Update UI with Coach's name and specialty
+        renderHeader(coach);
+        
+        // # Fetch requests and active clients
+        await refreshData();
 
-function initials(f, l) {
-  const a = (f || "").trim()[0] || "";
-  const b = (l || "").trim()[0] || "";
-  return (a + b).toUpperCase() || "CL";
+        // # Start listening for realtime changes
+        subscribeToCoachRequests();
+
+    } catch (err) {
+        console.error("Initialization failed:", err);
+    }
 }
 
-function formatMonthYear(dateStr) {
-  const d = new Date(dateStr);
-  if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleString("en-US", { month: "short", year: "numeric" });
+/**
+ * 2. DATA FETCHING
+ * This pulls from the Client_Coach_Relationship table and joins with the Client table
+ * so we can see the Athlete's name and details.
+ */
+async function refreshData() {
+    if (!currentCoach) return;
+
+    // # Fetch Pending Requests from the Relationship table
+    // We use .select('*, Client(*)') to get the athlete's name from the joined Client table
+const { data: pendingRequests, error: pError } = await supa
+    .from('Client_Coach_Relationship')
+    .select('request_id, status, client_id, Client(client_id, Fname, Lname, email, profile_pic_url)')
+    .eq('coach_id', currentCoach.coach_id)
+    .eq('status', 'pending');
+
+    // # Fetch Accepted Clients
+const { data: activeClients, error: aError } = await supa
+    .from('Client_Coach_Relationship')
+    .select('request_id, status, client_id, Client(client_id, Fname, Lname, email, profile_pic_url)')
+    .eq('coach_id', currentCoach.coach_id)
+    .eq('status', 'accepted');
+
+    renderPendingList(pendingRequests || []);
+    renderAcceptedList(activeClients || []);
+    
+    // # Update the "Active Clients" counter on the dashboard
+    if (document.getElementById('statActiveClients')) {
+        document.getElementById('statActiveClients').textContent = (activeClients || []).length;
+    }
 }
 
-function escapeHtml(str) {
-  return String(str || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+function subscribeToCoachRequests() {
+    if (!currentCoach) return;
+
+    // remove old channel if it already exists
+    if (coachRequestsChannel) {
+        supa.removeChannel(coachRequestsChannel);
+    }
+
+    coachRequestsChannel = supa
+        .channel(`coach-requests-${currentCoach.coach_id}`)
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'Client_Coach_Relationship'
+            },
+            async (payload) => {
+                console.log("Realtime change:", payload);
+
+                const newRow = payload.new;
+                const oldRow = payload.old;
+
+                // refresh only if this change belongs to the logged-in coach
+                if (
+                    newRow?.coach_id === currentCoach.coach_id ||
+                    oldRow?.coach_id === currentCoach.coach_id
+                ) {
+                    await refreshData();
+                }
+            }
+        )
+        .subscribe((status) => {
+            console.log("Realtime status:", status);
+        });
 }
 
-// Auth
-async function getLoggedInEmail() {
-  const { data, error } = await supabaseClient.auth.getUser();
-  if (error) throw error;
-  const email = data?.user?.email;
-  if (!email) throw new Error("No logged-in user. Please login as coach.");
-  return email;
+/**
+ * 3. ACTIONS (Accept/Reject)
+ * This updates the status in the Relationship table AND the Client table.
+ */
+async function handleRequest(requestId, clientId, newStatus) {
+    // # STEP A: Update the Relationship table (The primary source of truth)
+    const { error: relError } = await supa
+        .from('Client_Coach_Relationship')
+        .update({ status: newStatus })
+        .eq('request_id', requestId);
+
+    // # STEP B: Synchronize the status back to the Client table for the Athlete's view
+    const { error: clientError } = await supa
+        .from('Client')
+        .update({ request_status: newStatus })
+        .eq('client_id', clientId);
+
+    if (relError || clientError) {
+        alert("Error updating status.");
+    } else {
+        // # Refresh UI to show the client moved from "Pending" to "Your Clients"
+        await refreshData();
+    }
 }
 
-// DB
-async function loadCoachByEmail(email) {
-  const { data, error } = await supabaseClient
-    .from(TABLE_COACH)
-    .select(COACH_COLS)
-    .ilike("email", email.trim())
-    .maybeSingle();
-
-  if (error) throw error;
-  return data; // null if not found
+/**
+ * 4. UI RENDERING
+ */
+function renderHeader(coach) {
+    document.getElementById('coachNameSide').textContent = `${coach.Fname} ${coach.Lname}`;
+    document.getElementById('coachEmailSide').textContent = coach.email;
+    document.getElementById('coachNameTop').textContent = `${coach.Fname} ${coach.Lname}`;
+    document.getElementById('coachEmailTop').textContent = coach.email;
+    document.getElementById('coachSpecialtyTop').textContent = `Specialty: ${coach.Specialty}`;
+    document.getElementById('welcomeTitle').textContent = `Welcome, Coach ${coach.Fname}`;
 }
 
-async function loadClientsForCoach(coach_id, status) {
-  const { data, error } = await supabaseClient
-    .from(TABLE_CLIENT)
-    .select(CLIENT_COLS)
-    .eq("coach_id", coach_id)
-    .eq("request_status", status)
-    .order("email", { ascending: true });
-
-  if (error) throw error;
-  return data || [];
+// # Function to handle default images if the athlete hasn't uploaded one
+function getProfileImage(client) {
+    if (client.profile_pic_url) return client.profile_pic_url;
+    // Defaulting to a UI Avatar based on their initials
+    return `https://ui-avatars.com/api/?name=${client.Fname}+${client.Lname}&background=ffd2c2&color=4B3A57`;
 }
 
-async function updateClientRequest(client_id, status) {
-  const { error } = await supabaseClient
-    .from(TABLE_CLIENT)
-    .update({ request_status: status })
-    .eq("client_id", client_id);
+function renderPendingList(requests) {
+    const container = document.getElementById('pendingGrid');
+    const emptyMsg = document.getElementById('pendingEmpty');
+    if (!container) return;
 
-  if (error) throw error;
-}
+    container.innerHTML = "";
+    emptyMsg.style.display = requests.length ? "none" : "block";
 
-// Render Coach badge
-function renderCoachTop(coach) {
-  const fullName = `${coach?.Fname ?? ""} ${coach?.Lname ?? ""}`.trim() || "Coach";
-
-  if ($("coachNameTop")) $("coachNameTop").textContent = fullName;
-  if ($("coachEmailTop")) $("coachEmailTop").textContent = coach?.email ?? "—";
-  if ($("coachSpecialtyTop"))
-    $("coachSpecialtyTop").textContent = `Specialty: ${coach?.Specialty ?? "—"}`;
-
-  if ($("welcomeTitle")) $("welcomeTitle").textContent = `Welcome, ${fullName}`;
-}
-
-// Pending requests UI
-function renderPending(pendingClients) {
-  const grid = $("pendingGrid");
-  const empty = $("pendingEmpty");
-  if (!grid || !empty) return;
-
-  grid.innerHTML = "";
-
-  if (!pendingClients.length) {
-    empty.style.display = "block";
-    return;
-  }
-  empty.style.display = "none";
-
-  pendingClients.forEach((c) => {
-    const fullName = `${c.Fname ?? ""} ${c.Lname ?? ""}`.trim() || "Client";
-    const init = initials(c.Fname, c.Lname);
-
-    const card = document.createElement("div");
-    card.className = "client-card";
-    card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:14px;">
-        <div style="display:flex; gap:14px; align-items:center;">
-          <div class="coach-avatar" style="width:56px;height:56px;">${escapeHtml(init)}</div>
-          <div>
-            <div style="font-size:1.25rem; font-weight:600; color:#ffccbb; margin-bottom:4px;">
-              ${escapeHtml(fullName)}
+    requests.forEach(req => {
+        const c = req.Client; // Access the joined Client data
+        const div = document.createElement('div');
+        div.className = "client-card";
+        div.innerHTML = `
+            <div style="display:flex; gap:15px; align-items:center; margin-bottom:15px;">
+                <img src="${getProfileImage(c)}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
+                <div>
+                    <h4 style="color:#ffd2c2; margin:0;">${c.Fname} ${c.Lname}</h4>
+                    <small style="opacity:0.7;">${c.email}</small>
+                </div>
             </div>
-            <div style="opacity:.85; font-size:.95rem;">${escapeHtml(c.email || "")}</div>
-          </div>
-        </div>
-        <span class="pill" style="margin-top:0;">Pending</span>
-      </div>
-
-      <div style="display:flex; gap:10px; margin-top:auto;">
-        <button class="action-btn primary" style="padding:10px 14px;" data-accept="${c.client_id}">
-          <i class="fa-solid fa-check"></i> Accept
-        </button>
-        <button class="action-btn" style="padding:10px 14px;" data-reject="${c.client_id}">
-          <i class="fa-solid fa-xmark"></i> Reject
-        </button>
-      </div>
-    `;
-
-    grid.appendChild(card);
-  });
-
-  grid.querySelectorAll("[data-accept]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const clientId = btn.getAttribute("data-accept");
-      await updateClientRequest(clientId, "accepted");
-      await loadCoachDashboard();
-    });
-  });
-
-  grid.querySelectorAll("[data-reject]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const clientId = btn.getAttribute("data-reject");
-      await updateClientRequest(clientId, "rejected");
-      await loadCoachDashboard();
-    });
-  });
-}
-
-// Clients UI (your image style)
-function renderClients(acceptedClients) {
-  const grid = $("clientsGrid");
-  if (!grid) return;
-
-  grid.innerHTML = "";
-
-  if (!acceptedClients.length) {
-    grid.innerHTML = `<div style="opacity:.9; line-height:1.6;">No clients yet. Accept requests and they will appear here.</div>`;
-    return;
-  }
-
-  acceptedClients.forEach((c) => {
-    const fullName = `${c.Fname ?? ""} ${c.Lname ?? ""}`.trim() || "Client";
-    const init = initials(c.Fname, c.Lname);
-
-    // placeholders until you connect sessions/stats tables
-    const sessions = "—";
-    const imbalance = "—";
-    const improvement = "—";
-
-    const tags = ["VL Focus", "Consistent", "Squat Dominant"]; // later from DB
-
-    const card = document.createElement("div");
-    card.className = "client-card";
-    card.style.cursor = "pointer";
-
-    card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:16px;">
-        <div style="display:flex; gap:14px; align-items:center;">
-          <div class="coach-avatar" style="width:64px;height:64px;font-size:1.2rem;">${escapeHtml(init)}</div>
-          <div>
-            <div style="font-size:1.45rem; font-weight:700; color:#ffccbb; margin-bottom:4px;">
-              ${escapeHtml(fullName)}
+            <div style="display:flex; gap:10px;">
+                <button class="action-btn primary" onclick="handleRequest('${req.request_id}', '${req.client_id}', 'accepted')">Accept</button>
+                <button class="action-btn" onclick="handleRequest('${req.request_id}', '${req.client_id}', 'rejected')">Reject</button>
             </div>
-            <div style="opacity:.85;">Client</div>
-          </div>
-        </div>
-
-        <span style="
-          display:inline-flex; align-items:center; gap:8px;
-          padding:6px 12px; border-radius:999px;
-          background: rgba(141, 211, 161, 0.2);
-          color: #8dd3a1;
-          font-weight:600; font-size:.9rem;">
-          Active
-        </span>
-      </div>
-
-      <div style="display:flex; justify-content:space-between; gap:16px; margin: 6px 0 14px;">
-        <div style="flex:1; text-align:center;">
-          <div style="font-size:1.9rem; font-weight:300; color:#ffccbb;">${sessions}</div>
-          <div style="opacity:.85; margin-top:4px;">Sessions</div>
-        </div>
-        <div style="flex:1; text-align:center;">
-          <div style="font-size:1.9rem; font-weight:300; color:#ffccbb;">${imbalance}</div>
-          <div style="opacity:.85; margin-top:4px;">Imbalance</div>
-        </div>
-        <div style="flex:1; text-align:center;">
-          <div style="font-size:1.9rem; font-weight:300; color:#ffccbb;">${improvement}</div>
-          <div style="opacity:.85; margin-top:4px;">Improvement</div>
-        </div>
-      </div>
-
-      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-        ${tags.map(t => `<span class="pill" style="margin-top:0;">${escapeHtml(t)}</span>`).join("")}
-      </div>
-
-      <div style="display:flex; gap:12px; margin-top:auto;">
-        <button class="action-btn primary" style="flex:1; justify-content:center; padding:12px 14px;" data-view="${c.client_id}">
-          <i class="fa-solid fa-chart-line"></i> View Progress
-        </button>
-        <button class="action-btn" style="flex:1; justify-content:center; padding:12px 14px;" data-msg="${c.client_id}">
-          <i class="fa-solid fa-envelope"></i> Message
-        </button>
-      </div>
-    `;
-
-    card.addEventListener("click", (e) => {
-      if (e.target.closest("button")) return;
-      goToClientPage(c.client_id);
+        `;
+        container.appendChild(div);
     });
+}
 
-    grid.appendChild(card);
-  });
+function renderAcceptedList(relationships) {
+    const container = document.getElementById('clientsGrid');
+    if (!container) return;
 
-  grid.querySelectorAll("[data-view]").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      goToClientPage(btn.getAttribute("data-view"));
+    container.innerHTML = relationships.length ? "" : "<p style='opacity:0.5;'>No active athletes connected.</p>";
+
+    relationships.forEach(rel => {
+        const c = rel.Client;
+        const card = document.createElement('div');
+        card.className = "client-card active-athlete";
+        
+        // # Link to the detailed athlete profile for the coach to view EMG data
+
+        card.onclick = () => {
+    if (c && c.client_id) {
+        window.location.href = `athlete-dashboard.html?id=${c.client_id}`;
+    } else {
+        console.error("Client ID is missing in the data object", c);
+    }
+};
+        
+        card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:start;">
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <img src="${getProfileImage(c)}" style="width:60px; height:60px; border-radius:50%; border: 2px solid #ffd2c2;">
+                    <div>
+                        <h3 style="margin:0; color:#ffd2c2;">${c.Fname} ${c.Lname}</h3>
+                        <span class="pill">Active Athlete</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="opacity:0.5;"></i>
+            </div>
+            <div class="stats-row" style="display:flex; justify-content:space-around; margin-top:20px; text-align:center;">
+                <div><strong style="display:block; font-size:1.2rem;">View</strong><small>Profile</small></div>
+                <div><strong style="display:block; font-size:1.2rem;">Live</strong><small>Feedback</small></div>
+            </div>
+        `;
+        container.appendChild(card);
     });
-  });
-
-  grid.querySelectorAll("[data-msg]").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      alert("Messaging later 👍");
-    });
-  });
 }
 
-function goToClientPage(clientId) {
-  // change this to YOUR real client page file
-  window.location.href = `profileawtad.html?client_id=${encodeURIComponent(clientId)}`;
-}
-
-// Main loader
-async function loadCoachDashboard() {
-  try {
-    const coachEmail = await getLoggedInEmail();
-
-    const coach = await loadCoachByEmail(coachEmail);
-    if (!coach) throw new Error("Coach not found in Coach table. Check coach email matches exactly.");
-    renderCoachTop(coach);
-
-    const pending = await loadClientsForCoach(coach.coach_id, "pending");
-    renderPending(pending);
-
-    const accepted = await loadClientsForCoach(coach.coach_id, "accepted");
-    renderClients(accepted);
-
-    if ($("statActiveClients")) $("statActiveClients").textContent = String(accepted.length);
-  } catch (e) {
-    console.error(e);
-    alert(e.message || "Failed to load coach dashboard.");
-  }
-}
-
-// Logout modal wiring (your same UI)
-function wireLogoutModal() {
-  const logoutBtn = $("logoutBtn");
-  const logoutModal = $("logoutModal");
-  const cancelLogout = $("cancelLogout");
-  const confirmLogout = $("confirmLogout");
-
-  if (!logoutBtn || !logoutModal || !cancelLogout || !confirmLogout) return;
-
-  logoutBtn.addEventListener("click", () => logoutModal.classList.add("active"));
-  cancelLogout.addEventListener("click", () => logoutModal.classList.remove("active"));
-  logoutModal.addEventListener("click", (e) => {
-    if (e.target === logoutModal) logoutModal.classList.remove("active");
-  });
-
-  confirmLogout.addEventListener("click", async () => {
-    await supabaseClient.auth.signOut();
-    window.location.href = "loginawtad.html";
-  });
-}
-
-function wireNavButtons() {
-  const viewScheduleBtn = $("viewScheduleBtn");
-  if (viewScheduleBtn) viewScheduleBtn.addEventListener("click", () => {
-    window.location.href = "scheduleawtad.html";
-  });
-}
-
-// Init
-document.addEventListener("DOMContentLoaded", () => {
-  wireLogoutModal();
-  wireNavButtons();
-
-  const refreshBtn = $("refreshBtn");
-  if (refreshBtn) refreshBtn.addEventListener("click", loadCoachDashboard);
-
-  loadCoachDashboard();
+/**
+ * 5. EVENTS & LOGOUT
+ */
+document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    document.getElementById('logoutModal')?.classList.add('active');
 });
+
+document.getElementById('cancelLogout')?.addEventListener('click', () => {
+    document.getElementById('logoutModal')?.classList.remove('active');
+});
+
+document.getElementById('confirmLogout')?.addEventListener('click', async () => {
+    await supa.auth.signOut();
+    window.location.href = "loginawtad.html";
+});
+
+// Run once the page loads
+document.addEventListener("DOMContentLoaded", initDashboard);

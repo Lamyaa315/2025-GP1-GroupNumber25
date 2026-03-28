@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWTAD | Athlete Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --sidebar-width: 220px;
+            --primary-accent: #ffd2c2;
+            --bg-dark: #4B3A57;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.14);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: var(--bg-dark);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: white;
+            display: flex;
+        }
+
+        body::before {
+            content: ""; position: fixed; inset: 0;
+            background: radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.2), transparent 45%);
+            z-index: -1;
+        }
+
+        /* --- SIDEBAR (Consistent) --- */
+        .sidebar {
+            width: var(--sidebar-width); height: calc(100vh - 24px); margin: 12px;
+            position: fixed; background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 1px solid var(--glass-border); border-radius: 26px; backdrop-filter: blur(20px);
+            padding: 20px; display: flex; flex-direction: column; z-index: 1000;
+        }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; text-decoration: none; color: rgba(255,255,255,0.7); border-radius: 12px; margin-bottom: 8px; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: var(--primary-accent); }
+
+        /* --- MAIN CONTENT --- */
+        .main-wrapper { flex: 1; margin-left: calc(var(--sidebar-width) + 36px); padding: 40px; }
+
+        /* --- ATHLETE HEADER CARD --- */
+        .athlete-header-card {
+            background: var(--glass); border: 1px solid var(--glass-border); border-radius: 30px;
+            padding: 30px; display: flex; align-items: center; gap: 30px; margin-bottom: 40px;
+        }
+        .profile-pic { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary-accent); object-fit: cover; }
+        .header-info h1 { font-size: 2rem; color: var(--primary-accent); margin-bottom: 5px; }
+        .header-info p { opacity: 0.7; font-size: 0.9rem; margin-bottom: 5px; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; background: rgba(141, 211, 161, 0.2); color: #8dd3a1; font-size: 0.75rem; }
+
+        /* --- DATA SECTIONS --- */
+        .section-title { font-size: 1.4rem; color: var(--primary-accent); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        
+        .data-card {
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 20px; transition: 0.3s;
+        }
+        .data-card:hover { border-color: var(--primary-accent); background: rgba(255,255,255,0.08); }
+
+        .btn-small {
+            width: 100%; padding: 10px; margin-top: 15px; border-radius: 10px;
+            border: none; background: var(--primary-accent); color: #4B3A57;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .btn-small:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        /* --- MODAL / DETAIL VIEW --- */
+        .modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(10px);
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: #4B3A57; border: 1px solid var(--glass-border);
+            padding: 35px; border-radius: 25px; width: 90%; max-width: 500px;
+        }
+
+        textarea {
+            width: 100%; height: 100px; background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border); border-radius: 12px;
+            color: white; padding: 15px; margin: 15px 0; outline: none; resize: none;
+        }
+        textarea:focus { border-color: var(--primary-accent); }
+
+        .loading-spinner { text-align: center; padding: 50px; opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div style="text-align:center; margin-bottom: 30px;">
+            <img src="awtadlogo1.png" style="width: 90px;">
+        </div>
+        <nav>
+            <a href="coachawtad.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="MyAthletes.html" class="nav-item active"><i class="fas fa-users"></i> My Athletes</a>
+            <a href="coachschedule.html" class="nav-item"><i class="fas fa-calendar"></i> Schedule</a>
+        </nav>
+    </aside>
+
+    <main class="main-wrapper">
+        <div id="athleteHeader" class="athlete-header-card">
+            <p>Loading Athlete Profile...</p>
+        </div>
+
+        <div id="sessionsSection">
+            <h2 class="section-title"><i class="fas fa-history"></i> Training Sessions</h2>
+            <div id="sessionsGrid" class="grid-container">
+                </div>
+        </div>
+
+        <div id="repsSection" style="display:none; margin-top: 50px;">
+            <h2 class="section-title"><i class="fas fa-dumbbell"></i> Session Reps - <span id="activeSessionName"></span></h2>
+            <div id="repsGrid" class="grid-container">
+                </div>
+        </div>
+    </main>
+
+    <div id="repModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalRepLabel" style="color: var(--primary-accent); margin-bottom: 15px;">Rep Details</h3>
+            <div id="modalRepData" style="line-height: 1.8; opacity: 0.9;">
+                </div>
+            
+            <label style="display:block; margin-top:20px; font-size: 0.9rem; opacity: 0.7;">Coach Feedback</label>
+            <textarea id="coachFeedback" placeholder="Write your analysis here (e.g., 'Right side stronger')"></textarea>
+            
+            <div style="display:flex; gap:10px;">
+                <button class="btn-small" onclick="closeModal()" style="background: rgba(255,255,255,0.1); color: white;">Cancel</button>
+                <button class="btn-small" id="saveFeedbackBtn">Save Feedback</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
+        const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get('id');
+
+        async function init() {
+            if (!clientId) return alert("No athlete selected!");
+            
+            // # Load Athlete Info
+            const { data: athlete } = await supa.from('Client').select('*').eq('client_id', clientId).single();
+            if (athlete) renderAthleteHeader(athlete);
+
+            // # Load Sessions
+            fetchSessions();
+        }
+
+        function renderAthleteHeader(ath) {
+            const initials = `${ath.Fname[0]}${ath.Lname[0]}`;
+            const profilePic = ath.profile_pic_url || `https://ui-avatars.com/api/?name=${initials}&background=ffd2c2&color=4B3A57`;
+            
+            document.getElementById('athleteHeader').innerHTML = `
+                <img src="${profilePic}" class="profile-pic">
+                <div class="header-info">
+                    <h1>${ath.Fname} ${ath.Lname}</h1>
+                    <p><i class="fas fa-envelope"></i> ${ath.email}</p>
+                    <p><i class="fas fa-phone"></i> ${ath.Phone_Number || 'N/A'}</p>
+                    <span class="status-badge">Connected</span>
+                </div>
+            `;
+        }
+
+        async function fetchSessions() {
+            const { data: sessions, error } = await supa.from('Session').select('*').eq('client_id', clientId).order('session_date', {ascending: false});
+            const grid = document.getElementById('sessionsGrid');
+            
+            if (sessions.length === 0) {
+                grid.innerHTML = "<p style='opacity:0.5;'>No sessions recorded yet.</p>";
+                return;
+            }
+
+            grid.innerHTML = sessions.map(s => `
+                <div class="data-card">
+                    <h3 style="color:var(--primary-accent);">${s.exercise_type}</h3>
+                    <p style="font-size:0.85rem; opacity:0.7; margin-top:5px;">${new Date(s.session_date).toLocaleDateString()}</p>
+                    <p style="font-size:0.85rem; opacity:0.7;">Duration: ${s.duration_sec}s</p>
+                    <button class="btn-small" onclick="viewReps('${s.session_id}', '${s.exercise_type}')">View Reps</button>
+                </div>
+            `).join('');
+        }
+
+        async function viewReps(sessionId, type) {
+            document.getElementById('repsSection').style.display = 'block';
+            document.getElementById('activeSessionName').innerText = type;
+            
+            const { data: reps } = await supa.from('Reps').select('*').eq('session_id', sessionId);
+            const grid = document.getElementById('repsGrid');
+
+            grid.innerHTML = reps.map(r => `
+                <div class="data-card">
+                    <h4 style="color:var(--primary-accent);">${r.label}</h4>
+                    <p>Symmetry: ${(r.symmetry_index * 100).toFixed(1)}%</p>
+                    <p>Dominant: ${r.dominant_side}</p>
+                    <button class="btn-small" onclick="openRepDetail('${r.reps_id}')">View Result</button>
+                </div>
+            `).join('');
+
+            // Scroll down to reps
+            document.getElementById('repsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function openRepDetail(repId) {
+            const { data: rep } = await supa.from('Reps').select('*').eq('reps_id', repId).single();
+            const modal = document.getElementById('repModal');
+            
+            document.getElementById('modalRepLabel').innerText = `Analysis: ${rep.label}`;
+            document.getElementById('modalRepData').innerHTML = `
+                <p><strong>Symmetry Index:</strong> ${(rep.symmetry_index * 100).toFixed(2)}%</p>
+                <p><strong>Dominant Side:</strong> ${rep.dominant_side}</p>
+                <p><strong>Performance:</strong> ${rep.symmetry_index > 0.9 ? 'Excellent Balance' : 'Imbalance Detected'}</p>
+            `;
+            
+            // Load existing feedback if any
+            document.getElementById('coachFeedback').value = rep.feedback || "";
+            
+            // Setup save button
+            document.getElementById('saveFeedbackBtn').onclick = () => saveFeedback(repId);
+            
+            modal.classList.add('active');
+        }
+
+        async function saveFeedback(repId) {
+            const feedbackText = document.getElementById('coachFeedback').value;
+            const { error } = await supa.from('Reps').update({ feedback: feedbackText }).eq('reps_id', repId);
+
+            if (!error) {
+                alert("Feedback saved!");
+                closeModal();
+                // Refresh list to show data is updated
+                const activeSession = document.getElementById('activeSessionName').innerText;
+                // find current session id from any visible rep card or just re-run last viewReps (simplified here)
+            } else {
+                alert("Error saving feedback");
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('repModal').classList.remove('active');
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

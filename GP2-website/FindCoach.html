@@ -17,8 +17,8 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Basic Reset & Body Styling */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             min-height: 100vh;
             background: var(--bg-dark);
@@ -37,7 +37,7 @@
             z-index: -1;
         }
 
-        /* --- COLLAPSIBLE SIDEBAR --- */
+        /* --- SIDEBAR --- */
         .sidebar {
             width: var(--sb-width-expanded);
             height: calc(100vh - 24px);
@@ -54,115 +54,71 @@
             transition: var(--transition);
             z-index: 1000;
         }
-
         .sidebar.collapsed { width: var(--sb-width-collapsed); padding: 20px 10px; }
-
-        .sb-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            padding: 0 10px;
-        }
-
+        .sb-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; padding: 0 10px; }
         .sb-logo { width: 90px; transition: var(--transition); }
         .sidebar.collapsed .sb-logo { opacity: 0; width: 0; }
-
         #toggleSidebar { cursor: pointer; color: var(--primary-accent); transition: var(--transition); }
-        .sidebar.collapsed #toggleSidebar { transform: rotate(180deg); }
 
-        .user-profile-box {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 18px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: var(--transition);
-            overflow: hidden;
-        }
+        .user-profile-box { background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 18px; margin-bottom: 25px; transition: var(--transition); overflow: hidden; }
         .sidebar.collapsed .user-profile-box { opacity: 0; height: 0; margin: 0; padding: 0; }
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 14px;
-            text-decoration: none;
-            color: rgba(255,255,255,0.7);
-            border-radius: 14px;
-            margin-bottom: 8px;
-            transition: var(--transition);
-        }
-        .nav-item i { width: 25px; text-align: center; }
+        .nav-item { display: flex; align-items: center; gap: 15px; padding: 14px; text-decoration: none; color: rgba(255,255,255,0.7); border-radius: 14px; margin-bottom: 8px; transition: var(--transition); }
         .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: var(--primary-accent); }
-        .sidebar.collapsed .nav-text { opacity: 0; display: none; }
+        .sidebar.collapsed .nav-text { display: none; }
 
-        /* --- MAIN WRAPPER --- */
-        .main-wrapper {
-            flex: 1;
-            margin-left: calc(var(--sb-width-expanded) + 24px);
-            padding: 40px;
-            transition: var(--transition);
-        }
+        /* --- MAIN CONTENT --- */
+        .main-wrapper { flex: 1; margin-left: calc(var(--sb-width-expanded) + 24px); padding: 40px; transition: var(--transition); }
         .main-wrapper.full { margin-left: calc(var(--sb-width-collapsed) + 24px); }
 
-        /* --- CONTENT CARD --- */
-        .card {
+        .welcome-msg { font-size: 2.2rem; font-weight: 300; margin-bottom: 10px; color: var(--primary-accent); }
+        .section-title { margin: 40px 0 20px; font-weight: 400; opacity: 0.9; }
+
+        /* --- COACH DIRECTORY GRID --- */
+        .coach-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        .coach-card {
             background: var(--glass);
             border: 1px solid var(--glass-border);
-            padding: 40px;
-            border-radius: 30px;
-            backdrop-filter: blur(10px);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .welcome-msg { font-size: 2rem; font-weight: 300; margin-bottom: 10px; color: var(--primary-accent); }
-        .instruction { opacity: 0.7; margin-bottom: 30px; line-height: 1.6; }
-
-        /* --- INVITE FORM --- */
-        .invite-form {
-            display: flex;
-            gap: 10px;
-            background: rgba(0,0,0,0.2);
-            padding: 8px;
-            border-radius: 15px;
-            border: 1px solid var(--glass-border);
-        }
-        .invite-form input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: white;
-            padding: 10px 15px;
-            font-size: 1rem;
-        }
-        .btn {
-            padding: 12px 24px;
-            border-radius: 12px;
-            border: none;
+            border-radius: 24px;
+            padding: 25px;
+            text-align: center;
+            transition: var(--transition);
             cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
+            backdrop-filter: blur(10px);
         }
-        .btn-primary { background: var(--primary-accent); color: #4B3A57; }
-        .btn-primary:hover { transform: scale(1.03); opacity: 0.9; }
+        .coach-card:hover { transform: translateY(-8px); background: rgba(255,255,255,0.12); border-color: var(--primary-accent); }
 
-        /* --- STATUS BOXES --- */
-        .status-box {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 20px;
-            display: none; /* Shown via JS */
-            align-items: center;
-            gap: 20px;
+        .coach-img {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 2px solid var(--primary-accent);
+            background: #5a4a66;
+        }
+
+        .coach-name { font-size: 1.1rem; margin-bottom: 5px; }
+        .coach-spec { font-size: 0.85rem; color: var(--primary-accent); opacity: 0.8; margin-bottom: 20px; }
+
+        .btn { padding: 10px 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600; transition: 0.3s; width: 100%; }
+        .btn-primary { background: var(--primary-accent); color: #4B3A57; }
+        .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
+
+        /* --- STATUS ALERTS --- */
+        .status-banner {
+            padding: 20px; border-radius: 20px; margin-bottom: 30px;
+            display: none; align-items: center; gap: 15px;
             animation: fadeIn 0.5s ease;
         }
-        .status-pending { background: rgba(255, 209, 179, 0.1); border: 1px solid rgba(255, 209, 179, 0.3); color: #ffd1b3; }
-        .status-accepted { background: rgba(141, 211, 161, 0.1); border: 1px solid rgba(141, 211, 161, 0.3); color: #8dd3a1; }
+        .status-pending { background: rgba(255, 209, 179, 0.15); border: 1px solid rgba(255, 209, 179, 0.3); color: #ffd1b3; }
+        .status-accepted { background: rgba(141, 211, 161, 0.15); border: 1px solid rgba(141, 211, 161, 0.3); color: #8dd3a1; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -178,7 +134,7 @@
             <p id="userEmailSide" style="font-size: 0.75rem; opacity: 0.6;">---</p>
         </div>
 
-        <nav class="sidebar-nav">
+        <nav>
             <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large"></i> <span class="nav-text">Dashboard</span></a>
             <a href="#" class="nav-item active"><i class="fas fa-user-plus"></i> <span class="nav-text">Connect Coach</span></a>
             <a href="profile.html" class="nav-item"><i class="fas fa-user-circle"></i> <span class="nav-text">My Profile</span></a>
@@ -188,46 +144,32 @@
     </aside>
 
     <main class="main-wrapper" id="mainWrapper">
-        <div class="card">
-            <h1 class="welcome-msg" id="dynamicWelcome">Welcome, Athlete</h1>
-            <p class="instruction">
-                To begin your performance monitoring, connect with your coach. Enter their official AWTAD email below to send a connection request.
-            </p>
-
-            <div class="invite-form">
-                <input type="email" id="coachEmailInput" placeholder="Coach's email address...">
-                <button class="btn btn-primary" id="searchBtn">Find Coach</button>
-            </div>
-
-            <div id="boxPending" class="status-box status-pending">
-                <i class="fas fa-hourglass-half fa-2x"></i>
-                <div>
-                    <h3 id="pendingCoachName">Request Sent</h3>
-                    <p style="font-size: 0.9rem;">Waiting for coach to accept your request. You will be notified once active.</p>
-                </div>
-            </div>
-
-            <div id="boxAccepted" class="status-box status-accepted">
-                <i class="fas fa-check-circle fa-2x"></i>
-                <div>
-                    <h3 id="activeCoachName">Coach Connected</h3>
-                    <p style="font-size: 0.9rem;">Your coach can now view your sEMG sessions and provide live feedback.</p>
-                </div>
+        <h1 class="welcome-msg" id="dynamicWelcome">Welcome, Athlete</h1>
+        
+        <div id="statusBanner" class="status-banner">
+            <i id="statusIcon" class="fas"></i>
+            <div>
+                <h4 id="statusTitle"></h4>
+                <p id="statusDesc" style="font-size: 0.9rem; opacity: 0.8;"></p>
             </div>
         </div>
+
+        <h3 class="section-title">Available Coaches</h3>
+        <div class="coach-grid" id="coachDirectory">
+            </div>
     </main>
 
     <script>
+        // Initialize Supabase
         const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
         const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Sidebar Elements
         const sidebar = document.getElementById('sidebar');
         const mainWrapper = document.getElementById('mainWrapper');
         const toggleSidebar = document.getElementById('toggleSidebar');
 
-        // Toggle Logic
+        // --- 1. Sidebar Toggle Logic ---
         toggleSidebar.onclick = () => {
             sidebar.classList.toggle('collapsed');
             mainWrapper.classList.toggle('full');
@@ -235,71 +177,185 @@
             toggleSidebar.classList.toggle('fa-chevron-right');
         };
 
-        // Profile Loading & Status Logic
-        async function loadProfileState() {
+        // --- 2. Load User Profile & Current Connection Status ---
+        async function initPage() {
             const { data: { user } } = await supa.auth.getUser();
             if (!user) { window.location.href = "loginawtad.html"; return; }
 
-            // 1. Fetch Client Details
-            const { data: client } = await supa.from('Client').select('*').eq('email', user.email).single();
-            
-            // 2. Update Sidebar & Welcome Text
-            document.getElementById('userNameSide').innerText = `${client.Fname} ${client.Lname}`;
-            document.getElementById('userEmailSide').innerText = client.email;
-            document.getElementById('dynamicWelcome').innerText = `Welcome, ${client.Fname}`;
+            // Fetch Client info using the UUID (user.id)
+            const { data: client, error } = await supa.from('Client')
+                .select('*')
+                .eq('client_id', user.id) // Using ID is safer than email
+                .single();
 
-            // 3. Handle Request Status (pending or accepted)
-            if (client.coach_id) {
-                // Fetch the coach's name for the status boxes
-                const { data: coach } = await supa.from('Coach').select('Fname, Lname').eq('coach_id', client.coach_id).single();
-                const coachName = `${coach.Fname} ${coach.Lname}`;
+            if (client) {
+                document.getElementById('userNameSide').innerText = `${client.Fname} ${client.Lname}`;
+                document.getElementById('userEmailSide').innerText = client.email;
+                document.getElementById('dynamicWelcome').innerText = `Welcome, ${client.Fname}`;
+                checkRelationshipStatus(user.id);
+            } else {
+                console.error("Client not found in database for this Auth UID");
+                document.getElementById('userNameSide').innerText = "Profile Missing";
+            }
 
-                if (client.request_status === 'pending') {
-                    document.getElementById('boxPending').style.display = 'flex';
-                    document.getElementById('pendingCoachName').innerText = `Request sent to Coach ${coachName}`;
-                } else if (client.request_status === 'accepted') {
-                    document.getElementById('boxAccepted').style.display = 'flex';
-                    document.getElementById('activeCoachName').innerText = `Connected to Coach ${coachName}`;
+            loadCoachDirectory();
+        }
+
+        // --- 3. Check Relationship Status ---
+        async function checkRelationshipStatus(clientId) {
+            // Looking at Client_Coach_Relationship table for 'pending' or 'accepted'
+            const { data: rel, error } = await supa
+                .from('Client_Coach_Relationship')
+                .select('status, coach_id, Coach(Fname, Lname)')
+                .eq('client_id', clientId)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (rel) {
+                const banner = document.getElementById('statusBanner');
+                const title = document.getElementById('statusTitle');
+                const desc = document.getElementById('statusDesc');
+                const icon = document.getElementById('statusIcon');
+                const coachName = `Coach ${rel.Coach.Fname} ${rel.Coach.Lname}`;
+
+                banner.style.display = 'flex';
+                
+                if (rel.status === 'pending') {
+                    banner.className = 'status-banner status-pending';
+                    icon.className = 'fas fa-hourglass-half fa-lg';
+                    title.innerText = "Request Pending";
+                    desc.innerText = `Waiting for ${coachName} to approve your connection.`;
+                } else if (rel.status === 'accepted') {
+                    banner.className = 'status-banner status-accepted';
+                    icon.className = 'fas fa-check-circle fa-lg';
+                    title.innerText = "Connected";
+                    desc.innerText = `You are actively training with ${coachName}.`;
                 }
             }
         }
 
-        // Search and Request Logic
-        document.getElementById('searchBtn').onclick = async () => {
-            const email = document.getElementById('coachEmailInput').value.trim();
-            if (!email) return alert("Please enter a coach's email.");
+        // --- 4. Load Coach Directory ---
+        async function loadCoachDirectory() {
+            const { data: coaches, error } = await supa.from('Coach').select('*');
+            const directory = document.getElementById('coachDirectory');
+            
+            if (error) return;
 
-            // 1. Look for Coach in the Coach table
-            const { data: coach, error } = await supa.from('Coach').select('coach_id, Fname').eq('email', email).single();
+            directory.innerHTML = coaches.map(coach => {
+                // Logic for default image: Using a placeholder service based on name initials
+                const defaultImg = `https://ui-avatars.com/api/?name=${coach.Fname}+${coach.Lname}&background=ffd2c2&color=4B3A57`;
+                const profilePic = coach.profile_pic_url || defaultImg;
 
-            if (error || !coach) {
-                alert("Coach not found. Please check the email address.");
-                return;
-            }
+                return `
+                    <div class="coach-card" onclick="goToDetails('${coach.coach_id}')">
+                        <img src="${profilePic}" class="coach-img" alt="Coach">
+                        <div class="coach-name">${coach.Fname} ${coach.Lname}</div>
+                        <div class="coach-spec">${coach.Specialty}</div>
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); sendConnectRequest('${coach.coach_id}', '${coach.Fname}')">
+                            Send Request
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
 
-            // 2. Confirm Request
-            if (confirm(`Send connection request to Coach ${coach.Fname}?`)) {
-                const { data: { user } } = await supa.auth.getUser();
-                
-                const { error: updateErr } = await supa.from('Client').update({
-                    coach_id: coach.coach_id,
-                    request_status: 'pending'
-                }).eq('email', user.email);
 
-                if (!updateErr) {
-                    alert("Request sent!");
-                    location.reload(); // Refresh to show the pending box
-                }
-            }
-        };
 
-        // Logout
+
+
+async function sendConnectRequest(coachId, coachName) {
+    const { data: { user } } = await supa.auth.getUser();
+    if (!user) {
+        alert("You must be logged in.");
+        return;
+    }
+
+    // Find the real client row first
+    const { data: client, error: clientError } = await supa
+        .from('Client')
+        .select('client_id, email')
+        .eq('email', user.email)
+        .single();
+
+    if (clientError || !client) {
+        alert("Your client profile was not found. Please complete signup first.");
+        console.error("Client lookup failed:", clientError);
+        return;
+    }
+
+    // Prevent duplicate requests
+    const { data: existing } = await supa
+        .from('Client_Coach_Relationship')
+        .select('request_id, status')
+        .eq('client_id', client.client_id)
+        .eq('coach_id', coachId)
+        .maybeSingle();
+
+    if (existing) {
+        alert(`You already have a ${existing.status} request with Coach ${coachName}.`);
+        return;
+    }
+
+    if (!confirm(`Send a connection request to Coach ${coachName}?`)) return;
+
+    const { error: relError } = await supa
+        .from('Client_Coach_Relationship')
+        .insert([{
+            client_id: client.client_id,
+            coach_id: coachId,
+            status: 'pending'
+        }]);
+
+    if (relError) {
+        console.error("Insert error:", relError);
+        alert("Error: " + relError.message);
+        return;
+    }
+
+    await supa
+        .from('Client')
+        .update({
+            coach_id: coachId,
+            request_status: 'pending'
+        })
+        .eq('client_id', client.client_id);
+
+    alert("Request Sent!");
+    location.reload();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // --- 6. Navigation to Details Page ---
+        function goToDetails(coachId) {
+            window.location.href = `coach-details.html?id=${coachId}`;
+        }
+
+        // --- 7. Logout ---
         document.getElementById('logoutBtn').onclick = async () => {
             await supa.auth.signOut();
             window.location.href = "loginawtad.html";
         };
 
-        window.onload = loadProfileState;
+        window.onload = initPage;
     </script>
 </body>
 </html>
