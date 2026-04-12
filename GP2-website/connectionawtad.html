@@ -59,7 +59,6 @@
       z-index: -1;
     }
 
-    /* Menu Button */
     .menu-btn {
       position: fixed;
       top: 20px;
@@ -95,7 +94,6 @@
       transform: rotate(90deg);
     }
 
-    /* Sidebar */
     .sidebar {
       width: var(--sidebar-width);
       height: calc(100vh - 24px);
@@ -223,7 +221,6 @@
       color: var(--primary-accent);
     }
 
-    /* Main Content */
     .main-content {
       margin-left: 0;
       padding: 70px 34px 42px 80px;
@@ -707,6 +704,199 @@
         padding: 20px;
       }
     }
+
+    .balance-analysis {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 40px;
+}
+
+.analysis-header {
+  margin-bottom: 25px;
+}
+
+.analysis-title {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #ffccbb;
+}
+
+.balance-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.side-comparison {
+  text-align: center;
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.side-title {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #ffccbb;
+}
+
+.side-value {
+  font-size: 3rem;
+  font-weight: 300;
+  margin-bottom: 10px;
+  color: #ffccbb;
+}
+
+.side-strength {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.balance-visual {
+  height: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  margin: 20px 0;
+  overflow: hidden;
+  display: flex;
+}
+
+.balance-left {
+  height: 100%;
+  background: linear-gradient(90deg, #ffb6a3, #ffd1b3);
+  border-radius: 10px 0 0 10px;
+}
+
+.balance-right {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd1b3, #ffe8d6);
+  border-radius: 0 10px 10px 0;
+}
+
+.imbalance-indicator {
+  text-align: center;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid;
+  margin-top: 20px;
+}
+
+.imbalance-indicator.balanced {
+  background: rgba(141, 211, 161, 0.2);
+  border-color: rgba(141, 211, 161, 0.4);
+}
+
+.imbalance-indicator.imbalanced {
+  background: rgba(255, 182, 163, 0.2);
+  border-color: rgba(255, 182, 163, 0.4);
+}
+
+.imbalance-value {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.imbalance-value.balanced {
+  color: #8dd3a1;
+}
+
+.imbalance-value.imbalanced {
+  color: #ffb6a3;
+}
+
+.imbalance-label {
+  opacity: 0.9;
+  margin-bottom: 15px;
+}
+
+.imbalance-scale {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.scale-section {
+  text-align: center;
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.scale-section.active {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}
+
+.scale-label {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin-bottom: 5px;
+}
+
+.scale-range {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.scale-balanced {
+  color: #8dd3a1;
+}
+
+.scale-imbalanced {
+  color: #ffb6a3;
+}
+
+.scale-indicator {
+  margin-top: 10px;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #8dd3a1, #ffb6a3);
+  position: relative;
+}
+
+.scale-marker {
+  position: absolute;
+  top: -4px;
+  width: 3px;
+  height: 14px;
+  background: white;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 768px) {
+  .balance-comparison {
+    grid-template-columns: 1fr;
+  }
+
+  .imbalance-scale {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .scale-section {
+    width: 100%;
+  }
+
+  #dominantSide {
+  margin-top: 6px;
+  font-weight: 500;
+}
+}
   </style>
 </head>
 <body>
@@ -725,7 +915,7 @@
     </div>
 
     <div class="user-mini-card">
-      <h4>....</h4>
+      <h4 id="sidebarUserName">....</h4>
       <p>Performance Dashboard</p>
     </div>
 
@@ -804,7 +994,6 @@
 
       <div class="sensor-visual">
         <div class="sensor-image">
-          <!-- بدل sensor-placement.png باسم صورتك الحقيقي -->
           <img src="sensor-placement.jpeg" alt="EMG sensor placement guide" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
           <div class="sensor-image-placeholder" style="display:none;">
             <i class="fas fa-user"></i>
@@ -881,6 +1070,60 @@
           Start Session
         </button>
       </div>
+
+      <div id="resultCard" style="display:none; margin-top: 24px;">
+  <div class="balance-analysis">
+    <div class="analysis-header">
+      <h2 class="analysis-title">VL Muscle Balance Summary</h2>
+    </div>
+    
+    <div class="balance-comparison">
+      <div class="side-comparison">
+        <h3 class="side-title">
+          <i class="fas fa-arrow-left"></i>
+          Left VL
+        </h3>
+        <div class="side-value" id="leftValue">--%</div>
+        <div class="side-strength" id="leftStrength">--</div>
+      </div>
+      
+      <div class="side-comparison">
+        <h3 class="side-title">
+          <i class="fas fa-arrow-right"></i>
+          Right VL
+        </h3>
+        <div class="side-value" id="rightValue">--%</div>
+        <div class="side-strength" id="rightStrength">--</div>
+      </div>
+    </div>
+    
+    <div class="balance-visual">
+      <div class="balance-left" id="balanceLeftBar" style="width: 50%"></div>
+      <div class="balance-right" id="balanceRightBar" style="width: 50%"></div>
+    </div>
+    
+    <div class="imbalance-indicator balanced" id="imbalanceIndicator">
+      <div class="imbalance-value balanced" id="imbalanceValue">--% Overall Imbalance</div>
+      <div class="imbalance-label" id="imbalanceStatus">Status: --</div>
+      <div class="imbalance-label" id="dominantSide">Dominant Side: --</div>
+
+      <div class="imbalance-scale">
+        <div class="scale-section active" id="balancedSection">
+          <div class="scale-label">Balanced</div>
+          <div class="scale-range scale-balanced">0% - 14%</div>
+        </div>
+        <div class="scale-section" id="imbalancedSection">
+          <div class="scale-label">Imbalanced</div>
+          <div class="scale-range scale-imbalanced">15%+</div>
+        </div>
+      </div>
+      
+      <div class="scale-indicator">
+        <div class="scale-marker" id="scaleMarker" style="left: 7%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
     </section>
 
     <footer>
@@ -888,289 +1131,494 @@
     </footer>
   </main>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const menuBtn = document.getElementById('menuBtn');
-      const sidebar = document.getElementById('sidebar');
-      const mainContent = document.getElementById('mainContent');
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const API_BASE = "http://127.0.0.1:8000";
 
-      const connectBtn = document.getElementById('connectBtn');
-      const statusIndicator = document.getElementById('statusIndicator');
-      const statusText = document.getElementById('statusText');
-      const signalDisplay = document.getElementById('signalDisplay');
-      const signalCanvas = document.getElementById('signalCanvas');
-      const startSessionBtn = document.getElementById('startSessionBtn');
-      const exerciseTitle = document.getElementById('exerciseTitle');
-      const currentMuscle = document.getElementById('currentMuscle');
-      const statusMessage = document.getElementById('statusMessage');
-      const messageText = document.getElementById('messageText');
-      const sensorPositions = document.querySelector('.sensor-positions');
-      const exerciseSteps = document.querySelector('.exercise-steps');
-
-      let isConnected = false;
-      let isSessionActive = false;
-      let animationId;
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const exercise = urlParams.get('exercise') || 'squat';
-
-      const exerciseData = {
-        squat: {
-          name: 'Squat Analysis',
-          muscle: 'Vastus Lateralis (VL)',
-          steps: [
-            'Stand with feet shoulder-width apart, toes pointing slightly outward.',
-            'Lower your body by bending knees and hips while keeping the chest up.',
-            'Descend until the thighs are parallel to the ground or as deep as comfortable.',
-            'Push through the heels and return to the standing position.'
-          ],
-          stepTitles: ['Starting Position', 'Movement Phase', 'Depth', 'Return'],
-          sensorPositions: ['Left VL', 'Right VL']
-        },
-        jump: {
-          name: 'Jump Analysis',
-          muscle: 'Medial Gastrocnemius',
-          steps: [
-            'Stand upright with feet shoulder-width apart.',
-            'Prepare for the movement with a slight knee bend.',
-            'Push explosively through the feet into a vertical jump.',
-            'Land softly with controlled knee flexion.'
-          ],
-          stepTitles: ['Starting Position', 'Preparation', 'Jump', 'Landing'],
-          sensorPositions: ['Left Calf', 'Right Calf']
+    async function apiPost(endpoint, body = null) {
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
         }
       };
 
-      // Sidebar toggle
-      menuBtn.addEventListener('click', function () {
-        sidebar.classList.toggle('active');
-        mainContent.classList.toggle('shifted');
-        menuBtn.classList.toggle('active');
-      });
-
-      document.addEventListener('click', function (e) {
-        if (
-          !sidebar.contains(e.target) &&
-          !menuBtn.contains(e.target) &&
-          sidebar.classList.contains('active')
-        ) {
-          sidebar.classList.remove('active');
-          mainContent.classList.remove('shifted');
-          menuBtn.classList.remove('active');
-        }
-      });
-
-      if (exerciseData[exercise]) {
-        exerciseTitle.textContent = `Exercise: ${exerciseData[exercise].name}`;
-        currentMuscle.textContent = exerciseData[exercise].muscle;
-
-        sensorPositions.innerHTML = '';
-        exerciseData[exercise].sensorPositions.forEach(position => {
-          const item = document.createElement('div');
-          item.className = 'sensor-position';
-          item.innerHTML = `
-            <div class="sensor-dot"></div>
-            <div class="sensor-label">${position}</div>
-          `;
-          sensorPositions.appendChild(item);
-        });
-
-        exerciseSteps.innerHTML = '';
-        exerciseData[exercise].steps.forEach((step, index) => {
-          const block = document.createElement('div');
-          block.className = 'exercise-step';
-          block.innerHTML = `
-            <div class="exercise-step-number">${index + 1}</div>
-            <div class="exercise-step-content">
-              <h4>${exerciseData[exercise].stepTitles[index] || `Step ${index + 1}`}</h4>
-              <p>${step}</p>
-            </div>
-          `;
-          exerciseSteps.appendChild(block);
-        });
+      if (body) {
+        options.body = JSON.stringify(body);
       }
 
-      function showMessage(text) {
-        messageText.textContent = text;
-        statusMessage.classList.add('active');
-        setTimeout(() => {
-          statusMessage.classList.remove('active');
-        }, 3000);
-      }
+      const res = await fetch(`${API_BASE}${endpoint}`, options);
+      const data = await res.json();
+      return data;
+    }
 
-      connectBtn.addEventListener('click', function() {
-        if (!isConnected) {
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    const connectBtn = document.getElementById('connectBtn');
+    const statusIndicator = document.getElementById('statusIndicator');
+    const statusText = document.getElementById('statusText');
+    const dominantSideEl = document.getElementById('dominantSide');
+    const signalDisplay = document.getElementById('signalDisplay');
+    const signalCanvas = document.getElementById('signalCanvas');
+    const startSessionBtn = document.getElementById('startSessionBtn');
+    const exerciseTitle = document.getElementById('exerciseTitle');
+    const currentMuscle = document.getElementById('currentMuscle');
+    const statusMessage = document.getElementById('statusMessage');
+    const messageText = document.getElementById('messageText');
+    const sensorPositions = document.querySelector('.sensor-positions');
+    const exerciseSteps = document.querySelector('.exercise-steps');
+    const resultCard = document.getElementById('resultCard');
+
+    let isConnected = false;
+    let isSessionActive = false;
+    let animationId;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const exercise = urlParams.get('exercise') || 'squat';
+
+    const exerciseData = {
+      squat: {
+        name: 'Squat Analysis',
+        muscle: 'Vastus Lateralis (VL)',
+        steps: [
+          'Stand with feet shoulder-width apart, toes pointing slightly outward.',
+          'Lower your body by bending knees and hips while keeping the chest up.',
+          'Descend until the thighs are parallel to the ground or as deep as comfortable.',
+          'Push through the heels and return to the standing position.'
+        ],
+        stepTitles: ['Starting Position', 'Movement Phase', 'Depth', 'Return'],
+        sensorPositions: ['Left VL', 'Right VL']
+      },
+      jump: {
+        name: 'Jump Analysis',
+        muscle: 'Medial Gastrocnemius',
+        steps: [
+          'Stand upright with feet shoulder-width apart.',
+          'Prepare for the movement with a slight knee bend.',
+          'Push explosively through the feet into a vertical jump.',
+          'Land softly with controlled knee flexion.'
+        ],
+        stepTitles: ['Starting Position', 'Preparation', 'Jump', 'Landing'],
+        sensorPositions: ['Left Calf', 'Right Calf']
+      }
+    };
+
+    menuBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('active');
+      mainContent.classList.toggle('shifted');
+      menuBtn.classList.toggle('active');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (
+        !sidebar.contains(e.target) &&
+        !menuBtn.contains(e.target) &&
+        sidebar.classList.contains('active')
+      ) {
+        sidebar.classList.remove('active');
+        mainContent.classList.remove('shifted');
+        menuBtn.classList.remove('active');
+      }
+    });
+
+    if (exerciseData[exercise]) {
+      exerciseTitle.textContent = `Exercise: ${exerciseData[exercise].name}`;
+      currentMuscle.textContent = exerciseData[exercise].muscle;
+
+      sensorPositions.innerHTML = '';
+      exerciseData[exercise].sensorPositions.forEach(position => {
+        const item = document.createElement('div');
+        item.className = 'sensor-position';
+        item.innerHTML = `
+          <div class="sensor-dot"></div>
+          <div class="sensor-label">${position}</div>
+        `;
+        sensorPositions.appendChild(item);
+      });
+
+      exerciseSteps.innerHTML = '';
+      exerciseData[exercise].steps.forEach((step, index) => {
+        const block = document.createElement('div');
+        block.className = 'exercise-step';
+        block.innerHTML = `
+          <div class="exercise-step-number">${index + 1}</div>
+          <div class="exercise-step-content">
+            <h4>${exerciseData[exercise].stepTitles[index] || `Step ${index + 1}`}</h4>
+            <p>${step}</p>
+          </div>
+        `;
+        exerciseSteps.appendChild(block);
+      });
+    }
+
+    function showMessage(text) {
+      messageText.textContent = text;
+      statusMessage.classList.add('active');
+      setTimeout(() => {
+        statusMessage.classList.remove('active');
+      }, 3000);
+    }
+
+    connectBtn.addEventListener('click', async function() {
+      if (!isConnected) {
+        try {
           connectBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
           connectBtn.disabled = true;
 
-          setTimeout(() => {
-            isConnected = true;
-            statusIndicator.classList.add('connected');
-            statusText.textContent = 'Connected - Ready to start session';
-            connectBtn.innerHTML = '<i class="fas fa-plug"></i> Disconnect';
-            connectBtn.disabled = false;
-            signalDisplay.classList.add('active');
-            showMessage('Sensors connected successfully!');
-          }, 1800);
-        } else {
-          isConnected = false;
-          isSessionActive = false;
-          statusIndicator.classList.remove('connected');
-          statusText.textContent = 'Disconnected - Place sensors and click Connect';
+          const connectRes = await apiPost("/connect");
+
+          if (connectRes.error_type) {
+            throw new Error(connectRes.error_message || "Connection failed");
+          }
+
+          await apiPost("/scan");
+          await apiPost("/select-channels");
+
+          isConnected = true;
+          statusIndicator.classList.add('connected');
+          statusText.textContent = 'Connected - Ready to start session';
+          connectBtn.innerHTML = '<i class="fas fa-plug"></i> Disconnect';
+          signalDisplay.classList.add('active');
+          showMessage('Sensors connected successfully!');
+
+        } catch (error) {
+          console.error(error);
+          showMessage('Connection failed. Check backend or sensors.');
           connectBtn.innerHTML = '<i class="fas fa-plug"></i> Connect Sensors';
-          signalDisplay.classList.remove('active');
-          startSessionBtn.innerHTML = '<i class="fas fa-play-circle"></i> Start Session';
-          startSessionBtn.classList.remove('stop');
-          startSessionBtn.classList.add('primary');
-
-          if (animationId) cancelAnimationFrame(animationId);
-          showMessage('Sensors disconnected.');
-        }
-      });
-
-      startSessionBtn.addEventListener('click', function() {
-        if (!isConnected) {
-          showMessage('Please connect sensors first.');
-          return;
+        } finally {
+          connectBtn.disabled = false;
         }
 
-        if (!isSessionActive) {
+      } else {
+        isConnected = false;
+        isSessionActive = false;
+        statusIndicator.classList.remove('connected');
+        statusText.textContent = 'Disconnected - Place sensors and click Connect';
+        connectBtn.innerHTML = '<i class="fas fa-plug"></i> Connect Sensors';
+        signalDisplay.classList.remove('active');
+        resultCard.style.display = 'none';
+
+        startSessionBtn.innerHTML = '<i class="fas fa-play-circle"></i> Start Session';
+        startSessionBtn.classList.remove('stop');
+        startSessionBtn.classList.add('primary');
+
+        if (animationId) cancelAnimationFrame(animationId);
+        showMessage('Sensors disconnected.');
+      }
+    });
+
+    startSessionBtn.addEventListener('click', async function() {
+      if (!isConnected) {
+        showMessage('Please connect sensors first.');
+        return;
+      }
+
+      if (!isSessionActive) {
+        try {
+          const res = await apiPost("/start-session");
+
+          if (res.error_type) {
+            throw new Error(res.error_message || "Start failed");
+          }
+
           isSessionActive = true;
+          resultCard.style.display = 'none';
+
           startSessionBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Session';
           startSessionBtn.classList.remove('primary');
           startSessionBtn.classList.add('stop');
+
           statusText.textContent = 'Session Active - Recording in progress';
           startSignalVisualization();
-          showMessage('Session started! Perform the exercise while signals are being recorded.');
-        } else {
+          showMessage('Session started! Perform the exercise.');
+
+        } catch (error) {
+          console.error(error);
+          showMessage('Failed to start session.');
+        }
+
+      } else {
+        try {
+          const { data: { user } } = await window.supabase.auth.getUser();
+
+          if (!user) {
+            throw new Error("No logged-in user found.");
+          }
+
+          const result = await apiPost("/stop-session-and-analyze", {
+            client_id: user.id,
+            exercise_type: "Squat"
+          });
+
+          if (animationId) cancelAnimationFrame(animationId);
+
           isSessionActive = false;
           startSessionBtn.innerHTML = '<i class="fas fa-redo"></i> Restart Session';
           startSessionBtn.classList.remove('stop');
           startSessionBtn.classList.add('primary');
-          statusText.textContent = 'Session Stopped - Ready to restart';
 
-          if (animationId) cancelAnimationFrame(animationId);
-          showMessage('Session stopped. You can restart the session.');
+          statusText.textContent = 'Session Stopped - Analysis complete';
+
+          resultCard.style.display = 'block';
+
+          const leftValueEl = document.getElementById('leftValue');
+          const rightValueEl = document.getElementById('rightValue');
+          const leftStrengthEl = document.getElementById('leftStrength');
+          const rightStrengthEl = document.getElementById('rightStrength');
+          const balanceLeftBar = document.getElementById('balanceLeftBar');
+          const balanceRightBar = document.getElementById('balanceRightBar');
+          const imbalanceIndicator = document.getElementById('imbalanceIndicator');
+          const imbalanceValue = document.getElementById('imbalanceValue');
+          const imbalanceStatus = document.getElementById('imbalanceStatus');
+          const balancedSection = document.getElementById('balancedSection');
+          const imbalancedSection = document.getElementById('imbalancedSection');
+          const scaleMarker = document.getElementById('scaleMarker');
+
+          const si = Number(result.si || 0);
+          const imbalancePercentage = Math.round(si * 100);
+
+          const leftRms = Number(result.left_rms || 0.5);
+          const rightRms = Number(result.right_rms || 0.5);
+
+          const total = leftRms + rightRms;
+          const leftPercent = total > 0 ? Math.round((leftRms / total) * 100) : 50;
+          const rightPercent = total > 0 ? Math.round((rightRms / total) * 100) : 50;
+
+          leftValueEl.textContent = `${leftPercent}%`;
+          rightValueEl.textContent = `${rightPercent}%`;
+
+          balanceLeftBar.style.width = `${leftPercent}%`;
+          balanceRightBar.style.width = `${rightPercent}%`;
+
+          function getStrengthText(value) {
+            if (value >= 80) return "Strong Activation";
+            if (value >= 60) return "Moderate Activation";
+            return "Low Activation";
+          }
+
+          leftStrengthEl.textContent = getStrengthText(leftPercent);
+          rightStrengthEl.textContent = getStrengthText(rightPercent);
+
+          const markerPosition = Math.min(imbalancePercentage, 30);
+          scaleMarker.style.left = `${markerPosition}%`;
+
+          if (imbalancePercentage >= 15) {
+            imbalanceIndicator.className = 'imbalance-indicator imbalanced';
+            imbalanceValue.className = 'imbalance-value imbalanced';
+            imbalanceValue.textContent = `${imbalancePercentage}% Imbalance`;
+            imbalanceStatus.textContent = 'Status: Imbalanced (Above 15% threshold)';
+            balancedSection.classList.remove('active');
+            imbalancedSection.classList.add('active');
+          } else {
+            imbalanceIndicator.className = 'imbalance-indicator balanced';
+            imbalanceValue.className = 'imbalance-value balanced';
+            imbalanceValue.textContent = `${imbalancePercentage}% Overall Imbalance`;
+            imbalanceStatus.textContent = 'Status: Balanced (Below 15% threshold)';
+            balancedSection.classList.add('active');
+            imbalancedSection.classList.remove('active');
+          }
+
+          dominantSideEl.textContent = `Dominant Side: ${result.dominant}`;
+
+          if (result.raw_plot) {
+            drawRawSignal(result.raw_plot);
+          }
+
+          showMessage('Session analyzed successfully!');
+
+        } catch (error) {
+          console.error(error);
+          showMessage('Failed to stop/analyze session.');
         }
-      });
-
-      function startSignalVisualization() {
-        const canvas = signalCanvas;
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-
-        const width = canvas.width;
-        const height = canvas.height;
-
-        let time = 0;
-        const leftSignal = [];
-        const rightSignal = [];
-
-        function draw() {
-          ctx.clearRect(0, 0, width, height);
-
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-          ctx.lineWidth = 1;
-
-          for (let y = 0; y < height; y += height / 10) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(width, y);
-            ctx.stroke();
-          }
-
-          for (let x = 0; x < width; x += width / 20) {
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, height);
-            ctx.stroke();
-          }
-
-          time += 0.05;
-
-          const leftAmplitude = 0.7 + 0.3 * Math.sin(time * 0.5);
-          const leftValue = Math.sin(time * 3) * leftAmplitude * (height / 4) + (height / 4);
-          leftSignal.push({ x: time, y: leftValue });
-
-          const rightAmplitude = 0.4 + 0.2 * Math.sin(time * 0.3);
-          const rightValue = Math.sin(time * 3 + 0.5) * rightAmplitude * (height / 4) + (3 * height / 4);
-          rightSignal.push({ x: time, y: rightValue });
-
-          if (leftSignal.length > 200) {
-            leftSignal.shift();
-            rightSignal.shift();
-          }
-
-          ctx.strokeStyle = 'rgba(255, 182, 163, 0.85)';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          for (let i = 0; i < leftSignal.length; i++) {
-            const x = (i / leftSignal.length) * width;
-            const y = leftSignal[i].y;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
-
-          ctx.strokeStyle = 'rgba(141, 211, 161, 0.85)';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          for (let i = 0; i < rightSignal.length; i++) {
-            const x = (i / rightSignal.length) * width;
-            const y = rightSignal[i].y;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
-
-          animationId = requestAnimationFrame(draw);
-        }
-
-        draw();
       }
     });
-    document.addEventListener("DOMContentLoaded", async function () {
-  try {
-    const supa = window.supabase;
 
-    // جيب المستخدم الحالي
-    const { data: { user }, error: userError } = await supa.auth.getUser();
+    function startSignalVisualization() {
+      const canvas = signalCanvas;
+      const ctx = canvas.getContext('2d');
 
-    if (userError || !user) {
-      console.error("No logged-in user found");
-      return;
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      const width = canvas.width;
+      const height = canvas.height;
+
+      let time = 0;
+      const leftSignal = [];
+      const rightSignal = [];
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.lineWidth = 1;
+
+        for (let y = 0; y < height; y += height / 10) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(width, y);
+          ctx.stroke();
+        }
+
+        for (let x = 0; x < width; x += width / 20) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        }
+
+        time += 0.05;
+
+        const leftAmplitude = 0.7 + 0.3 * Math.sin(time * 0.5);
+        const leftValue = Math.sin(time * 3) * leftAmplitude * (height / 4) + (height / 4);
+        leftSignal.push({ x: time, y: leftValue });
+
+        const rightAmplitude = 0.4 + 0.2 * Math.sin(time * 0.3);
+        const rightValue = Math.sin(time * 3 + 0.5) * rightAmplitude * (height / 4) + (3 * height / 4);
+        rightSignal.push({ x: time, y: rightValue });
+
+        if (leftSignal.length > 200) {
+          leftSignal.shift();
+          rightSignal.shift();
+        }
+
+        ctx.strokeStyle = 'rgba(255, 182, 163, 0.85)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i = 0; i < leftSignal.length; i++) {
+          const x = (i / leftSignal.length) * width;
+          const y = leftSignal[i].y;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(141, 211, 161, 0.85)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i = 0; i < rightSignal.length; i++) {
+          const x = (i / rightSignal.length) * width;
+          const y = rightSignal[i].y;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        animationId = requestAnimationFrame(draw);
+      }
+
+      draw();
     }
 
-    // جيب الاسم الأول من جدول Client
-    const { data: client, error: clientError } = await supa
-      .from("Client")
-      .select("Fname")
-      .eq("client_id", user.id)
-      .single();
+    function drawRawSignal(rawPlot) {
+      const canvas = signalCanvas;
+      const ctx = canvas.getContext('2d');
 
-    if (clientError) {
-      console.error("Error fetching client name:", clientError.message);
-      return;
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      const width = canvas.width;
+      const height = canvas.height;
+
+      ctx.clearRect(0, 0, width, height);
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1;
+
+      for (let y = 0; y < height; y += height / 10) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      for (let x = 0; x < width; x += width / 20) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+
+      const left = rawPlot.emg_left || [];
+      const right = rawPlot.emg_right || [];
+
+      if (!left.length || !right.length) return;
+
+      const allValues = [...left, ...right];
+      const minVal = Math.min(...allValues);
+      const maxVal = Math.max(...allValues);
+      const range = (maxVal - minVal) || 1;
+
+      function normalize(val, top, sectionHeight) {
+        return top + sectionHeight - ((val - minVal) / range) * sectionHeight;
+      }
+
+      const topSection = height * 0.05;
+      const sectionHeight = height * 0.35;
+      const bottomSection = height * 0.55;
+
+      ctx.strokeStyle = 'rgba(255, 182, 163, 0.9)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i = 0; i < left.length; i++) {
+        const x = (i / (left.length - 1)) * width;
+        const y = normalize(left[i], topSection, sectionHeight);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(141, 211, 161, 0.9)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i = 0; i < right.length; i++) {
+        const x = (i / (right.length - 1)) * width;
+        const y = normalize(right[i], bottomSection, sectionHeight);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
     }
+  });
 
-    // حط الاسم في الـ Welcome
-    const welcomeName = document.getElementById("welcomeName");
-    if (welcomeName) {
-      welcomeName.textContent = client.Fname || "User";
+  document.addEventListener("DOMContentLoaded", async function() {
+    try {
+      const supa = window.supabase;
+
+      const { data: { user }, error: userError } = await supa.auth.getUser();
+
+      if (userError || !user) {
+        console.error("No logged-in user found");
+        return;
+      }
+
+      const { data: client, error: clientError } = await supa
+        .from("Client")
+        .select("Fname")
+        .eq("client_id", user.id)
+        .single();
+
+      if (clientError) {
+        console.error("Error fetching client name:", clientError.message);
+        return;
+      }
+
+      const welcomeName = document.getElementById("welcomeName");
+      if (welcomeName) {
+        welcomeName.textContent = client.Fname || "User";
+      }
+
+      const sidebarUserName = document.getElementById("sidebarUserName");
+      if (sidebarUserName) {
+        sidebarUserName.textContent = client.Fname || "User";
+      }
+
+    } catch (err) {
+      console.error("Unexpected error:", err);
     }
-
-    // حط الاسم في الـ Sidebar
-    const sidebarUserName = document.getElementById("sidebarUserName");
-    if (sidebarUserName) {
-      sidebarUserName.textContent = client.Fname || "User";
-    }
-
-  } catch (err) {
-    console.error("Unexpected error:", err);
-  }
-});
-  </script>
+  });
+</script>
 </body>
 </html>
