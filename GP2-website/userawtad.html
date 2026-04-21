@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AWTAD - Exercise Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
 
   <style>
     :root {
@@ -62,7 +61,6 @@
       z-index: -1;
     }
 
-    /* --- MENU BUTTON (الزر الجديد) --- */
     .menu-btn {
       position: fixed;
       top: 20px;
@@ -98,14 +96,13 @@
       transform: rotate(90deg);
     }
 
-    /* --- SIDEBAR (مخفي في البداية) --- */
     .sidebar {
       width: var(--sidebar-width);
       height: calc(100vh - 24px);
       margin: 12px;
       position: fixed;
       top: 0;
-      left: -250px; /* مخفي خارج الشاشة */
+      left: -250px;
       display: flex;
       flex-direction: column;
       padding: 22px 16px;
@@ -121,11 +118,11 @@
       -webkit-backdrop-filter: blur(22px) saturate(140%);
       z-index: 1000;
       overflow: hidden;
-      transition: left 0.3s ease; /* حركة انزلاق */
+      transition: left 0.3s ease;
     }
 
     .sidebar.active {
-      left: 0; /* يظهر عند الضغط */
+      left: 0;
     }
 
     .sidebar::before {
@@ -170,6 +167,7 @@
       color: var(--primary-accent);
       font-size: 0.92rem;
       margin-bottom: 4px;
+      word-break: break-word;
     }
 
     .user-mini-card p {
@@ -226,17 +224,17 @@
       color: var(--primary-accent);
     }
 
-    /* --- MAIN CONTENT (يتحرك مع الـ Sidebar) --- */
     .main-content {
-  margin-left: 0;
-  padding: 70px 34px 42px 80px;
-  width: 100%;
-  transition: margin-left 0.3s ease;
-}
+      margin-left: 0;
+      padding: 70px 34px 42px 80px;
+      width: 100%;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+    }
 
     .main-content.shifted {
-  margin-left: calc(var(--sidebar-width) + 20px);
-}
+      margin-left: calc(var(--sidebar-width) + 32px);
+      width: calc(100% - var(--sidebar-width) - 32px);
+    }
 
     .dashboard-header {
       margin-bottom: 34px;
@@ -262,7 +260,6 @@
       max-width: 850px;
     }
 
-    /* shared glass */
     .exercise-card,
     .stat-card,
     .progress-section,
@@ -680,7 +677,6 @@
       font-size: 0.95rem;
     }
 
-    /* --- MODAL --- */
     .modal {
       display: none;
       position: fixed;
@@ -725,7 +721,6 @@
       margin: 10px 0 15px 20px;
     }
 
-    /* --- RESPONSIVE --- */
     @media (max-width: 1200px) {
       .vl-stages {
         grid-template-columns: repeat(2, 1fr);
@@ -763,7 +758,10 @@
     }
 
     @media (max-width: 768px) {
-      .main-content {
+      .main-content,
+      .main-content.shifted {
+        width: 100%;
+        margin-left: 0;
         padding: 20px 18px;
       }
 
@@ -814,21 +812,19 @@
 </head>
 <body>
 
-  <!-- زر القائمة (يظهر في البداية) -->
   <div class="menu-btn" id="menuBtn">
     <i class="fas fa-bars"></i>
   </div>
 
-  <!-- Sidebar (مخفي في البداية) -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <img src="awtadlogo1.png" alt="AWTAD">
     </div>
 
     <div class="user-mini-card">
-  <h4 id="sidebarUserName">...</h4>
-  <p>Performance Dashboard</p>
-</div>
+      <h4 id="sidebarUserName">...</h4>
+      <p>Performance Dashboard</p>
+    </div>
 
     <nav class="sidebar-nav">
       <a href="userawtad.html" class="nav-item active">
@@ -855,22 +851,17 @@
     </a>
   </aside>
 
-  <!-- Main Content -->
   <main class="main-content" id="mainContent">
     <section class="dashboard-header">
       <div class="welcome-section">
         <h1 class="welcome-title">Welcome, <span id="welcomeName">...</span></h1>
+        <p class="welcome-subtitle">Here is your latest EMG session summary and overall performance progress.</p>
       </div>
 
       <div class="action-buttons">
         <button class="action-btn primary" onclick="window.location.href='startsesstionawtad.html'">
           <i class="fas fa-play-circle"></i>
           Start Session
-        </button>
-
-        <button class="action-btn" onclick="window.location.href='lastsessionawtad.html'">
-          <i class="fas fa-history"></i>
-          Last Session
         </button>
 
         <button class="action-btn" onclick="window.location.href='profileawtad.html'">
@@ -886,77 +877,40 @@
       <div class="exercises-grid">
         <div class="exercise-card">
           <div class="exercise-header">
-            <h3 class="exercise-title">Squat Analysis</h3>
+            <h3 class="exercise-title" id="lastExerciseTitle">No Session Yet</h3>
             <div class="exercise-icon">
               <i class="fas fa-running"></i>
             </div>
           </div>
 
-          <p class="exercise-description">
-            Your squat session showed excellent overall form with consistent muscle activation patterns.
-            Focus on maintaining equal pressure distribution during the concentric phase.
+          <p class="exercise-description" id="lastExerciseDescription">
+            No recorded sessions were found yet. Start your first session to see your dashboard insights.
           </p>
 
           <div class="muscle-target">
-            <h4 class="muscle-target-title">VL Muscle Activation Imbalance</h4>
-            <div class="muscle-target-list">
-              <span class="muscle-tag">Imbalance: 8%</span>
-              <span class="muscle-tag">Right VL: 88%</span>
-              <span class="muscle-tag">Left VL: 80%</span>
-              <span class="muscle-tag">Target: ≤5%</span>
+            <h4 class="muscle-target-title" id="summaryTitle">Last Session Summary</h4>
+            <div class="muscle-target-list" id="summaryTags">
+              <span class="muscle-tag">No data</span>
             </div>
           </div>
 
           <div class="muscle-target">
-            <h4 class="muscle-target-title">VL Activation Stages</h4>
-            <div class="vl-stages">
+            <h4 class="muscle-target-title" id="detailsTitle">Session Details</h4>
+            <div class="vl-stages" id="sessionDetailsCards">
               <div class="stage-card">
-                <div class="stage-number">1</div>
-                <div class="stage-title">Descent Phase</div>
-                <div class="stage-status balanced">Balanced</div>
-                <div class="stage-percentage">3%</div>
-                <div class="stage-percentage-label">Imbalance Level</div>
+                <div class="stage-number">-</div>
+                <div class="stage-title">No Session Data</div>
+                <div class="stage-status balanced">Unavailable</div>
+                <div class="stage-percentage">N/A</div>
+                <div class="stage-percentage-label">Start a session first</div>
                 <div class="stage-progress">
-                  <div class="stage-progress-fill balanced" style="width: 97%"></div>
-                </div>
-              </div>
-
-              <div class="stage-card">
-                <div class="stage-number">2</div>
-                <div class="stage-title">Bottom Position</div>
-                <div class="stage-status imbalanced">Imbalanced</div>
-                <div class="stage-percentage">12%</div>
-                <div class="stage-percentage-label">Imbalance Level</div>
-                <div class="stage-progress">
-                  <div class="stage-progress-fill imbalanced" style="width: 88%"></div>
-                </div>
-              </div>
-
-              <div class="stage-card">
-                <div class="stage-number">3</div>
-                <div class="stage-title">Ascent Phase</div>
-                <div class="stage-status imbalanced">Imbalanced</div>
-                <div class="stage-percentage">9%</div>
-                <div class="stage-percentage-label">Imbalance Level</div>
-                <div class="stage-progress">
-                  <div class="stage-progress-fill imbalanced" style="width: 91%"></div>
-                </div>
-              </div>
-
-              <div class="stage-card">
-                <div class="stage-number">4</div>
-                <div class="stage-title">Lockout Phase</div>
-                <div class="stage-status balanced">Balanced</div>
-                <div class="stage-percentage">2%</div>
-                <div class="stage-percentage-label">Imbalance Level</div>
-                <div class="stage-progress">
-                  <div class="stage-progress-fill balanced" style="width: 98%"></div>
+                  <div class="stage-progress-fill balanced" style="width:0%"></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <button class="exercise-btn" onclick="selectExercise('squat')">
+          <button class="exercise-btn" onclick="window.location.href='sesstionsawtad.html'">
             View More
           </button>
         </div>
@@ -965,26 +919,22 @@
 
     <section class="imbalance-section">
       <div class="imbalance-header">
-        <h2 class="imbalance-title">VL Muscle Activation Analysis</h2>
+        <h2 class="imbalance-title">Muscle Activation Analysis</h2>
         <div class="imbalance-icon">
           <i class="fas fa-balance-scale"></i>
         </div>
       </div>
 
       <div class="imbalance-content">
-        <div class="imbalance-text">
-          <p><strong>Vastus Lateralis (VL) Muscle</strong> is a key quadriceps muscle crucial for knee extension and stability.
-          Balanced VL activation is essential for proper squat mechanics and injury prevention.</p>
+        <div class="imbalance-text" id="analysisText">
+          <p><strong>No analysis data available yet.</strong></p>
           <br>
-          <p><strong>Current Status:</strong> Your VL activation shows an 8% overall imbalance favoring the right side.
-          This is an improvement from your previous 15% imbalance. Continue focusing on unilateral exercises to address this.</p>
-          <br>
-          <p><strong>Stage Analysis:</strong> You have good balance in the descent and lockout phases, but need improvement in the bottom position and ascent phase.</p>
+          <p>Start a session to generate symmetry index, dominant side, and progress information.</p>
         </div>
 
         <button class="learn-more-btn" onclick="showImbalanceDetails()">
           <i class="fas fa-book"></i>
-          Learn More About VL Activation Balance
+          Learn More About Activation Balance
         </button>
       </div>
     </section>
@@ -1000,24 +950,24 @@
               <i class="fas fa-dumbbell"></i>
             </div>
           </div>
-          <div class="stat-card-value">24</div>
+          <div class="stat-card-value" id="totalSessionsValue">0</div>
           <div class="stat-card-change">
             <i class="fas fa-check-circle"></i>
-            <span>Consistent training</span>
+            <span id="totalSessionsText">No sessions yet</span>
           </div>
         </div>
 
         <div class="stat-card">
           <div class="stat-card-header">
-            <h3 class="stat-card-title">VL Balance Improvement</h3>
+            <h3 class="stat-card-title">Balance Improvement</h3>
             <div class="stat-card-icon">
               <i class="fas fa-chart-line"></i>
             </div>
           </div>
-          <div class="stat-card-value">47%</div>
+          <div class="stat-card-value" id="improvementValue">N/A</div>
           <div class="stat-card-change">
             <i class="fas fa-arrow-up"></i>
-            <span>From 15% to 8%</span>
+            <span id="improvementText">Need more sessions</span>
           </div>
         </div>
 
@@ -1028,10 +978,10 @@
               <i class="fas fa-clock"></i>
             </div>
           </div>
-          <div class="stat-card-value">42m</div>
+          <div class="stat-card-value" id="avgDurationValue">N/A</div>
           <div class="stat-card-change">
             <i class="fas fa-check-circle"></i>
-            <span>Optimal training time</span>
+            <span id="avgDurationText">No duration data</span>
           </div>
         </div>
       </div>
@@ -1039,7 +989,7 @@
 
     <section class="progress-section">
       <div class="progress-header">
-        <h2 class="progress-title">VL Muscle Balance Progress</h2>
+        <h2 class="progress-title">Symmetry Index Progress</h2>
         <div class="chart-actions">
           <button class="chart-btn active" onclick="changeChartPeriod(event, 'month')">1 Month</button>
           <button class="chart-btn" onclick="changeChartPeriod(event, '3months')">3 Months</button>
@@ -1057,45 +1007,30 @@
     </footer>
   </main>
 
-  <!-- Modals (نفسها) -->
   <div id="logoutModal" class="modal">
     <div class="modal-content">
       <h3 class="modal-title">Confirm Logout</h3>
       <p class="modal-text">Are you sure you want to log out? You'll need to log in again to access your account.</p>
       <div class="modal-buttons">
         <button id="cancelLogout" class="modal-btn cancel">Cancel</button>
-        <button id="confirmLogout" class="modal-btn confirm" onclick="window.location.href='loginawtad.html'">Logout</button>
+        <button id="confirmLogout" class="modal-btn confirm">Logout</button>
       </div>
     </div>
   </div>
 
   <div id="imbalanceModal" class="modal">
     <div class="modal-content">
-      <h3 class="modal-title">VL Muscle Activation Details</h3>
+      <h3 class="modal-title">Muscle Activation Details</h3>
       <div class="modal-text" style="text-align: left;">
-        <p><strong>What is VL Muscle Imbalance?</strong></p>
-        <p>Unequal activation of the Vastus Lateralis muscles between legs during movement, often caused by:</p>
+        <p><strong>What is Muscle Imbalance?</strong></p>
+        <p>It refers to unequal muscle activation between sides during movement, which may be linked to dominance, previous injuries, muscle weakness, or biomechanical asymmetry.</p>
+        <br>
+        <p><strong>Why it matters:</strong></p>
         <ul>
-          <li>Dominant leg preference</li>
-          <li>Previous knee injuries</li>
-          <li>Muscle tightness/weakness</li>
-          <li>Biomechanical asymmetries</li>
-        </ul>
-
-        <p><strong>The 4 Activation Stages:</strong></p>
-        <ol>
-          <li><strong>Descent Phase:</strong> Initial loading pattern (Balanced: ≤5% difference)</li>
-          <li><strong>Bottom Position:</strong> Maximum muscle engagement (Imbalanced: ≥8% difference)</li>
-          <li><strong>Ascent Phase:</strong> Power generation phase (Imbalanced: ≥8% difference)</li>
-          <li><strong>Lockout Phase:</strong> Full extension completion (Balanced: ≤5% difference)</li>
-        </ol>
-
-        <p><strong>Recommended Exercises:</strong></p>
-        <ul>
-          <li>Single-leg squats</li>
-          <li>Bulgarian split squats</li>
-          <li>Step-ups with focus on weaker side</li>
-          <li>Leg extensions with emphasis on control</li>
+          <li>Improves movement quality</li>
+          <li>Supports injury prevention</li>
+          <li>Helps monitor rehabilitation progress</li>
+          <li>Guides better training decisions</li>
         </ul>
       </div>
       <div class="modal-buttons">
@@ -1113,21 +1048,23 @@
       dark: '#e6a491'
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
-      // عناصر التحكم بالـ Sidebar
+    const supa = window.supabase;
+    let progressChart;
+    let allProgressLabels = [];
+    let allProgressValues = [];
+
+    document.addEventListener('DOMContentLoaded', async function () {
       const menuBtn = document.getElementById('menuBtn');
       const sidebar = document.getElementById('sidebar');
       const mainContent = document.getElementById('mainContent');
 
-      // فتح/غلق الـ Sidebar عند الضغط على الزر
-      menuBtn.addEventListener('click', function() {
+      menuBtn.addEventListener('click', function () {
         sidebar.classList.toggle('active');
         mainContent.classList.toggle('shifted');
         menuBtn.classList.toggle('active');
       });
 
-      // إغلاق الـ Sidebar عند الضغط خارجها (اختياري)
-      document.addEventListener('click', function(e) {
+      document.addEventListener('click', function (e) {
         if (!sidebar.contains(e.target) && !menuBtn.contains(e.target) && sidebar.classList.contains('active')) {
           sidebar.classList.remove('active');
           mainContent.classList.remove('shifted');
@@ -1135,54 +1072,54 @@
         }
       });
 
-      // باقي الكود (modals, charts, etc)
       const logoutBtn = document.getElementById('logoutBtn');
       const logoutModal = document.getElementById('logoutModal');
       const cancelLogout = document.getElementById('cancelLogout');
       const confirmLogout = document.getElementById('confirmLogout');
-
       const imbalanceModal = document.getElementById('imbalanceModal');
       const closeImbalanceModal = document.getElementById('closeImbalanceModal');
 
       if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
+        logoutBtn.addEventListener('click', function (e) {
           e.preventDefault();
           logoutModal.classList.add('active');
         });
       }
 
       if (cancelLogout) {
-        cancelLogout.addEventListener('click', function() {
+        cancelLogout.addEventListener('click', function () {
           logoutModal.classList.remove('active');
         });
       }
 
       if (confirmLogout) {
-        confirmLogout.addEventListener('click', function() {
-          logoutModal.classList.remove('active');
+        confirmLogout.addEventListener('click', async function () {
+          const { error } = await supa.auth.signOut();
+          if (error) {
+            alert("Logout failed: " + error.message);
+            return;
+          }
+          window.location.href = 'loginawtad.html';
         });
       }
 
       if (closeImbalanceModal) {
-        closeImbalanceModal.addEventListener('click', function() {
+        closeImbalanceModal.addEventListener('click', function () {
           imbalanceModal.classList.remove('active');
         });
       }
 
       [logoutModal, imbalanceModal].forEach(modal => {
         if (modal) {
-          modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-              modal.classList.remove('active');
-            }
+          modal.addEventListener('click', function (e) {
+            if (e.target === modal) modal.classList.remove('active');
           });
         }
       });
 
-      initializeProgressChart();
+      await loadDashboardData();
 
       const cards = document.querySelectorAll('.exercise-card, .stat-card, .progress-section, .imbalance-section, .stage-card');
-
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -1204,19 +1141,315 @@
       document.getElementById('imbalanceModal').classList.add('active');
     }
 
-    let progressChart;
+    async function loadDashboardData() {
+      try {
+        const { data: { user }, error: userError } = await supa.auth.getUser();
 
-    function initializeProgressChart() {
-      const progressCtx = document.getElementById('progressChart').getContext('2d');
+        if (userError || !user) {
+          console.error("No logged-in user found");
+          window.location.href = "loginawtad.html";
+          return;
+        }
+
+        const { data: client, error: clientError } = await supa
+          .from("Client")
+          .select("Fname, Lname")
+          .eq("client_id", user.id)
+          .single();
+
+        if (clientError) {
+          console.error("Error fetching client:", clientError.message);
+        }
+
+        const firstName = client?.Fname || "User";
+        const fullName = `${client?.Fname || ""} ${client?.Lname || ""}`.trim() || "User";
+
+        const sidebarUserName = document.getElementById("sidebarUserName");
+        const welcomeName = document.getElementById("welcomeName");
+
+        if (sidebarUserName) sidebarUserName.textContent = fullName;
+        if (welcomeName) welcomeName.textContent = firstName;
+
+        const { data: sessions, error: sessionError } = await supa
+          .from("Session")
+          .select(`
+            session_id,
+            exercise_type,
+            session_date,
+            duration_sec,
+            coach_feedback,
+            Reps (
+              reps_id,
+              label,
+              symmetry_index,
+              dominant_side
+            )
+          `)
+          .eq("client_id", user.id)
+          .order("session_date", { ascending: false });
+
+        if (sessionError) {
+          console.error("Error fetching sessions:", sessionError.message);
+          return;
+        }
+
+        const mappedSessions = (sessions || []).map(session => {
+          const rep = session.Reps && session.Reps.length > 0 ? session.Reps[0] : null;
+
+          return {
+            session_id: session.session_id,
+            exercise_type: session.exercise_type || "Exercise",
+            session_date: session.session_date,
+            duration_sec: session.duration_sec,
+            coach_feedback: session.coach_feedback || "No feedback yet.",
+            label: rep?.label || "Unknown",
+            symmetry_index: rep?.symmetry_index != null ? Number(rep.symmetry_index) : null,
+            dominant_side: rep?.dominant_side || "N/A"
+          };
+        });
+
+        fillLastSessionSection(mappedSessions);
+        fillStatsSection(mappedSessions);
+        fillImbalanceSection(mappedSessions);
+        fillChartSection(mappedSessions);
+
+      } catch (err) {
+        console.error("Unexpected dashboard error:", err);
+      }
+    }
+
+    function fillLastSessionSection(sessions) {
+      const exerciseTitle = document.getElementById('lastExerciseTitle');
+      const exerciseDescription = document.getElementById('lastExerciseDescription');
+      const summaryTitle = document.getElementById('summaryTitle');
+      const summaryTags = document.getElementById('summaryTags');
+      const detailsTitle = document.getElementById('detailsTitle');
+      const detailsCards = document.getElementById('sessionDetailsCards');
+
+      if (!sessions.length) {
+        exerciseTitle.textContent = "No Session Yet";
+        exerciseDescription.textContent = "No recorded sessions were found yet. Start your first session to see your dashboard insights.";
+        summaryTitle.textContent = "Last Session Summary";
+        summaryTags.innerHTML = `<span class="muscle-tag">No data</span>`;
+        detailsTitle.textContent = "Session Details";
+        detailsCards.innerHTML = `
+          <div class="stage-card">
+            <div class="stage-number">-</div>
+            <div class="stage-title">No Session Data</div>
+            <div class="stage-status balanced">Unavailable</div>
+            <div class="stage-percentage">N/A</div>
+            <div class="stage-percentage-label">Start a session first</div>
+            <div class="stage-progress">
+              <div class="stage-progress-fill balanced" style="width:0%"></div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const latest = sessions[0];
+      const statusClass = latest.label.toLowerCase() === "balanced" ? "balanced" : "imbalanced";
+
+      exerciseTitle.textContent = `${latest.exercise_type} Analysis`;
+
+      exerciseDescription.textContent =
+        `Your latest ${latest.exercise_type.toLowerCase()} session was analyzed successfully. ` +
+        `The current result is ${latest.label.toLowerCase()} with a symmetry index of ` +
+        `${latest.symmetry_index != null ? latest.symmetry_index.toFixed(2) + "%" : "N/A"}.`;
+
+      summaryTitle.textContent = "Last Session Summary";
+
+      summaryTags.innerHTML = `
+        <span class="muscle-tag">Symmetry Index: ${latest.symmetry_index != null ? latest.symmetry_index.toFixed(2) + "%" : "N/A"}</span>
+        <span class="muscle-tag">Dominant Side: ${latest.dominant_side}</span>
+        <span class="muscle-tag">Status: ${latest.label}</span>
+        <span class="muscle-tag">Duration: ${latest.duration_sec != null ? latest.duration_sec + " sec" : "N/A"}</span>
+      `;
+
+      detailsTitle.textContent = "Session Details";
+
+      detailsCards.innerHTML = `
+        <div class="stage-card">
+          <div class="stage-number">1</div>
+          <div class="stage-title">Exercise</div>
+          <div class="stage-status balanced">Recorded</div>
+          <div class="stage-percentage">${latest.exercise_type}</div>
+          <div class="stage-percentage-label">Latest session</div>
+          <div class="stage-progress">
+            <div class="stage-progress-fill balanced" style="width:100%"></div>
+          </div>
+        </div>
+
+        <div class="stage-card">
+          <div class="stage-number">2</div>
+          <div class="stage-title">Symmetry Index</div>
+          <div class="stage-status ${statusClass}">${latest.label}</div>
+          <div class="stage-percentage">${latest.symmetry_index != null ? latest.symmetry_index.toFixed(2) + "%" : "N/A"}</div>
+          <div class="stage-percentage-label">Current result</div>
+          <div class="stage-progress">
+            <div class="stage-progress-fill ${statusClass}" style="width:${latest.symmetry_index != null ? Math.max(5, 100 - latest.symmetry_index) : 0}%"></div>
+          </div>
+        </div>
+
+        <div class="stage-card">
+          <div class="stage-number">3</div>
+          <div class="stage-title">Status</div>
+          <div class="stage-status ${statusClass}">${latest.label}</div>
+          <div class="stage-percentage">${latest.label}</div>
+          <div class="stage-percentage-label">Classification</div>
+          <div class="stage-progress">
+            <div class="stage-progress-fill ${statusClass}" style="width:100%"></div>
+          </div>
+        </div>
+
+        <div class="stage-card">
+          <div class="stage-number">4</div>
+          <div class="stage-title">Dominant Side</div>
+          <div class="stage-status balanced">Detected</div>
+          <div class="stage-percentage">${latest.dominant_side}</div>
+          <div class="stage-percentage-label">Dominance</div>
+          <div class="stage-progress">
+            <div class="stage-progress-fill balanced" style="width:100%"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function fillStatsSection(sessions) {
+      const totalSessionsValue = document.getElementById('totalSessionsValue');
+      const totalSessionsText = document.getElementById('totalSessionsText');
+      const improvementValue = document.getElementById('improvementValue');
+      const improvementText = document.getElementById('improvementText');
+      const avgDurationValue = document.getElementById('avgDurationValue');
+      const avgDurationText = document.getElementById('avgDurationText');
+
+      const totalSessions = sessions.length;
+
+      const validSI = sessions
+        .map(s => s.symmetry_index)
+        .filter(v => typeof v === "number" && !isNaN(v));
+
+      const validDurations = sessions
+        .map(s => s.duration_sec)
+        .filter(v => typeof v === "number" && !isNaN(v));
+
+      totalSessionsValue.textContent = totalSessions;
+      totalSessionsText.textContent = totalSessions > 0 ? "Recorded sessions" : "No sessions yet";
+
+      if (validSI.length >= 2 && validSI[validSI.length - 1] > 0) {
+        const oldest = validSI[validSI.length - 1];
+        const latest = validSI[0];
+        const improvement = ((oldest - latest) / oldest) * 100;
+        improvementValue.textContent = `${improvement.toFixed(0)}%`;
+        improvementText.textContent = `From ${oldest.toFixed(2)}% to ${latest.toFixed(2)}%`;
+      } else {
+        improvementValue.textContent = "N/A";
+        improvementText.textContent = "Need more sessions";
+      }
+
+      if (validDurations.length) {
+        const avg = validDurations.reduce((a, b) => a + b, 0) / validDurations.length;
+        avgDurationValue.textContent = `${avg.toFixed(0)} sec`;
+        avgDurationText.textContent = "Average across sessions";
+      } else {
+        avgDurationValue.textContent = "N/A";
+        avgDurationText.textContent = "No duration data";
+      }
+    }
+
+    function fillImbalanceSection(sessions) {
+      const analysisText = document.getElementById('analysisText');
+
+      if (!sessions.length) {
+        analysisText.innerHTML = `
+          <p><strong>No analysis data available yet.</strong></p>
+          <br>
+          <p>Start a session to generate symmetry index, dominant side, and progress information.</p>
+        `;
+        return;
+      }
+
+      const latest = sessions[0];
+      const validSI = sessions
+        .map(s => s.symmetry_index)
+        .filter(v => typeof v === "number" && !isNaN(v));
+
+      const previous = validSI.length >= 2 ? validSI[1] : null;
+
+      let trendText = "This is your first recorded session.";
+      if (previous != null && latest.symmetry_index != null) {
+        if (latest.symmetry_index < previous) {
+          trendText = `This is an improvement from your previous ${previous.toFixed(2)}% symmetry index.`;
+        } else if (latest.symmetry_index > previous) {
+          trendText = `This session shows a higher imbalance compared to your previous ${previous.toFixed(2)}%.`;
+        } else {
+          trendText = `Your result is unchanged from your previous session.`;
+        }
+      }
+
+      analysisText.innerHTML = `
+        <p><strong>Latest Exercise:</strong> ${latest.exercise_type}</p>
+        <br>
+        <p><strong>Current Status:</strong> Your latest result is <strong>${latest.label}</strong> with a symmetry index of <strong>${latest.symmetry_index != null ? latest.symmetry_index.toFixed(2) + "%" : "N/A"}</strong>.</p>
+        <br>
+        <p><strong>Dominant Side:</strong> ${latest.dominant_side}</p>
+        <br>
+        <p><strong>Progress Insight:</strong> ${trendText}</p>
+      `;
+    }
+
+    function fillChartSection(sessions) {
+      const sorted = [...sessions]
+        .filter(s => s.session_date && typeof s.symmetry_index === "number" && !isNaN(s.symmetry_index))
+        .sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
+
+      allProgressLabels = sorted.map(s => {
+        const d = new Date(s.session_date);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      });
+
+      allProgressValues = sorted.map(s => s.symmetry_index);
+
+      initializeProgressChart("month");
+    }
+
+    function getChartDataByPeriod(period) {
+      if (!allProgressLabels.length || !allProgressValues.length) {
+        return {
+          labels: ['No Data'],
+          values: [0]
+        };
+      }
+
+      let count = 4;
+      if (period === '3months') count = 8;
+      if (period === '6months') count = 12;
+
+      return {
+        labels: allProgressLabels.slice(-count),
+        values: allProgressValues.slice(-count)
+      };
+    }
+
+    function initializeProgressChart(period = "month") {
+      const canvas = document.getElementById('progressChart');
+      if (!canvas) return;
+
+      const progressCtx = canvas.getContext('2d');
+      const sliced = getChartDataByPeriod(period);
+
+      if (progressChart) {
+        progressChart.destroy();
+      }
 
       progressChart = new Chart(progressCtx, {
         type: 'line',
         data: {
-          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+          labels: sliced.labels,
           datasets: [
             {
-              label: 'VL Imbalance % (Lower is better)',
-              data: [15, 12, 10, 8],
+              label: 'Symmetry Index %',
+              data: sliced.values,
               borderColor: peachColors.primary,
               backgroundColor: 'rgba(255, 182, 163, 0.15)',
               tension: 0.3,
@@ -1253,7 +1486,7 @@
               cornerRadius: 8,
               callbacks: {
                 label: function(context) {
-                  return `VL Imbalance: ${context.raw}%`;
+                  return `Symmetry Index: ${context.raw}%`;
                 }
               }
             }
@@ -1261,7 +1494,6 @@
           scales: {
             y: {
               beginAtZero: true,
-              max: 25,
               grid: {
                 color: 'rgba(255, 255, 255, 0.1)'
               },
@@ -1270,13 +1502,11 @@
                 callback: function(value) {
                   return value + '%';
                 },
-                font: {
-                  size: 12
-                }
+                font: { size: 12 }
               },
               title: {
                 display: true,
-                text: 'Imbalance Percentage',
+                text: 'Symmetry Index',
                 color: 'white',
                 font: {
                   size: 13,
@@ -1290,21 +1520,13 @@
               },
               ticks: {
                 color: 'white',
-                font: {
-                  size: 12
-                }
+                font: { size: 12 }
               }
             }
           },
           interaction: {
             intersect: false,
             mode: 'index'
-          },
-          animations: {
-            tension: {
-              duration: 1000,
-              easing: 'linear'
-            }
           }
         }
       });
@@ -1313,73 +1535,8 @@
     function changeChartPeriod(event, period) {
       document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
-
-      let labels, data;
-
-      switch(period) {
-        case '3months':
-          labels = ['Month 1', 'Month 2', 'Month 3'];
-          data = [18, 13, 8];
-          break;
-        case '6months':
-          labels = ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6'];
-          data = [22, 19, 16, 13, 10, 8];
-          break;
-        default:
-          labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-          data = [15, 12, 10, 8];
-      }
-
-      progressChart.data.labels = labels;
-      progressChart.data.datasets[0].data = data;
-      progressChart.update();
+      initializeProgressChart(period);
     }
-
-    function selectExercise(exerciseType) {
-      if (exerciseType === 'squat') {
-        window.location.href = 'session-detail.html?exercise=squat';
-      }
-    }
-document.addEventListener("DOMContentLoaded", async function () {
-  try {
-    const supa = window.supabase;
-
-    // جيب المستخدم الحالي
-    const { data: { user }, error: userError } = await supa.auth.getUser();
-
-    if (userError || !user) {
-      console.error("No logged-in user found");
-      return;
-    }
-
-    // جيب الاسم الأول من جدول Client
-    const { data: client, error: clientError } = await supa
-      .from("Client")
-      .select("Fname")
-      .eq("client_id", user.id)
-      .single();
-
-    if (clientError) {
-      console.error("Error fetching client name:", clientError.message);
-      return;
-    }
-
-    // حط الاسم في الـ Welcome
-    const welcomeName = document.getElementById("welcomeName");
-    if (welcomeName) {
-      welcomeName.textContent = client.Fname || "User";
-    }
-
-    // حط الاسم في الـ Sidebar
-    const sidebarUserName = document.getElementById("sidebarUserName");
-    if (sidebarUserName) {
-      sidebarUserName.textContent = client.Fname || "User";
-    }
-
-  } catch (err) {
-    console.error("Unexpected error:", err);
-  }
-});
-</script>
+  </script>
 </body>
 </html>

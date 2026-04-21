@@ -1,361 +1,675 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWTAD | Connect with Coach</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --sb-width-expanded: 260px;
-            --sb-width-collapsed: 80px;
-            --primary-accent: #ffd2c2;
-            --bg-dark: #4B3A57;
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.14);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWTAD | Connect with Coach</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        /* Basic Reset & Body Styling */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            min-height: 100vh;
-            background: var(--bg-dark);
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            color: white;
-            display: flex;
-            overflow-x: hidden;
-        }
+  <style>
+    :root {
+      --sidebar-width: 220px;
+      --primary-accent: #ffd2c2;
+      --primary-strong: #ffb59c;
+      --bg-dark: #4B3A57;
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.22);
+      --shadow-glow: 0 0 30px rgba(255, 181, 156, 0.12);
+      --success: #8dd3a1;
+      --warning: #ffd1b3;
+      --danger: #ff6b6b;
+    }
 
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.15), transparent 45%),
-                        radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.1), transparent 45%);
-            z-index: -1;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      min-width: 0;
+    }
 
-        /* --- SIDEBAR --- */
-        .sidebar {
-            width: var(--sb-width-expanded);
-            height: calc(100vh - 24px);
-            margin: 12px;
-            position: fixed;
-            left: 0; top: 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-            border: 1px solid var(--glass-border);
-            border-radius: 26px;
-            backdrop-filter: blur(20px);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            transition: var(--transition);
-            z-index: 1000;
-        }
-        .sidebar.collapsed { width: var(--sb-width-collapsed); padding: 20px 10px; }
-        .sb-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; padding: 0 10px; }
-        .sb-logo { width: 90px; transition: var(--transition); }
-        .sidebar.collapsed .sb-logo { opacity: 0; width: 0; }
-        #toggleSidebar { cursor: pointer; color: var(--primary-accent); transition: var(--transition); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #4B3A57;
+      overflow-x: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      position: relative;
+    }
 
-        .user-profile-box { background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 18px; margin-bottom: 25px; transition: var(--transition); overflow: hidden; }
-        .sidebar.collapsed .user-profile-box { opacity: 0; height: 0; margin: 0; padding: 0; }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.30), transparent 42%),
+        radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.22), transparent 48%),
+        radial-gradient(circle at 55% 45%, rgba(255, 160, 140, 0.10), transparent 50%);
+      z-index: -2;
+    }
 
-        .nav-item { display: flex; align-items: center; gap: 15px; padding: 14px; text-decoration: none; color: rgba(255,255,255,0.7); border-radius: 14px; margin-bottom: 8px; transition: var(--transition); }
-        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: var(--primary-accent); }
-        .sidebar.collapsed .nav-text { display: none; }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: -1;
+    }
 
-        /* --- MAIN CONTENT --- */
-        .main-wrapper { flex: 1; margin-left: calc(var(--sb-width-expanded) + 24px); padding: 40px; transition: var(--transition); }
-        .main-wrapper.full { margin-left: calc(var(--sb-width-collapsed) + 24px); }
+    /* SIDEBAR - same as Sessions page */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: calc(100vh - 24px);
+      margin: 12px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 16px;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.04) 100%
+      );
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft), var(--shadow-glow);
+      border-radius: 26px;
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      z-index: 1000;
+      overflow: hidden;
+    }
 
-        .welcome-msg { font-size: 2.2rem; font-weight: 300; margin-bottom: 10px; color: var(--primary-accent); }
-        .section-title { margin: 40px 0 20px; font-weight: 400; opacity: 0.9; }
+    .sidebar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.12) 0%,
+          rgba(255, 255, 255, 0.02) 35%,
+          rgba(255, 255, 255, 0.01) 100%
+        );
+      pointer-events: none;
+    }
 
-        /* --- COACH DIRECTORY GRID --- */
-        .coach-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 25px;
-        }
+    .sidebar-brand {
+      text-align: center;
+      padding-bottom: 26px;
+      position: relative;
+      z-index: 1;
+    }
 
-        .coach-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 25px;
-            text-align: center;
-            transition: var(--transition);
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-        .coach-card:hover { transform: translateY(-8px); background: rgba(255,255,255,0.12); border-color: var(--primary-accent); }
+    .sidebar-brand img {
+      width: 105px;
+      filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.2));
+    }
 
-        .coach-img {
-            width: 90px; height: 90px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 15px;
-            border: 2px solid var(--primary-accent);
-            background: #5a4a66;
-        }
+    .user-mini-card {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      padding: 14px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+    }
 
-        .coach-name { font-size: 1.1rem; margin-bottom: 5px; }
-        .coach-spec { font-size: 0.85rem; color: var(--primary-accent); opacity: 0.8; margin-bottom: 20px; }
+    .user-mini-card h4 {
+      color: var(--primary-accent);
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+    }
 
-        .btn { padding: 10px 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600; transition: 0.3s; width: 100%; }
-        .btn-primary { background: var(--primary-accent); color: #4B3A57; }
-        .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
+    .user-mini-card p {
+      font-size: 0.76rem;
+      opacity: 0.72;
+      line-height: 1.5;
+      word-break: break-word;
+    }
 
-        /* --- STATUS ALERTS --- */
-        .status-banner {
-            padding: 20px; border-radius: 20px; margin-bottom: 30px;
-            display: none; align-items: center; gap: 15px;
-            animation: fadeIn 0.5s ease;
-        }
-        .status-pending { background: rgba(255, 209, 179, 0.15); border: 1px solid rgba(255, 209, 179, 0.3); color: #ffd1b3; }
-        .status-accepted { background: rgba(141, 211, 161, 0.15); border: 1px solid rgba(141, 211, 161, 0.3); color: #8dd3a1; }
+    .sidebar-nav {
+      flex-grow: 1;
+      position: relative;
+      z-index: 1;
+    }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.72);
+      border-radius: 14px;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-item i {
+      width: 18px;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 204, 187, 0.18),
+        rgba(255, 255, 255, 0.06)
+      );
+      border: 1px solid rgba(255, 210, 194, 0.16);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        0 0 18px rgba(255, 181, 156, 0.10);
+    }
+
+    .nav-item:hover {
+      transform: translateX(2px);
+    }
+
+    .nav-item.active i,
+    .nav-item:hover i {
+      color: var(--primary-accent);
+    }
+
+    /* MAIN CONTENT - same spacing as Sessions */
+    .main-content {
+      margin-left: calc(var(--sidebar-width) + 36px);
+      padding: 42px 28px 42px 20px;
+      width: calc(100% - var(--sidebar-width) - 48px);
+      max-width: none;
+    }
+
+    .dashboard {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+
+    .dashboard-title {
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: white;
+      text-shadow: 0 0 18px rgba(255, 190, 170, 0.08);
+    }
+
+    .dashboard-subtitle {
+      opacity: 0.82;
+      margin-top: 8px;
+      font-size: 0.98rem;
+    }
+
+    /* Status banner */
+    .status-banner {
+      padding: 20px;
+      border-radius: 22px;
+      margin-bottom: 30px;
+      display: none;
+      align-items: center;
+      gap: 15px;
+      animation: fadeIn 0.5s ease;
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.08) 0%,
+        rgba(255,255,255,0.05) 100%
+      );
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        var(--shadow-soft),
+        inset 0 1px 0 rgba(255,255,255,0.07);
+      backdrop-filter: blur(16px) saturate(135%);
+      -webkit-backdrop-filter: blur(16px) saturate(135%);
+    }
+
+    .status-pending {
+      border-color: rgba(255, 209, 179, 0.3);
+      color: var(--warning);
+    }
+
+    .status-accepted {
+      border-color: rgba(141, 211, 161, 0.3);
+      color: var(--success);
+    }
+
+    /* Section title */
+    .section-title {
+      margin: 24px 0 20px;
+      font-weight: 400;
+      opacity: 0.95;
+      color: var(--primary-accent);
+      font-size: 1.25rem;
+    }
+
+    /* Coach cards */
+    .coach-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 22px;
+      width: 100%;
+    }
+
+    .coach-card {
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.08) 0%,
+        rgba(255,255,255,0.05) 100%
+      );
+      border: 1px solid var(--glass-border);
+      border-radius: 22px;
+      padding: 24px;
+      text-align: center;
+      transition: all 0.28s ease;
+      cursor: pointer;
+      backdrop-filter: blur(16px) saturate(135%);
+      -webkit-backdrop-filter: blur(16px) saturate(135%);
+      box-shadow:
+        var(--shadow-soft),
+        inset 0 1px 0 rgba(255,255,255,0.07);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .coach-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.07) 0%,
+        transparent 42%
+      );
+      pointer-events: none;
+    }
+
+    .coach-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 210, 194, 0.24);
+      box-shadow:
+        0 16px 36px rgba(0, 0, 0, 0.26),
+        0 0 28px rgba(255, 181, 156, 0.12),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .coach-img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      border: 2px solid var(--primary-accent);
+      background: #5a4a66;
+    }
+
+    .coach-name {
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+      color: white;
+    }
+
+    .coach-spec {
+      font-size: 0.85rem;
+      color: var(--primary-accent);
+      opacity: 0.85;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
+      color: #4B3A57;
+      font-weight: 700;
+      border: none;
+      box-shadow: 0 8px 18px rgba(255, 181, 156, 0.20);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.95;
+      transform: scale(1.02);
+      box-shadow: 0 12px 22px rgba(255, 181, 156, 0.24);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px 0 0;
+      opacity: 0.78;
+      font-size: 0.96rem;
+      margin-top: 28px;
+    }
+
+    @media (max-width: 1024px) {
+      :root {
+        --sidebar-width: 82px;
+      }
+
+      .sidebar {
+        padding: 18px 10px;
+        border-radius: 22px;
+      }
+
+      .sidebar-brand img,
+      .nav-text,
+      .user-mini-card {
+        display: none;
+      }
+
+      .main-content {
+        margin-left: calc(var(--sidebar-width) + 28px);
+        padding: 34px 20px;
+        width: calc(100% - var(--sidebar-width) - 40px);
+      }
+
+      .nav-item {
+        justify-content: center;
+        padding: 12px;
+      }
+
+      .nav-item i {
+        width: auto;
+      }
+
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 110px 16px 24px;
+      }
+
+      .sidebar {
+        width: calc(100% - 24px);
+        height: auto;
+        position: fixed;
+        top: 12px;
+        left: 0;
+        right: 0;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+      }
+
+      .sidebar-brand {
+        padding-bottom: 0;
+      }
+
+      .sidebar-brand img {
+        display: block;
+        width: 82px;
+      }
+
+      .sidebar-nav {
+        display: flex;
+        flex-grow: 0;
+        gap: 8px;
+      }
+
+      .nav-item {
+        margin-bottom: 0;
+      }
+
+      .coach-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
 
-    <aside class="sidebar" id="sidebar">
-        <div class="sb-header">
-            <img src="awtadlogo1.png" alt="AWTAD" class="sb-logo">
-            <i class="fas fa-chevron-left" id="toggleSidebar"></i>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="awtadlogo1.png" alt="AWTAD">
+    </div>
+
+    <div class="user-mini-card">
+      <h4 id="userNameSide">Loading...</h4>
+      <p id="userEmailSide">---</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="userawtad.html" class="nav-item">
+        <i class="fas fa-th-large"></i>
+        <span class="nav-text">Dashboard</span>
+      </a>
+      <a href="FindCoach.html" class="nav-item active">
+        <i class="fas fa-user-tie"></i>
+        <span class="nav-text">My Coach</span>
+      </a>
+      <a href="sesstionsawtad.html" class="nav-item">
+        <i class="fas fa-calendar"></i>
+        <span class="nav-text">Sessions</span>
+      </a>
+      <a href="profileawtad.html" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span class="nav-text">Profile</span>
+      </a>
+    </nav>
+
+    <a href="#" id="logoutBtn" class="nav-item">
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="nav-text">Logout</span>
+    </a>
+  </aside>
+
+  <main class="main-content">
+    <section class="dashboard">
+      <div class="dashboard-header">
+        <div>
+          <h1 class="dashboard-title" id="dynamicWelcome">Welcome, Athlete</h1>
+          <p class="dashboard-subtitle">Browse available coaches and send a connection request.</p>
         </div>
+      </div>
 
-        <div class="user-profile-box">
-            <h4 id="userNameSide">Loading...</h4>
-            <p id="userEmailSide" style="font-size: 0.75rem; opacity: 0.6;">---</p>
+      <div id="statusBanner" class="status-banner">
+        <i id="statusIcon" class="fas"></i>
+        <div>
+          <h4 id="statusTitle"></h4>
+          <p id="statusDesc" style="font-size: 0.9rem; opacity: 0.8;"></p>
         </div>
+      </div>
 
-        <nav>
-            <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large"></i> <span class="nav-text">Dashboard</span></a>
-            <a href="#" class="nav-item active"><i class="fas fa-user-plus"></i> <span class="nav-text">Connect Coach</span></a>
-            <a href="profileawtad.html" class="nav-item"><i class="fas fa-user-circle"></i> <span class="nav-text">My Profile</span></a>
-        </nav>
+      <h3 class="section-title">Available Coaches</h3>
+      <div class="coach-grid" id="coachDirectory"></div>
 
-        <a href="#" id="logoutBtn" class="nav-item" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i> <span class="nav-text">Logout</span></a>
-    </aside>
+      <footer>
+        <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
+      </footer>
+    </section>
+  </main>
 
-    <main class="main-wrapper" id="mainWrapper">
-        <h1 class="welcome-msg" id="dynamicWelcome">Welcome, Athlete</h1>
-        
-        <div id="statusBanner" class="status-banner">
-            <i id="statusIcon" class="fas"></i>
-            <div>
-                <h4 id="statusTitle"></h4>
-                <p id="statusDesc" style="font-size: 0.9rem; opacity: 0.8;"></p>
-            </div>
-        </div>
+  <script>
+    const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
+    const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        <h3 class="section-title">Available Coaches</h3>
-        <div class="coach-grid" id="coachDirectory">
-            </div>
-    </main>
-
-    <script>
-        // Initialize Supabase
-        const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
-        const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        const sidebar = document.getElementById('sidebar');
-        const mainWrapper = document.getElementById('mainWrapper');
-        const toggleSidebar = document.getElementById('toggleSidebar');
-
-        // --- 1. Sidebar Toggle Logic ---
-        toggleSidebar.onclick = () => {
-            sidebar.classList.toggle('collapsed');
-            mainWrapper.classList.toggle('full');
-            toggleSidebar.classList.toggle('fa-chevron-left');
-            toggleSidebar.classList.toggle('fa-chevron-right');
-        };
-
-        // --- 2. Load User Profile & Current Connection Status ---
-        async function initPage() {
-            const { data: { user } } = await supa.auth.getUser();
-            if (!user) { window.location.href = "loginawtad.html"; return; }
-
-            // Fetch Client info using the UUID (user.id)
-            const { data: client, error } = await supa.from('Client')
-                .select('*')
-                .eq('client_id', user.id) // Using ID is safer than email
-                .single();
-
-            if (client) {
-                document.getElementById('userNameSide').innerText = `${client.Fname} ${client.Lname}`;
-                document.getElementById('userEmailSide').innerText = client.email;
-                document.getElementById('dynamicWelcome').innerText = `Welcome, ${client.Fname}`;
-                checkRelationshipStatus(user.id);
-            } else {
-                console.error("Client not found in database for this Auth UID");
-                document.getElementById('userNameSide').innerText = "Profile Missing";
-            }
-
-            loadCoachDirectory();
-        }
-
-        // --- 3. Check Relationship Status ---
-        async function checkRelationshipStatus(clientId) {
-            // Looking at Client_Coach_Relationship table for 'pending' or 'accepted'
-            const { data: rel, error } = await supa
-                .from('Client_Coach_Relationship')
-                .select('status, coach_id, Coach(Fname, Lname)')
-                .eq('client_id', clientId)
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .single();
-
-            if (rel) {
-                const banner = document.getElementById('statusBanner');
-                const title = document.getElementById('statusTitle');
-                const desc = document.getElementById('statusDesc');
-                const icon = document.getElementById('statusIcon');
-                const coachName = `Coach ${rel.Coach.Fname} ${rel.Coach.Lname}`;
-
-                banner.style.display = 'flex';
-                
-                if (rel.status === 'pending') {
-                    banner.className = 'status-banner status-pending';
-                    icon.className = 'fas fa-hourglass-half fa-lg';
-                    title.innerText = "Request Pending";
-                    desc.innerText = `Waiting for ${coachName} to approve your connection.`;
-                } else if (rel.status === 'accepted') {
-                    banner.className = 'status-banner status-accepted';
-                    icon.className = 'fas fa-check-circle fa-lg';
-                    title.innerText = "Connected";
-                    desc.innerText = `You are actively training with ${coachName}.`;
-                }
-            }
-        }
-
-        // --- 4. Load Coach Directory ---
-        async function loadCoachDirectory() {
-            const { data: coaches, error } = await supa.from('Coach').select('*');
-            const directory = document.getElementById('coachDirectory');
-            
-            if (error) return;
-
-            directory.innerHTML = coaches.map(coach => {
-                // Logic for default image: Using a placeholder service based on name initials
-                const defaultImg = `https://ui-avatars.com/api/?name=${coach.Fname}+${coach.Lname}&background=ffd2c2&color=4B3A57`;
-                const profilePic = coach.profile_pic_url || defaultImg;
-
-                return `
-                    <div class="coach-card" onclick="goToDetails('${coach.coach_id}')">
-                        <img src="${profilePic}" class="coach-img" alt="Coach">
-                        <div class="coach-name">${coach.Fname} ${coach.Lname}</div>
-                        <div class="coach-spec">${coach.Specialty}</div>
-                        <button class="btn btn-primary" onclick="event.stopPropagation(); sendConnectRequest('${coach.coach_id}', '${coach.Fname}')">
-                            Send Request
-                        </button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-
-
-
-
-async function sendConnectRequest(coachId, coachName) {
-    const { data: { user } } = await supa.auth.getUser();
-    if (!user) {
-        alert("You must be logged in.");
+    async function initPage() {
+      const { data: { user } } = await supa.auth.getUser();
+      if (!user) {
+        window.location.href = "loginawtad.html";
         return;
+      }
+
+      const { data: client, error } = await supa
+        .from('Client')
+        .select('*')
+        .eq('client_id', user.id)
+        .single();
+
+      if (client) {
+        document.getElementById('userNameSide').innerText = `${client.Fname} ${client.Lname}`;
+        document.getElementById('userEmailSide').innerText = client.email;
+        document.getElementById('dynamicWelcome').innerText = `Welcome, ${client.Fname}`;
+        checkRelationshipStatus(user.id);
+      } else {
+        console.error("Client not found in database for this Auth UID");
+        document.getElementById('userNameSide').innerText = "Profile Missing";
+      }
+
+      loadCoachDirectory();
     }
 
-    // Find the real client row first
-    const { data: client, error: clientError } = await supa
+    async function checkRelationshipStatus(clientId) {
+      const { data: rel } = await supa
+        .from('Client_Coach_Relationship')
+        .select('status, coach_id, Coach(Fname, Lname)')
+        .eq('client_id', clientId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (rel) {
+        const banner = document.getElementById('statusBanner');
+        const title = document.getElementById('statusTitle');
+        const desc = document.getElementById('statusDesc');
+        const icon = document.getElementById('statusIcon');
+        const coachName = `Coach ${rel.Coach.Fname} ${rel.Coach.Lname}`;
+
+        banner.style.display = 'flex';
+
+        if (rel.status === 'pending') {
+          banner.className = 'status-banner status-pending';
+          icon.className = 'fas fa-hourglass-half fa-lg';
+          title.innerText = "Request Pending";
+          desc.innerText = `Waiting for ${coachName} to approve your connection.`;
+        } else if (rel.status === 'accepted') {
+          banner.className = 'status-banner status-accepted';
+          icon.className = 'fas fa-check-circle fa-lg';
+          title.innerText = "Connected";
+          desc.innerText = `You are actively training with ${coachName}.`;
+        }
+      }
+    }
+
+    async function loadCoachDirectory() {
+      const { data: coaches, error } = await supa.from('Coach').select('*');
+      const directory = document.getElementById('coachDirectory');
+
+      if (error) return;
+
+      directory.innerHTML = coaches.map(coach => {
+        const defaultImg = `https://ui-avatars.com/api/?name=${coach.Fname}+${coach.Lname}&background=ffd2c2&color=4B3A57`;
+        const profilePic = coach.profile_pic_url || defaultImg;
+
+        return `
+          <div class="coach-card" onclick="goToDetails('${coach.coach_id}')">
+            <img src="${profilePic}" class="coach-img" alt="Coach">
+            <div class="coach-name">${coach.Fname} ${coach.Lname}</div>
+            <div class="coach-spec">${coach.Specialty || "No Specialty"}</div>
+            <button class="btn btn-primary" onclick="event.stopPropagation(); sendConnectRequest('${coach.coach_id}', '${coach.Fname}')">
+              Send Request
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function sendConnectRequest(coachId, coachName) {
+      const { data: { user } } = await supa.auth.getUser();
+      if (!user) {
+        alert("You must be logged in.");
+        return;
+      }
+
+      const { data: client, error: clientError } = await supa
         .from('Client')
         .select('client_id, email')
         .eq('email', user.email)
         .single();
 
-    if (clientError || !client) {
+      if (clientError || !client) {
         alert("Your client profile was not found. Please complete signup first.");
         console.error("Client lookup failed:", clientError);
         return;
-    }
+      }
 
-    // Prevent duplicate requests
-    const { data: existing } = await supa
+      const { data: existing } = await supa
         .from('Client_Coach_Relationship')
         .select('request_id, status')
         .eq('client_id', client.client_id)
         .eq('coach_id', coachId)
         .maybeSingle();
 
-    if (existing) {
+      if (existing) {
         alert(`You already have a ${existing.status} request with Coach ${coachName}.`);
         return;
-    }
+      }
 
-    if (!confirm(`Send a connection request to Coach ${coachName}?`)) return;
+      if (!confirm(`Send a connection request to Coach ${coachName}?`)) return;
 
-    const { error: relError } = await supa
+      const { error: relError } = await supa
         .from('Client_Coach_Relationship')
         .insert([{
-            client_id: client.client_id,
-            coach_id: coachId,
-            status: 'pending'
+          client_id: client.client_id,
+          coach_id: coachId,
+          status: 'pending'
         }]);
 
-    if (relError) {
+      if (relError) {
         console.error("Insert error:", relError);
         alert("Error: " + relError.message);
         return;
-    }
+      }
 
-    await supa
+      await supa
         .from('Client')
         .update({
-            coach_id: coachId,
-            request_status: 'pending'
+          coach_id: coachId,
+          request_status: 'pending'
         })
         .eq('client_id', client.client_id);
 
-    alert("Request Sent!");
-    location.reload();
-}
+      alert("Request Sent!");
+      location.reload();
+    }
 
+    function goToDetails(coachId) {
+      window.location.href = `coach-details.html?id=${coachId}`;
+    }
 
+    document.getElementById('logoutBtn').onclick = async () => {
+      await supa.auth.signOut();
+      window.location.href = "loginawtad.html";
+    };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // --- 6. Navigation to Details Page ---
-        function goToDetails(coachId) {
-            window.location.href = `coach-details.html?id=${coachId}`;
-        }
-
-        // --- 7. Logout ---
-        document.getElementById('logoutBtn').onclick = async () => {
-            await supa.auth.signOut();
-            window.location.href = "loginawtad.html";
-        };
-
-        window.onload = initPage;
-    </script>
+    window.onload = initPage;
+  </script>
 </body>
 </html>

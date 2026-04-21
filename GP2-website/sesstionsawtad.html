@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AWTAD - Session History</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -56,7 +56,6 @@
       z-index: -1;
     }
 
-    /* SIDEBAR */
     .sidebar {
       width: var(--sidebar-width);
       height: calc(100vh - 24px);
@@ -180,7 +179,6 @@
       color: var(--primary-accent);
     }
 
-    /* MAIN */
     .main-content {
       margin-left: calc(var(--sidebar-width) + 36px);
       padding: 42px 28px 42px 20px;
@@ -250,7 +248,6 @@
       box-shadow: 0 12px 22px rgba(255, 181, 156, 0.24);
     }
 
-    /* shared cards */
     .filter-section,
     .stat-card,
     .session-card,
@@ -455,12 +452,11 @@
       border: 1px solid rgba(255,255,255,0.08);
       color: var(--primary-accent);
       white-space: nowrap;
+      text-transform: capitalize;
     }
 
     .session-metrics-top {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      display: block;
       margin-bottom: 18px;
       padding: 15px;
       background: rgba(255, 182, 163, 0.10);
@@ -473,10 +469,11 @@
     }
 
     .metric-value-top {
-      font-size: 1.4rem;
-      font-weight: 300;
+      font-size: 1.1rem;
+      font-weight: 400;
       margin-bottom: 5px;
       color: var(--primary-accent);
+      word-break: break-word;
     }
 
     .metric-label-top {
@@ -595,27 +592,6 @@
       display: flex;
       align-items: center;
       gap: 5px;
-    }
-
-    .view-report-btn {
-      padding: 8px 14px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.12);
-      color: white;
-      border-radius: 12px;
-      font-size: 0.88rem;
-      cursor: pointer;
-      transition: all 0.22s ease;
-      text-decoration: none;
-      display: inline-block;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .view-report-btn:hover {
-      background: rgba(255,255,255,0.08);
-      transform: translateY(-2px);
-      border-color: rgba(255, 210, 194, 0.18);
     }
 
     .empty-state {
@@ -780,7 +756,7 @@
       </a>
       <a href="FindCoach.html" class="nav-item">
         <i class="fas fa-user-tie"></i>
-        <span class="nav-text">Find a Coach</span>
+        <span class="nav-text">My Coach</span>
       </a>
       <a href="sesstionsawtad.html" class="nav-item active">
         <i class="fas fa-calendar"></i>
@@ -808,10 +784,7 @@
             <i class="fas fa-play-circle"></i>
             Start Session
           </button>
-          <button class="action-btn">
-            <i class="fas fa-download"></i>
-            Export Data
-          </button>
+         
         </div>
       </div>
 
@@ -821,14 +794,6 @@
         </div>
 
         <div class="filter-controls">
-          <div class="filter-group">
-            <label class="filter-label">Exercise Type</label>
-            <select class="filter-select" id="exerciseFilter">
-              <option value="all">All Exercises</option>
-              <option value="squat">Squat Analysis</option>
-            </select>
-          </div>
-
           <div class="filter-group">
             <label class="filter-label">Time Period</label>
             <select class="filter-select" id="timeFilter">
@@ -844,7 +809,7 @@
             <select class="filter-select" id="sortFilter">
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
-              <option value="score">Highest Score</option>
+              <option value="score">Highest Symmetry Index</option>
             </select>
           </div>
         </div>
@@ -855,7 +820,7 @@
           <div class="stat-icon">
             <i class="fas fa-dumbbell"></i>
           </div>
-          <div class="stat-value">24</div>
+          <div class="stat-value" id="totalSessionsValue">0</div>
           <div class="stat-label">Total Sessions</div>
         </div>
 
@@ -863,23 +828,23 @@
           <div class="stat-icon">
             <i class="fas fa-balance-scale"></i>
           </div>
-          <div class="stat-value">8%</div>
-          <div class="stat-label">Current VL Imbalance</div>
+          <div class="stat-value" id="currentImbalanceValue">N/A</div>
+          <div class="stat-label">Current Symmetry Index</div>
         </div>
 
         <div class="stat-card">
           <div class="stat-icon">
             <i class="fas fa-chart-line"></i>
           </div>
-          <div class="stat-value">+47%</div>
-          <div class="stat-label">VL Balance Improvement</div>
+          <div class="stat-value" id="improvementValue">N/A</div>
+          <div class="stat-label">Improvement</div>
         </div>
 
         <div class="stat-card">
           <div class="stat-icon">
             <i class="fas fa-clock"></i>
           </div>
-          <div class="stat-value">42m</div>
+          <div class="stat-value" id="avgDurationValue">N/A</div>
           <div class="stat-label">Avg. Session Duration</div>
         </div>
       </div>
@@ -904,153 +869,134 @@
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+
   <script>
-    const sessionData = [
-      {
-        id: 1,
-        title: "Squat Analysis",
-        date: "2023-12-05",
-        exercise: "squat",
-        exerciseName: "Squat Analysis",
-        score: 82,
-        overallImbalance: 8,
-        duration: "45 min",
-        status: "completed",
-        metrics: {
-          leftVL: 85,
-          rightVL: 78,
-          sets: 4
-        },
-        phases: [
-          { number: 1, name: "Descent", imbalance: 3, status: "balanced" },
-          { number: 2, name: "Bottom", imbalance: 12, status: "imbalanced" },
-          { number: 3, name: "Ascent", imbalance: 9, status: "imbalanced" },
-          { number: 4, name: "Lockout", imbalance: 2, status: "balanced" }
-        ]
-      },
-      {
-        id: 2,
-        title: "Squat Analysis",
-        date: "2023-11-28",
-        exercise: "squat",
-        exerciseName: "Squat Analysis",
-        score: 79,
-        overallImbalance: 15,
-        duration: "50 min",
-        status: "completed",
-        metrics: {
-          leftVL: 82,
-          rightVL: 79,
-          sets: 4
-        },
-        phases: [
-          { number: 1, name: "Descent", imbalance: 5, status: "balanced" },
-          { number: 2, name: "Bottom", imbalance: 18, status: "imbalanced" },
-          { number: 3, name: "Ascent", imbalance: 14, status: "imbalanced" },
-          { number: 4, name: "Lockout", imbalance: 4, status: "balanced" }
-        ]
-      },
-      {
-        id: 3,
-        title: "Squat Analysis",
-        date: "2023-11-20",
-        exercise: "squat",
-        exerciseName: "Squat Analysis",
-        score: 76,
-        overallImbalance: 19,
-        duration: "40 min",
-        status: "completed",
-        metrics: {
-          leftVL: 80,
-          rightVL: 76,
-          sets: 4
-        },
-        phases: [
-          { number: 1, name: "Descent", imbalance: 8, status: "balanced" },
-          { number: 2, name: "Bottom", imbalance: 22, status: "imbalanced" },
-          { number: 3, name: "Ascent", imbalance: 17, status: "imbalanced" },
-          { number: 4, name: "Lockout", imbalance: 6, status: "balanced" }
-        ]
-      },
-      {
-        id: 4,
-        title: "Squat Analysis",
-        date: "2023-11-12",
-        exercise: "squat",
-        exerciseName: "Squat Analysis",
-        score: 74,
-        overallImbalance: 21,
-        duration: "55 min",
-        status: "completed",
-        metrics: {
-          leftVL: 78,
-          rightVL: 74,
-          sets: 4
-        },
-        phases: [
-          { number: 1, name: "Descent", imbalance: 9, status: "balanced" },
-          { number: 2, name: "Bottom", imbalance: 24, status: "imbalanced" },
-          { number: 3, name: "Ascent", imbalance: 19, status: "imbalanced" },
-          { number: 4, name: "Lockout", imbalance: 7, status: "balanced" }
-        ]
-      },
-      {
-        id: 5,
-        title: "Squat Analysis",
-        date: "2023-11-05",
-        exercise: "squat",
-        exerciseName: "Squat Analysis",
-        score: 70,
-        overallImbalance: 25,
-        duration: "38 min",
-        status: "completed",
-        metrics: {
-          leftVL: 75,
-          rightVL: 70,
-          sets: 3
-        },
-        phases: [
-          { number: 1, name: "Descent", imbalance: 12, status: "imbalanced" },
-          { number: 2, name: "Bottom", imbalance: 28, status: "imbalanced" },
-          { number: 3, name: "Ascent", imbalance: 22, status: "imbalanced" },
-          { number: 4, name: "Lockout", imbalance: 10, status: "imbalanced" }
-        ]
-      },
-      {
-        id: 6,
-        title: "Squat Analysis",
-        date: "2023-10-28",
-        exercise: "squat",
-        exerciseName: "Squat Analysis",
-        score: 65,
-        overallImbalance: 30,
-        duration: "35 min",
-        status: "completed",
-        metrics: {
-          leftVL: 72,
-          rightVL: 65,
-          sets: 3
-        },
-        phases: [
-          { number: 1, name: "Descent", imbalance: 15, status: "imbalanced" },
-          { number: 2, name: "Bottom", imbalance: 32, status: "imbalanced" },
-          { number: 3, name: "Ascent", imbalance: 26, status: "imbalanced" },
-          { number: 4, name: "Lockout", imbalance: 13, status: "imbalanced" }
-        ]
-      }
-    ];
+    let sessionData = [];
 
     function formatDate(dateString) {
+      if (!dateString) return "N/A";
       const options = { year: 'numeric', month: 'short', day: 'numeric' };
       return new Date(dateString).toLocaleDateString('en-US', options);
     }
 
-    function getStatusClass(status) {
-      return status === 'balanced' ? 'balanced' : 'imbalanced';
+    function formatDuration(seconds) {
+      if (seconds == null || isNaN(seconds)) return "N/A";
+      return `${seconds} sec`;
     }
 
-    function getStatusText(status) {
-      return status === 'balanced' ? 'Balanced' : 'Imbalanced';
+    function getStatusClass(label) {
+      return label && label.toLowerCase() === 'balanced' ? 'balanced' : 'imbalanced';
+    }
+
+    function getStatusText(label) {
+      return label && label.toLowerCase() === 'balanced' ? 'Balanced' : 'Imbalanced';
+    }
+
+    async function fetchSessionsFromDB() {
+      try {
+        const { data: authData, error: authError } = await supabase.auth.getUser();
+
+        if (authError) throw authError;
+        if (!authData.user) {
+          alert("You must be logged in first.");
+          window.location.href = "loginawtad.html";
+          return;
+        }
+
+        const clientId = authData.user.id;
+
+        const { data, error } = await supabase
+          .from("Session")
+          .select(`
+            session_id,
+            exercise_type,
+            session_date,
+            duration_sec,
+            coach_feedback,
+            Reps (
+              reps_id,
+              label,
+              symmetry_index,
+              dominant_side
+            )
+          `)
+          .eq("client_id", clientId)
+          .order("session_date", { ascending: false });
+
+        if (error) throw error;
+
+        sessionData = (data || []).map(session => {
+          const rep = session.Reps && session.Reps.length > 0 ? session.Reps[0] : null;
+
+          const symmetryValue = rep?.symmetry_index != null && !isNaN(rep.symmetry_index)
+            ? Number(rep.symmetry_index)
+            : null;
+
+          return {
+            id: session.session_id,
+            title: session.exercise_type ? `${session.exercise_type} Analysis` : "Session Analysis",
+            date: session.session_date,
+            exerciseName: session.exercise_type || "Unknown Exercise",
+            overallImbalance: symmetryValue,
+            durationSec: session.duration_sec,
+            duration: formatDuration(session.duration_sec),
+            status: rep?.label ? rep.label.toLowerCase() : "imbalanced",
+            dominantSide: rep?.dominant_side || "N/A",
+            coachFeedback: session.coach_feedback || "No feedback yet"
+          };
+        });
+
+        applyFiltersAndRender();
+
+      } catch (err) {
+        console.error("Error loading sessions:", err.message);
+        alert("Failed to load session history: " + err.message);
+      }
+    }
+
+    function updateStats(sessions) {
+      const totalSessionsEl = document.getElementById("totalSessionsValue");
+      const currentImbalanceEl = document.getElementById("currentImbalanceValue");
+      const improvementEl = document.getElementById("improvementValue");
+      const avgDurationEl = document.getElementById("avgDurationValue");
+
+      if (!sessions.length) {
+        totalSessionsEl.textContent = "0";
+        currentImbalanceEl.textContent = "N/A";
+        improvementEl.textContent = "N/A";
+        avgDurationEl.textContent = "N/A";
+        return;
+      }
+
+      totalSessionsEl.textContent = sessions.length;
+
+      const validSI = sessions
+        .map(s => s.overallImbalance)
+        .filter(v => typeof v === "number" && !isNaN(v));
+
+      currentImbalanceEl.textContent = validSI.length ? `${validSI[0].toFixed(2)}%` : "N/A";
+
+      if (validSI.length >= 2) {
+        const oldest = validSI[validSI.length - 1];
+        const latest = validSI[0];
+        const diff = oldest - latest;
+        improvementEl.textContent = `${diff >= 0 ? "+" : ""}${diff.toFixed(2)}%`;
+      } else {
+        improvementEl.textContent = "N/A";
+      }
+
+      const validDurations = sessions
+        .map(s => s.durationSec)
+        .filter(v => typeof v === "number" && !isNaN(v));
+
+      if (validDurations.length) {
+        const avg = validDurations.reduce((a, b) => a + b, 0) / validDurations.length;
+        avgDurationEl.textContent = `${avg.toFixed(0)} sec`;
+      } else {
+        avgDurationEl.textContent = "N/A";
+      }
     }
 
     function renderSessions(sessions) {
@@ -1064,11 +1010,10 @@
       }
 
       grid.style.display = 'grid';
-      emptyState.style.display = 'block' === 'none' ? 'block' : 'none';
       emptyState.style.display = 'none';
 
       grid.innerHTML = sessions.map(session => `
-        <div class="session-card" onclick="viewSession(${session.id})">
+        <div class="session-card" onclick="viewSession('${session.id}')">
           <div class="session-header">
             <div>
               <h3 class="session-title">${session.title}</h3>
@@ -1079,36 +1024,35 @@
 
           <div class="session-metrics-top">
             <div class="metric-top">
-              <div class="metric-value-top">${session.overallImbalance}%</div>
-              <div class="metric-label-top">Overall Imbalance</div>
-            </div>
-            <div class="metric-top">
-              <div class="metric-value-top">${session.metrics.leftVL}%</div>
-              <div class="metric-label-top">Left VL</div>
-            </div>
-            <div class="metric-top">
-              <div class="metric-value-top">${session.metrics.rightVL}%</div>
-              <div class="metric-label-top">Right VL</div>
+              <div class="metric-value-top">${session.exerciseName}</div>
+              <div class="metric-label-top">Exercise</div>
             </div>
           </div>
 
           <div class="phase-squares">
             <div class="phase-title">
               <i class="fas fa-chart-bar phase-icon"></i>
-              VL Activation Phases
+              Session Details
             </div>
 
             <div class="phase-grid">
-              ${session.phases.map(phase => `
-                <div class="phase-square ${getStatusClass(phase.status)}">
-                  <div class="phase-number">${phase.number}</div>
-                  <div class="phase-name">${phase.name}</div>
-                  <div class="phase-percentage">${phase.imbalance}%</div>
-                  <div class="phase-status ${getStatusClass(phase.status)}">
-                    ${getStatusText(phase.status)}
-                  </div>
+              <div class="phase-square ${getStatusClass(session.status)}">
+                <div class="phase-number">1</div>
+                <div class="phase-name">Symmetry Index</div>
+                <div class="phase-percentage">
+                  ${session.overallImbalance == null ? "N/A" : session.overallImbalance.toFixed(2) + "%"}
                 </div>
-              `).join('')}
+                <div class="phase-status ${getStatusClass(session.status)}">
+                  ${getStatusText(session.status)}
+                </div>
+              </div>
+
+              <div class="phase-square">
+                <div class="phase-number"><i class="fas fa-user"></i></div>
+                <div class="phase-name">Dominant Side</div>
+                <div class="phase-percentage">${session.dominantSide}</div>
+                <div class="phase-status">Recorded</div>
+              </div>
             </div>
           </div>
 
@@ -1117,28 +1061,20 @@
               <i class="fas fa-clock"></i>
               ${session.duration}
             </div>
-            <a href="#" class="view-report-btn" onclick="event.stopPropagation(); viewSession(${session.id})">
-              View More
-            </a>
           </div>
         </div>
       `).join('');
     }
 
-    function filterSessions() {
-      const exerciseFilter = document.getElementById('exerciseFilter').value;
+    function applyFiltersAndRender() {
       const timeFilter = document.getElementById('timeFilter').value;
       const sortFilter = document.getElementById('sortFilter').value;
 
       let filteredSessions = [...sessionData];
 
-      if (exerciseFilter !== 'all') {
-        filteredSessions = filteredSessions.filter(session => session.exercise === exerciseFilter);
-      }
-
       if (timeFilter !== 'all') {
         const now = new Date();
-        let cutoffDate = new Date();
+        const cutoffDate = new Date();
 
         switch (timeFilter) {
           case 'week':
@@ -1152,7 +1088,10 @@
             break;
         }
 
-        filteredSessions = filteredSessions.filter(session => new Date(session.date) >= cutoffDate);
+        filteredSessions = filteredSessions.filter(session => {
+          if (!session.date) return false;
+          return new Date(session.date) >= cutoffDate;
+        });
       }
 
       switch (sortFilter) {
@@ -1163,10 +1102,15 @@
           filteredSessions.sort((a, b) => new Date(a.date) - new Date(b.date));
           break;
         case 'score':
-          filteredSessions.sort((a, b) => b.score - a.score);
+          filteredSessions.sort((a, b) => {
+            const aVal = typeof a.overallImbalance === "number" ? a.overallImbalance : -Infinity;
+            const bVal = typeof b.overallImbalance === "number" ? b.overallImbalance : -Infinity;
+            return bVal - aVal;
+          });
           break;
       }
 
+      updateStats(filteredSessions);
       renderSessions(filteredSessions);
     }
 
@@ -1174,12 +1118,24 @@
       window.location.href = `lastsessionawtad.html?id=${sessionId}`;
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('exerciseFilter').addEventListener('change', filterSessions);
-      document.getElementById('timeFilter').addEventListener('change', filterSessions);
-      document.getElementById('sortFilter').addEventListener('change', filterSessions);
+    async function logout() {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        alert("Logout failed: " + error.message);
+        return;
+      }
+      window.location.href = "loginawtad.html";
+    }
 
-      renderSessions(sessionData);
+    document.addEventListener('DOMContentLoaded', async function() {
+      document.getElementById('timeFilter').addEventListener('change', applyFiltersAndRender);
+      document.getElementById('sortFilter').addEventListener('change', applyFiltersAndRender);
+      document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        logout();
+      });
+
+      await fetchSessionsFromDB();
     });
   </script>
 </body>
