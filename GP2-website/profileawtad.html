@@ -9,10 +9,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
 
     :root{
-      --sidebar-width: 220px;
+      --sidebar-width: 190px;
       --primary-accent: #ffd2c2;
       --primary-strong: #ffb59c;
       --bg-dark: #4B3A57;
@@ -27,6 +27,7 @@
       --success: #8dd3a1;
       --danger: #ff6b6b;
       --radius: 22px;
+      --glass-border: rgba(255,255,255,0.14);
     }
 
     body{
@@ -58,14 +59,50 @@
       z-index: -1;
     }
 
-    /* Sidebar */
+    /* MENU BUTTON */
+    .menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1001;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .menu-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+      transform: scale(1.05);
+      border-color: rgba(255, 210, 194, 0.3);
+    }
+
+    .menu-btn i {
+      font-size: 1.5rem;
+      color: var(--primary-accent);
+      transition: all 0.3s ease;
+    }
+
+    .menu-btn.active i {
+      transform: rotate(90deg);
+    }
+
+    /* SIDEBAR */
     .sidebar {
       width: var(--sidebar-width);
       height: calc(100vh - 24px);
       margin: 12px;
       position: fixed;
       top: 0;
-      left: 0;
+      left: -250px;
       display: flex;
       flex-direction: column;
       padding: 22px 16px;
@@ -81,6 +118,11 @@
       -webkit-backdrop-filter: blur(22px) saturate(140%);
       z-index: 1000;
       overflow: hidden;
+      transition: left 0.3s ease;
+    }
+
+    .sidebar.active {
+      left: 0;
     }
 
     .sidebar::before {
@@ -183,12 +225,17 @@
       color: var(--primary-accent);
     }
 
-    /* Main */
+    /* MAIN */
     .main-content{
-      margin-left: calc(var(--sidebar-width) + 36px);
-      padding: 42px 28px 42px 20px;
-      width: calc(100% - var(--sidebar-width) - 48px);
-      max-width: none;
+      margin-left: 0;
+      padding: 70px 34px 42px 80px;
+      width: 100%;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+    }
+
+    .main-content.shifted {
+      margin-left: calc(var(--sidebar-width) + 32px);
+      width: calc(100% - var(--sidebar-width) - 32px);
     }
 
     .dashboard-header{
@@ -292,8 +339,7 @@
     }
 
     .profile-left,
-    .profile-right,
-    .activity-card{
+    .profile-right{
       padding: 22px;
     }
 
@@ -332,7 +378,6 @@
       background: rgba(75,58,87,0.90);
       color: var(--primary-accent);
       cursor:pointer;
-      z-index: 2;
     }
 
     .name{
@@ -429,70 +474,7 @@
       font-family: inherit;
     }
 
-    textarea.input{
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .activity-grid{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-
-    .activity-item{
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 14px;
-      padding: 14px;
-      transition: 0.25s;
-    }
-
-    .activity-item:hover{
-      transform: translateY(-3px);
-      border-color: rgba(255,182,163,0.30);
-    }
-
-    .activity-top{
-      display:flex;
-      justify-content: space-between;
-      align-items:center;
-      margin-bottom: 8px;
-    }
-
-    .activity-top h3{
-      color: var(--primary-accent);
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .activity-top span{
-      font-size: 12px;
-      opacity: 0.85;
-    }
-
-    .activity-item p{
-      opacity: 0.9;
-      line-height: 1.5;
-      font-size: 13px;
-    }
-
-    .activity-stats{
-      display:flex;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
-
-    .big{
-      color: var(--primary-accent);
-      font-weight: 700;
-    }
-
-    .small{
-      font-size: 11px;
-      opacity: 0.85;
-      margin-top: 2px;
-    }
+    textarea.input{ min-height: 100px; resize: vertical; }
 
     .page-footer{
       text-align:center;
@@ -513,9 +495,7 @@
       padding: 18px;
     }
 
-    .modal.show{
-      display:flex;
-    }
+    .modal.show{ display:flex; }
 
     .modal-content{
       width: min(420px, 92vw);
@@ -554,20 +534,12 @@
       flex-wrap: wrap;
     }
 
-    @media (max-width: 1100px){
-      .profile-grid{
-        grid-template-columns: 1fr;
-      }
-
-      .activity-grid{
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 980px){
+      .profile-grid{ grid-template-columns: 1fr; }
     }
 
     @media (max-width: 1024px) {
-      :root {
-        --sidebar-width: 82px;
-      }
+      :root { --sidebar-width: 82px; }
 
       .sidebar {
         padding: 18px 10px;
@@ -578,12 +550,6 @@
       .nav-text,
       .user-mini-card {
         display: none;
-      }
-
-      .main-content {
-        margin-left: calc(var(--sidebar-width) + 28px);
-        padding: 34px 20px;
-        width: calc(100% - var(--sidebar-width) - 40px);
       }
 
       .nav-item {
@@ -597,52 +563,15 @@
     }
 
     @media (max-width: 768px){
-      .main-content{
+      .main-content,
+      .main-content.shifted{
         margin-left: 0;
         width: 100%;
-        padding: 110px 16px 24px;
+        padding: 20px 16px 24px;
       }
 
-      .sidebar {
-        width: calc(100% - 24px);
-        height: auto;
-        position: fixed;
-        top: 12px;
-        left: 0;
-        right: 0;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 14px;
-      }
-
-      .sidebar-brand {
-        padding-bottom: 0;
-      }
-
-      .sidebar-brand img {
-        display: block;
-        width: 82px;
-      }
-
-      .sidebar-nav {
-        display: flex;
-        flex-grow: 0;
-        gap: 8px;
-      }
-
-      .nav-item {
-        margin-bottom: 0;
-      }
-
-      .dashboard-header{
-        flex-direction: column;
-        align-items:flex-start;
-      }
-
-      .form-grid{
-        grid-template-columns: 1fr;
-      }
+      .dashboard-header{ flex-direction: column; align-items:flex-start; }
+      .form-grid{ grid-template-columns: 1fr; }
 
       .header-actions{
         width: 100%;
@@ -680,7 +609,11 @@
     </div>
   </div>
 
-  <aside class="sidebar">
+  <div class="menu-btn" id="menuBtn">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <img src="awtadlogo1.png" alt="AWTAD">
     </div>
@@ -715,7 +648,7 @@
     </a>
   </aside>
 
-  <main class="main-content">
+  <main class="main-content" id="mainContent">
     <header class="dashboard-header">
       <h1 class="dashboard-title" id="profileTitle">Profile</h1>
 
@@ -731,6 +664,7 @@
 
         <div class="avatar-wrap">
           <div class="avatar-circle" id="avatarCircle">
+
             <img id="avatarImg"
                  src=""
                  alt="Profile Picture"
@@ -739,6 +673,7 @@
             <button class="avatar-edit" id="profilePicBtn" title="Change photo">
               <i class="fa-solid fa-camera"></i>
             </button>
+
           </div>
         </div>
 
@@ -750,7 +685,7 @@
         <h2 class="name" id="nameDisplay">—</h2>
         <p class="subtitle" id="titleDisplay">—</p>
 
-        
+       
 
         <p class="bio" id="bioDisplay">—</p>
 
@@ -799,6 +734,48 @@
       <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
     </footer>
   </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const menuBtn = document.getElementById('menuBtn');
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+
+      menuBtn.addEventListener('click', function () {
+        sidebar.classList.toggle('active');
+        mainContent.classList.toggle('shifted');
+        menuBtn.classList.toggle('active');
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!sidebar.contains(e.target) && !menuBtn.contains(e.target) && sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+          mainContent.classList.remove('shifted');
+          menuBtn.classList.remove('active');
+        }
+      });
+
+      const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+      if (cancelLogoutBtn) {
+        cancelLogoutBtn.addEventListener('click', function () {
+          document.getElementById('logoutModal')?.classList.remove('show');
+        });
+      }
+
+      const saveOkBtn = document.getElementById('saveOkBtn');
+      if (saveOkBtn) {
+        saveOkBtn.addEventListener('click', function () {
+          document.getElementById('saveModal')?.classList.remove('show');
+        });
+      }
+
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', function (e) {
+          if (e.target === modal) modal.classList.remove('show');
+        });
+      });
+    });
+  </script>
 
   <script src="profileawtad.js"></script>
 </body>

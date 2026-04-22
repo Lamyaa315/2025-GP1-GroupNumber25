@@ -4,10 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AWTAD - Session History</title>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+
   <style>
     :root {
-      --sidebar-width: 220px;
+      --sidebar-width: 190px;
       --primary-accent: #ffd2c2;
       --primary-strong: #ffb59c;
       --bg-dark: #4B3A57;
@@ -56,13 +60,50 @@
       z-index: -1;
     }
 
+    /* MENU BUTTON */
+    .menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1001;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .menu-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+      transform: scale(1.05);
+      border-color: rgba(255, 210, 194, 0.3);
+    }
+
+    .menu-btn i {
+      font-size: 1.5rem;
+      color: var(--primary-accent);
+      transition: all 0.3s ease;
+    }
+
+    .menu-btn.active i {
+      transform: rotate(90deg);
+    }
+
+    /* SIDEBAR */
     .sidebar {
       width: var(--sidebar-width);
       height: calc(100vh - 24px);
       margin: 12px;
       position: fixed;
       top: 0;
-      left: 0;
+      left: -250px;
       display: flex;
       flex-direction: column;
       padding: 22px 16px;
@@ -78,6 +119,11 @@
       -webkit-backdrop-filter: blur(22px) saturate(140%);
       z-index: 1000;
       overflow: hidden;
+      transition: left 0.3s ease;
+    }
+
+    .sidebar.active {
+      left: 0;
     }
 
     .sidebar::before {
@@ -122,6 +168,7 @@
       color: var(--primary-accent);
       font-size: 0.92rem;
       margin-bottom: 4px;
+      word-break: break-word;
     }
 
     .user-mini-card p {
@@ -179,11 +226,17 @@
       color: var(--primary-accent);
     }
 
+    /* MAIN CONTENT */
     .main-content {
-      margin-left: calc(var(--sidebar-width) + 36px);
-      padding: 42px 28px 42px 20px;
-      width: calc(100% - var(--sidebar-width) - 48px);
-      max-width: none;
+      margin-left: 0;
+      padding: 70px 34px 42px 80px;
+      width: 100%;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+    }
+
+    .main-content.shifted {
+      margin-left: calc(var(--sidebar-width) + 32px);
+      width: calc(100% - var(--sidebar-width) - 32px);
     }
 
     .dashboard {
@@ -228,6 +281,7 @@
       font-size: 0.95rem;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      text-decoration: none;
     }
 
     .action-btn:hover {
@@ -326,7 +380,7 @@
       border-radius: 12px;
       color: white;
       font-size: 0.9rem;
-      min-width: 150px;
+      min-width: 180px;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
@@ -456,7 +510,6 @@
     }
 
     .session-metrics-top {
-      display: block;
       margin-bottom: 18px;
       padding: 15px;
       background: rgba(255, 182, 163, 0.10);
@@ -643,12 +696,6 @@
         display: none;
       }
 
-      .main-content {
-        margin-left: calc(var(--sidebar-width) + 28px);
-        padding: 34px 20px;
-        width: calc(100% - var(--sidebar-width) - 40px);
-      }
-
       .nav-item {
         justify-content: center;
         padding: 12px;
@@ -657,58 +704,26 @@
       .nav-item i {
         width: auto;
       }
-
-      .dashboard-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
     }
 
     @media (max-width: 768px) {
-      .main-content {
-        margin-left: 0;
+      .main-content,
+      .main-content.shifted {
         width: 100%;
-        padding: 110px 16px 24px;
+        margin-left: 0;
+        padding: 20px 18px;
       }
 
-      .sidebar {
-        width: calc(100% - 24px);
-        height: auto;
-        position: fixed;
-        top: 12px;
-        left: 0;
-        right: 0;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 14px;
-      }
-
-      .sidebar-brand {
-        padding-bottom: 0;
-      }
-
-      .sidebar-brand img {
-        display: block;
-        width: 82px;
-      }
-
-      .sidebar-nav {
-        display: flex;
-        flex-grow: 0;
-        gap: 8px;
-      }
-
-      .nav-item {
-        margin-bottom: 0;
+      .dashboard-title {
+        font-size: 2rem;
       }
 
       .action-buttons {
         flex-direction: column;
-        width: 100%;
       }
 
       .action-btn {
+        justify-content: center;
         width: 100%;
       }
 
@@ -719,14 +734,7 @@
       .sessions-grid {
         grid-template-columns: 1fr;
       }
-    }
 
-    @media (max-width: 480px) {
-      .dashboard-title {
-        font-size: 1.8rem;
-      }
-
-      .session-metrics-top,
       .phase-grid {
         grid-template-columns: 1fr;
       }
@@ -736,16 +744,33 @@
         align-items: flex-start;
       }
     }
+
+    @media (max-width: 480px) {
+      .dashboard-title {
+        font-size: 1.75rem;
+      }
+
+      .stat-card,
+      .session-card,
+      .filter-section {
+        padding: 20px;
+      }
+    }
   </style>
 </head>
 <body>
-  <aside class="sidebar">
+
+  <div class="menu-btn" id="menuBtn">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <img src="awtadlogo1.png" alt="AWTAD">
     </div>
 
     <div class="user-mini-card">
-      <h4>Session History</h4>
+      <h4 id="sidebarUserName">...</h4>
       <p>Your training records</p>
     </div>
 
@@ -756,7 +781,7 @@
       </a>
       <a href="FindCoach.html" class="nav-item">
         <i class="fas fa-user-tie"></i>
-        <span class="nav-text">My Coach</span>
+        <span class="nav-text">Find a Coach</span>
       </a>
       <a href="sesstionsawtad.html" class="nav-item active">
         <i class="fas fa-calendar"></i>
@@ -774,7 +799,7 @@
     </a>
   </aside>
 
-  <main class="main-content">
+  <main class="main-content" id="mainContent">
     <section class="dashboard">
       <div class="dashboard-header">
         <h1 class="dashboard-title">Session History</h1>
@@ -784,7 +809,6 @@
             <i class="fas fa-play-circle"></i>
             Start Session
           </button>
-         
         </div>
       </div>
 
@@ -869,10 +893,8 @@
     </section>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
-
   <script>
+    const supa = window.supabase;
     let sessionData = [];
 
     function formatDate(dateString) {
@@ -896,18 +918,29 @@
 
     async function fetchSessionsFromDB() {
       try {
-        const { data: authData, error: authError } = await supabase.auth.getUser();
+        const { data: { user }, error: authError } = await supa.auth.getUser();
 
         if (authError) throw authError;
-        if (!authData.user) {
+        if (!user) {
           alert("You must be logged in first.");
           window.location.href = "loginawtad.html";
           return;
         }
 
-        const clientId = authData.user.id;
+        const { data: client, error: clientError } = await supa
+          .from("Client")
+          .select("Fname, Lname")
+          .eq("client_id", user.id)
+          .single();
 
-        const { data, error } = await supabase
+        if (!clientError && client) {
+          const sidebarUserName = document.getElementById("sidebarUserName");
+          if (sidebarUserName) {
+            sidebarUserName.textContent = `${client.Fname || ""} ${client.Lname || ""}`.trim() || "User";
+          }
+        }
+
+        const { data, error } = await supa
           .from("Session")
           .select(`
             session_id,
@@ -922,7 +955,7 @@
               dominant_side
             )
           `)
-          .eq("client_id", clientId)
+          .eq("client_id", user.id)
           .order("session_date", { ascending: false });
 
         if (error) throw error;
@@ -948,7 +981,8 @@
           };
         });
 
-        applyFiltersAndRender();
+        updateStats(sessionData);
+        filterSessions();
 
       } catch (err) {
         console.error("Error loading sessions:", err.message);
@@ -978,11 +1012,11 @@
 
       currentImbalanceEl.textContent = validSI.length ? `${validSI[0].toFixed(2)}%` : "N/A";
 
-      if (validSI.length >= 2) {
+      if (validSI.length >= 2 && validSI[validSI.length - 1] !== 0) {
         const oldest = validSI[validSI.length - 1];
         const latest = validSI[0];
-        const diff = oldest - latest;
-        improvementEl.textContent = `${diff >= 0 ? "+" : ""}${diff.toFixed(2)}%`;
+        const diff = ((oldest - latest) / oldest) * 100;
+        improvementEl.textContent = `${diff.toFixed(0)}%`;
       } else {
         improvementEl.textContent = "N/A";
       }
@@ -1066,7 +1100,7 @@
       `).join('');
     }
 
-    function applyFiltersAndRender() {
+    function filterSessions() {
       const timeFilter = document.getElementById('timeFilter').value;
       const sortFilter = document.getElementById('sortFilter').value;
 
@@ -1088,10 +1122,9 @@
             break;
         }
 
-        filteredSessions = filteredSessions.filter(session => {
-          if (!session.date) return false;
-          return new Date(session.date) >= cutoffDate;
-        });
+        filteredSessions = filteredSessions.filter(session =>
+          session.date && new Date(session.date) >= cutoffDate
+        );
       }
 
       switch (sortFilter) {
@@ -1110,7 +1143,6 @@
           break;
       }
 
-      updateStats(filteredSessions);
       renderSessions(filteredSessions);
     }
 
@@ -1119,7 +1151,7 @@
     }
 
     async function logout() {
-      const { error } = await supabase.auth.signOut();
+      const { error } = await supa.auth.signOut();
       if (error) {
         alert("Logout failed: " + error.message);
         return;
@@ -1127,10 +1159,29 @@
       window.location.href = "loginawtad.html";
     }
 
-    document.addEventListener('DOMContentLoaded', async function() {
-      document.getElementById('timeFilter').addEventListener('change', applyFiltersAndRender);
-      document.getElementById('sortFilter').addEventListener('change', applyFiltersAndRender);
-      document.getElementById('logoutBtn').addEventListener('click', function(e) {
+    document.addEventListener('DOMContentLoaded', async function () {
+      const menuBtn = document.getElementById('menuBtn');
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+
+      menuBtn.addEventListener('click', function () {
+        sidebar.classList.toggle('active');
+        mainContent.classList.toggle('shifted');
+        menuBtn.classList.toggle('active');
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!sidebar.contains(e.target) && !menuBtn.contains(e.target) && sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+          mainContent.classList.remove('shifted');
+          menuBtn.classList.remove('active');
+        }
+      });
+
+      document.getElementById('timeFilter').addEventListener('change', filterSessions);
+      document.getElementById('sortFilter').addEventListener('change', filterSessions);
+
+      document.getElementById('logoutBtn').addEventListener('click', function (e) {
         e.preventDefault();
         logout();
       });

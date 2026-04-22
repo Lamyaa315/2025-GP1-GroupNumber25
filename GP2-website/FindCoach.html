@@ -2,23 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AWTAD | Connect with Coach</title>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
-      --sidebar-width: 220px;
+      --sidebar-width: 190px;
       --primary-accent: #ffd2c2;
       --primary-strong: #ffb59c;
       --bg-dark: #4B3A57;
-      --glass: rgba(255, 255, 255, 0.08);
+      --bg-darker: #382a44;
+      --card-bg: rgba(255, 255, 255, 0.07);
+      --card-bg-strong: rgba(255, 255, 255, 0.1);
       --glass-border: rgba(255, 255, 255, 0.14);
+      --glass-highlight: rgba(255, 255, 255, 0.18);
       --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.22);
       --shadow-glow: 0 0 30px rgba(255, 181, 156, 0.12);
       --success: #8dd3a1;
-      --warning: #ffd1b3;
       --danger: #ff6b6b;
     }
 
@@ -30,13 +33,12 @@
     }
 
     body {
-      margin: 0;
-      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, sans-serif;
       background: #4B3A57;
-      overflow-x: hidden;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: white;
+      min-height: 100vh;
       position: relative;
+      overflow-x: hidden;
     }
 
     body::before {
@@ -59,14 +61,50 @@
       z-index: -1;
     }
 
-    /* SIDEBAR - same as Sessions page */
+    /* MENU BUTTON */
+    .menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1001;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .menu-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+      transform: scale(1.05);
+      border-color: rgba(255, 210, 194, 0.3);
+    }
+
+    .menu-btn i {
+      font-size: 1.5rem;
+      color: var(--primary-accent);
+      transition: all 0.3s ease;
+    }
+
+    .menu-btn.active i {
+      transform: rotate(90deg);
+    }
+
+    /* SIDEBAR */
     .sidebar {
       width: var(--sidebar-width);
       height: calc(100vh - 24px);
       margin: 12px;
       position: fixed;
       top: 0;
-      left: 0;
+      left: -250px;
       display: flex;
       flex-direction: column;
       padding: 22px 16px;
@@ -82,6 +120,11 @@
       -webkit-backdrop-filter: blur(22px) saturate(140%);
       z-index: 1000;
       overflow: hidden;
+      transition: left 0.3s ease;
+    }
+
+    .sidebar.active {
+      left: 0;
     }
 
     .sidebar::before {
@@ -126,13 +169,13 @@
       color: var(--primary-accent);
       font-size: 0.92rem;
       margin-bottom: 4px;
+      word-break: break-word;
     }
 
     .user-mini-card p {
       font-size: 0.76rem;
       opacity: 0.72;
       line-height: 1.5;
-      word-break: break-word;
     }
 
     .sidebar-nav {
@@ -184,90 +227,52 @@
       color: var(--primary-accent);
     }
 
-    /* MAIN CONTENT - same spacing as Sessions */
+    /* MAIN CONTENT */
     .main-content {
-      margin-left: calc(var(--sidebar-width) + 36px);
-      padding: 42px 28px 42px 20px;
-      width: calc(100% - var(--sidebar-width) - 48px);
-      max-width: none;
+      margin-left: 0;
+      padding: 70px 34px 42px 80px;
+      width: 100%;
+      transition: margin-left 0.3s ease, width 0.3s ease;
     }
 
-    .dashboard {
-      width: 100%;
-      max-width: 100%;
+    .main-content.shifted {
+      margin-left: calc(var(--sidebar-width) + 32px);
+      width: calc(100% - var(--sidebar-width) - 32px);
     }
 
     .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 28px;
-      flex-wrap: wrap;
-      gap: 18px;
+      margin-bottom: 32px;
     }
 
-    .dashboard-title {
-      font-size: 2.2rem;
+    .welcome-section {
+      margin-bottom: 30px;
+    }
+
+    .welcome-title {
+      font-size: 2.35rem;
       font-weight: 300;
+      margin-bottom: 8px;
       color: white;
+      letter-spacing: 0.2px;
       text-shadow: 0 0 18px rgba(255, 190, 170, 0.08);
     }
 
-    .dashboard-subtitle {
-      opacity: 0.82;
-      margin-top: 8px;
-      font-size: 0.98rem;
+    .welcome-subtitle {
+      opacity: 0.76;
+      font-weight: 300;
+      line-height: 1.7;
+      max-width: 850px;
     }
 
-    /* Status banner */
-    .status-banner {
-      padding: 20px;
-      border-radius: 22px;
-      margin-bottom: 30px;
-      display: none;
-      align-items: center;
-      gap: 15px;
-      animation: fadeIn 0.5s ease;
-      background: linear-gradient(
-        180deg,
-        rgba(255,255,255,0.08) 0%,
-        rgba(255,255,255,0.05) 100%
-      );
-      border: 1px solid var(--glass-border);
-      box-shadow:
-        var(--shadow-soft),
-        inset 0 1px 0 rgba(255,255,255,0.07);
-      backdrop-filter: blur(16px) saturate(135%);
-      -webkit-backdrop-filter: blur(16px) saturate(135%);
-    }
-
-    .status-pending {
-      border-color: rgba(255, 209, 179, 0.3);
-      color: var(--warning);
-    }
-
-    .status-accepted {
-      border-color: rgba(141, 211, 161, 0.3);
-      color: var(--success);
-    }
-
-    /* Section title */
     .section-title {
-      margin: 24px 0 20px;
+      font-size: 1.5rem;
       font-weight: 400;
-      opacity: 0.95;
       color: var(--primary-accent);
-      font-size: 1.25rem;
+      margin-bottom: 20px;
+      letter-spacing: 0.2px;
     }
 
-    /* Coach cards */
-    .coach-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 22px;
-      width: 100%;
-    }
-
+    .status-banner,
     .coach-card {
       background: linear-gradient(
         180deg,
@@ -275,20 +280,16 @@
         rgba(255,255,255,0.05) 100%
       );
       border: 1px solid var(--glass-border);
-      border-radius: 22px;
-      padding: 24px;
-      text-align: center;
-      transition: all 0.28s ease;
-      cursor: pointer;
-      backdrop-filter: blur(16px) saturate(135%);
-      -webkit-backdrop-filter: blur(16px) saturate(135%);
       box-shadow:
         var(--shadow-soft),
         inset 0 1px 0 rgba(255,255,255,0.07);
+      backdrop-filter: blur(16px) saturate(135%);
+      -webkit-backdrop-filter: blur(16px) saturate(135%);
       position: relative;
       overflow: hidden;
     }
 
+    .status-banner::before,
     .coach-card::before {
       content: "";
       position: absolute;
@@ -301,8 +302,44 @@
       pointer-events: none;
     }
 
+    .status-banner {
+      padding: 20px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      display: none;
+      align-items: center;
+      gap: 15px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .status-pending {
+      background: rgba(255, 209, 179, 0.15);
+      border: 1px solid rgba(255, 209, 179, 0.3);
+      color: #ffd1b3;
+    }
+
+    .status-accepted {
+      background: rgba(141, 211, 161, 0.15);
+      border: 1px solid rgba(141, 211, 161, 0.3);
+      color: #8dd3a1;
+    }
+
+    .coach-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 25px;
+    }
+
+    .coach-card {
+      border-radius: 24px;
+      padding: 25px;
+      text-align: center;
+      transition: all 0.28s ease;
+      cursor: pointer;
+    }
+
     .coach-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-8px);
       border-color: rgba(255, 210, 194, 0.24);
       box-shadow:
         0 16px 36px rgba(0, 0, 0, 0.26),
@@ -341,33 +378,24 @@
       font-weight: 600;
       transition: 0.3s;
       width: 100%;
+      font-family: inherit;
     }
 
     .btn-primary {
       background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
       color: #4B3A57;
       font-weight: 700;
-      border: none;
       box-shadow: 0 8px 18px rgba(255, 181, 156, 0.20);
     }
 
     .btn-primary:hover {
-      opacity: 0.95;
-      transform: scale(1.02);
+      transform: translateY(-2px);
       box-shadow: 0 12px 22px rgba(255, 181, 156, 0.24);
     }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-
-    footer {
-      text-align: center;
-      padding: 24px 0 0;
-      opacity: 0.78;
-      font-size: 0.96rem;
-      margin-top: 28px;
     }
 
     @media (max-width: 1024px) {
@@ -386,12 +414,6 @@
         display: none;
       }
 
-      .main-content {
-        margin-left: calc(var(--sidebar-width) + 28px);
-        padding: 34px 20px;
-        width: calc(100% - var(--sidebar-width) - 40px);
-      }
-
       .nav-item {
         justify-content: center;
         padding: 12px;
@@ -400,61 +422,39 @@
       .nav-item i {
         width: auto;
       }
-
-      .dashboard-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
     }
 
     @media (max-width: 768px) {
-      .main-content {
-        margin-left: 0;
+      .main-content,
+      .main-content.shifted {
         width: 100%;
-        padding: 110px 16px 24px;
+        margin-left: 0;
+        padding: 20px 18px;
       }
 
-      .sidebar {
-        width: calc(100% - 24px);
-        height: auto;
-        position: fixed;
-        top: 12px;
-        left: 0;
-        right: 0;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 14px;
-      }
-
-      .sidebar-brand {
-        padding-bottom: 0;
-      }
-
-      .sidebar-brand img {
-        display: block;
-        width: 82px;
-      }
-
-      .sidebar-nav {
-        display: flex;
-        flex-grow: 0;
-        gap: 8px;
-      }
-
-      .nav-item {
-        margin-bottom: 0;
+      .welcome-title {
+        font-size: 2rem;
       }
 
       .coach-grid {
         grid-template-columns: 1fr;
       }
     }
+
+    @media (max-width: 480px) {
+      .welcome-title {
+        font-size: 1.75rem;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <aside class="sidebar">
+  <div class="menu-btn" id="menuBtn">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <img src="awtadlogo1.png" alt="AWTAD">
     </div>
@@ -489,29 +489,25 @@
     </a>
   </aside>
 
-  <main class="main-content">
-    <section class="dashboard">
-      <div class="dashboard-header">
-        <div>
-          <h1 class="dashboard-title" id="dynamicWelcome">Welcome, Athlete</h1>
-          <p class="dashboard-subtitle">Browse available coaches and send a connection request.</p>
-        </div>
+  <main class="main-content" id="mainContent">
+    <section class="dashboard-header">
+      <div class="welcome-section">
+        <h1 class="welcome-title" id="dynamicWelcome">Welcome, Athlete</h1>
+        <p class="welcome-subtitle">Browse available coaches and request a connection to support your training journey.</p>
       </div>
+    </section>
 
-      <div id="statusBanner" class="status-banner">
-        <i id="statusIcon" class="fas"></i>
-        <div>
-          <h4 id="statusTitle"></h4>
-          <p id="statusDesc" style="font-size: 0.9rem; opacity: 0.8;"></p>
-        </div>
+    <div id="statusBanner" class="status-banner">
+      <i id="statusIcon" class="fas"></i>
+      <div>
+        <h4 id="statusTitle"></h4>
+        <p id="statusDesc" style="font-size: 0.9rem; opacity: 0.8;"></p>
       </div>
+    </div>
 
+    <section>
       <h3 class="section-title">Available Coaches</h3>
       <div class="coach-grid" id="coachDirectory"></div>
-
-      <footer>
-        <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
-      </footer>
     </section>
   </main>
 
@@ -519,6 +515,26 @@
     const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
     const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const menuBtn = document.getElementById('menuBtn');
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+
+      menuBtn.addEventListener('click', function () {
+        sidebar.classList.toggle('active');
+        mainContent.classList.toggle('shifted');
+        menuBtn.classList.toggle('active');
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!sidebar.contains(e.target) && !menuBtn.contains(e.target) && sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+          mainContent.classList.remove('shifted');
+          menuBtn.classList.remove('active');
+        }
+      });
+    });
 
     async function initPage() {
       const { data: { user } } = await supa.auth.getUser();
@@ -592,7 +608,7 @@
           <div class="coach-card" onclick="goToDetails('${coach.coach_id}')">
             <img src="${profilePic}" class="coach-img" alt="Coach">
             <div class="coach-name">${coach.Fname} ${coach.Lname}</div>
-            <div class="coach-spec">${coach.Specialty || "No Specialty"}</div>
+            <div class="coach-spec">${coach.Specialty || 'Coach'}</div>
             <button class="btn btn-primary" onclick="event.stopPropagation(); sendConnectRequest('${coach.coach_id}', '${coach.Fname}')">
               Send Request
             </button>
@@ -664,7 +680,8 @@
       window.location.href = `coach-details.html?id=${coachId}`;
     }
 
-    document.getElementById('logoutBtn').onclick = async () => {
+    document.getElementById('logoutBtn').onclick = async (e) => {
+      e.preventDefault();
       await supa.auth.signOut();
       window.location.href = "loginawtad.html";
     };

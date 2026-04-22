@@ -146,16 +146,32 @@
             overflow: hidden;
         }
 
-        .signup-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                135deg,
-                rgba(255,255,255,0.07) 0%,
-                transparent 42%
-            );
-            pointer-events: none;
+        /* تنسيق رسائل التنبيه داخل الصفحة */
+        #message-container {
+            display: none;
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.95rem;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .msg-error {
+            background: rgba(255, 107, 107, 0.15);
+            border: 1px solid var(--danger);
+            color: #ff8787;
+        }
+
+        .msg-success {
+            background: rgba(141, 211, 161, 0.15);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .signup-header {
@@ -178,11 +194,6 @@
             font-weight: 300;
         }
 
-        #signup-form {
-            position: relative;
-            z-index: 1;
-        }
-
         .form-group {
             margin-bottom: 18px;
         }
@@ -203,25 +214,12 @@
             color: white;
             font-size: 1rem;
             transition: all 0.3s ease;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-
-        .form-input::placeholder {
-            color: rgba(255,255,255,0.45);
         }
 
         .form-input:focus {
             outline: none;
             border-color: rgba(255, 182, 163, 0.45);
             box-shadow: 0 0 0 3px rgba(255, 182, 163, 0.08);
-            background: rgba(255, 255, 255, 0.10);
-        }
-
-        .user-type-container {
-            margin-bottom: 26px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.10);
         }
 
         .user-type-options {
@@ -232,7 +230,6 @@
 
         .user-type-option {
             flex: 1;
-            text-align: center;
         }
 
         .user-type-option input[type="radio"] {
@@ -246,27 +243,14 @@
             border: 1px solid rgba(255, 255, 255, 0.14);
             border-radius: 14px;
             cursor: pointer;
+            text-align: center;
             transition: 0.3s;
-            color: rgba(255,255,255,0.82);
-        }
-
-        .user-type-option label i {
-            margin-right: 6px;
         }
 
         .user-type-option input[type="radio"]:checked + label {
-            background: linear-gradient(
-                135deg,
-                rgba(255, 204, 187, 0.18),
-                rgba(255, 255, 255, 0.06)
-            );
-            border-color: rgba(255, 210, 194, 0.24);
+            background: rgba(255, 204, 187, 0.18);
+            border-color: var(--primary-accent);
             color: var(--primary-accent);
-            box-shadow: 0 0 18px rgba(255, 181, 156, 0.10);
-        }
-
-        #specialty-group {
-            display: none;
         }
 
         .password-container {
@@ -282,11 +266,6 @@
             border: none;
             color: rgba(255,255,255,0.75);
             cursor: pointer;
-            font-size: 0.95rem;
-        }
-
-        .password-toggle:hover {
-            color: var(--primary-accent);
         }
 
         .password-requirements {
@@ -296,12 +275,9 @@
             border-radius: 12px;
             font-size: 0.85rem;
             display: none;
-            border: 1px solid rgba(255,255,255,0.08);
         }
 
-        .password-requirements.show {
-            display: block;
-        }
+        .password-requirements.show { display: block; }
 
         .requirement {
             display: flex;
@@ -311,13 +287,7 @@
             color: var(--danger);
         }
 
-        .requirement:last-child {
-            margin-bottom: 0;
-        }
-
-        .requirement.valid {
-            color: var(--success);
-        }
+        .requirement.valid { color: var(--success); }
 
         .signup-btn {
             width: 100%;
@@ -330,73 +300,19 @@
             font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
-            box-shadow: 0 8px 18px rgba(255, 181, 156, 0.20);
+            margin-top: 10px;
         }
 
-        .signup-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 22px rgba(255, 181, 156, 0.24);
-        }
+        .signup-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .signup-btn:disabled { background: #888; cursor: not-allowed; transform: none; }
 
-        .signup-btn:disabled {
-            background: rgba(255,255,255,0.3);
-            color: rgba(75, 58, 87, 0.8);
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
+        .login-hint { text-align: center; margin-top: 20px; color: rgba(255,255,255,0.8); }
+        .login-hint a { color: var(--primary-strong); text-decoration: none; }
 
-        .login-hint {
-            text-align: center;
-            margin-top: 20px;
-            color: rgba(255,255,255,0.8);
-        }
-
-        .login-hint a {
-            color: var(--primary-strong);
-            text-decoration: none;
-        }
-
-        .login-hint a:hover {
-            color: var(--primary-accent);
-        }
-
-        footer {
-            text-align: center;
-            padding: 32px 20px 40px;
-            opacity: 0.72;
-        }
+        footer { text-align: center; padding: 32px; opacity: 0.7; }
 
         @media (max-width: 768px) {
-            .navbar {
-                padding: 16px 20px;
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .nav-links {
-                gap: 18px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .signup-container {
-                padding: 24px 16px;
-                min-height: auto;
-            }
-
-            .signup-card {
-                padding: 28px 20px;
-                border-radius: 22px;
-            }
-
-            .signup-title {
-                font-size: 1.9rem;
-            }
-
-            .user-type-options {
-                flex-direction: column;
-            }
+            .user-type-options { flex-direction: column; }
         }
     </style>
 </head>
@@ -419,8 +335,10 @@
                 <p class="signup-subtitle">Join AWTAD to track muscle activation</p>
             </div>
 
+            <div id="message-container"></div>
+
             <form id="signup-form">
-                <div class="user-type-container">
+                <div class="form-group">
                     <label class="form-label">I am signing up as:</label>
                     <div class="user-type-options">
                         <div class="user-type-option">
@@ -434,9 +352,9 @@
                     </div>
                 </div>
 
-                <div class="form-group" id="specialty-group">
+                <div class="form-group" id="specialty-group" style="display:none;">
                     <label class="form-label" for="specialty">Specialty</label>
-                    <input type="text" id="specialty" class="form-input" placeholder="e.g. Physiotherapy, Fitness">
+                    <input type="text" id="specialty" class="form-input" placeholder="e.g. Physiotherapy">
                 </div>
 
                 <div class="form-group">
@@ -479,8 +397,7 @@
                 <button type="submit" class="signup-btn" id="submitBtn">Create Account</button>
 
                 <div class="login-hint">
-                    Already have an account?
-                    <a href="loginawtad.html">Log in</a>
+                    Already have an account? <a href="loginawtad.html">Log in</a>
                 </div>
             </form>
         </div>
@@ -498,7 +415,17 @@
         const specialtyGroup = document.getElementById('specialty-group');
         const specialtyInput = document.getElementById('specialty');
         const userTypeRadios = document.querySelectorAll('input[name="userType"]');
+        const messageContainer = document.getElementById('message-container');
 
+        // دالة إظهار الرسائل
+        function showMessage(text, type) {
+            messageContainer.textContent = text;
+            messageContainer.style.display = 'block';
+            messageContainer.className = type === 'error' ? 'msg-error' : 'msg-success';
+            messageContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // إظهار/إخفاء تخصص المدرب
         userTypeRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 if (e.target.value === 'coach') {
@@ -511,6 +438,7 @@
             });
         });
 
+        // إظهار/إخفاء كلمة المرور
         document.querySelectorAll('.password-toggle').forEach(btn => {
             btn.addEventListener('click', function() {
                 const input = this.previousElementSibling;
@@ -520,6 +448,7 @@
             });
         });
 
+        // التحقق من قوة كلمة المرور
         passwordInput.addEventListener('input', function() {
             const val = this.value;
             document.getElementById('passwordRequirements').classList.add('show');
@@ -537,8 +466,11 @@
             }
         }
 
+        // إرسال البيانات
         document.getElementById('signup-form').addEventListener('submit', async function(e) {
             e.preventDefault();
+            messageContainer.style.display = 'none'; // إخفاء أي رسالة قديمة
+
             const fullName = document.getElementById('fullname').value;
             const email = document.getElementById('email').value;
             const phone = document.getElementById('phone').value;
@@ -548,7 +480,7 @@
             const submitBtn = document.getElementById('submitBtn');
 
             if (password !== confirmPasswordInput.value) {
-                alert("Passwords do not match!");
+                showMessage("Passwords do not match!", "error");
                 return;
             }
 
@@ -589,11 +521,15 @@
 
                     if (dbError) throw dbError;
 
-                    alert("Success! Account created and profile saved.");
-                    window.location.href = "luserawtad.html";
+                    // توجيه تلقائي عند النجاح
+                    window.location.href = "userawtad.html";
                 }
             } catch (err) {
-                alert("Error: " + err.message);
+                let errorMsg = err.message;
+                if (err.message.includes("already registered")) {
+                    errorMsg = "This email is already registered. Try logging in.";
+                }
+                showMessage(errorMsg, "error");
             } finally {
                 submitBtn.innerText = "Create Account";
                 submitBtn.disabled = false;

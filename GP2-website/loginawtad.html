@@ -1,564 +1,405 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AWTAD - Log In</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --primary-accent: #ffd2c2;
-      --primary-strong: #ffb59c;
-      --bg-dark: #4B3A57;
-      --card-bg: rgba(255, 255, 255, 0.08);
-      --glass-border: rgba(255, 255, 255, 0.14);
-      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.22);
-      --shadow-glow: 0 0 30px rgba(255, 181, 156, 0.12);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWTAD - Log In</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-accent: #ffd2c2;
+            --primary-strong: #ffb59c;
+            --bg-dark: #4B3A57;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.14);
+            --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.22);
+            --shadow-glow: 0 0 30px rgba(255, 181, 156, 0.12);
+            --success: #8dd3a1;
+            --danger: #ff6b6b;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #4B3A57;
-      overflow-x: hidden;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: white;
-      position: relative;
-    }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #4B3A57;
+            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            position: relative;
+        }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.30), transparent 42%),
-        radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.22), transparent 48%),
-        radial-gradient(circle at 55% 45%, rgba(255, 160, 140, 0.10), transparent 50%);
-      z-index: -2;
-    }
+        /* تكرار نفس خلفية الساين أب */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.30), transparent 42%),
+                radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.22), transparent 48%),
+                radial-gradient(circle at 55% 45%, rgba(255, 160, 140, 0.10), transparent 50%);
+            z-index: -2;
+        }
 
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
-      z-index: -1;
-    }
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            z-index: -1;
+        }
 
-    .navbar {
-      position: static;
-      width: 100%;
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 1000;
-      background: rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(18px) saturate(140%);
-      -webkit-backdrop-filter: blur(18px) saturate(140%);
-      border-bottom: 1px solid var(--glass-border);
-      box-shadow: var(--shadow-soft);
-    }
+        .navbar {
+            position: static;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(18px) saturate(140%);
+            -webkit-backdrop-filter: blur(18px) saturate(140%);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+        }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      height: 100px;
-      margin: -15px 0;
-    }
+        .logo {
+            display: flex;
+            align-items: center;
+            height: 100px;
+            margin: -15px 0;
+        }
 
-    .logo img {
-      height: 100%;
-      width: auto;
-      max-height: 100px;
-      object-fit: contain;
-      filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.15));
-    }
+        .logo img {
+            height: 100%;
+            width: auto;
+            max-height: 100px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.15));
+        }
 
-    .nav-links {
-      display: flex;
-      gap: 28px;
-      align-items: center;
-    }
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
 
-    .nav-links a {
-      color: rgba(255,255,255,0.82);
-      text-decoration: none;
-      font-weight: 300;
-      transition: all 0.3s ease;
-      position: relative;
-    }
+        .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-weight: 300;
+            transition: all 0.3s ease;
+            position: relative;
+        }
 
-    .nav-links a:hover {
-      color: var(--primary-accent);
-    }
+        .nav-links a:hover { color: var(--primary-accent); }
 
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 1px;
-      bottom: -6px;
-      left: 0;
-      background-color: var(--primary-accent);
-      transition: width 0.3s ease;
-    }
+        .nav-links a::after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 1px;
+            left: 0;
+            bottom: -6px;
+            background: var(--primary-accent);
+            transition: width 0.3s ease;
+        }
 
-    .nav-links a:hover::after {
-      width: 100%;
-    }
+        .nav-links a:hover::after { width: 100%; }
 
-    .login-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: calc(100vh - 160px);
-      padding: 40px 20px;
-    }
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 160px);
+            padding: 40px 20px;
+        }
 
-    .login-card {
-      width: 100%;
-      max-width: 460px;
-      padding: 38px 32px;
-      border-radius: 26px;
-      background: linear-gradient(
-        180deg,
-        rgba(255,255,255,0.08) 0%,
-        rgba(255,255,255,0.05) 100%
-      );
-      border: 1px solid var(--glass-border);
-      box-shadow:
-        var(--shadow-soft),
-        var(--shadow-glow),
-        inset 0 1px 0 rgba(255,255,255,0.07);
-      backdrop-filter: blur(18px) saturate(135%);
-      -webkit-backdrop-filter: blur(18px) saturate(135%);
-      position: relative;
-      overflow: hidden;
-    }
+        .login-card {
+            width: 100%;
+            max-width: 480px; /* أصغر قليلاً من الساين أب لتناسب المحتوى */
+            padding: 38px 32px;
+            border-radius: 26px;
+            background: linear-gradient(
+                180deg,
+                rgba(255,255,255,0.08) 0%,
+                rgba(255,255,255,0.05) 100%
+            );
+            border: 1px solid var(--glass-border);
+            box-shadow:
+                var(--shadow-soft),
+                var(--shadow-glow),
+                inset 0 1px 0 rgba(255,255,255,0.07);
+            backdrop-filter: blur(18px) saturate(135%);
+            -webkit-backdrop-filter: blur(18px) saturate(135%);
+            position: relative;
+        }
 
-    .login-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        135deg,
-        rgba(255,255,255,0.07) 0%,
-        transparent 42%
-      );
-      pointer-events: none;
-    }
+        #message-container {
+            display: none;
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.95rem;
+            animation: fadeIn 0.4s ease;
+        }
 
-    .login-header {
-      text-align: center;
-      margin-bottom: 30px;
-      position: relative;
-      z-index: 1;
-    }
+        .msg-error { background: rgba(255, 107, 107, 0.15); border: 1px solid var(--danger); color: #ff8787; }
+        .msg-success { background: rgba(141, 211, 161, 0.15); border: 1px solid var(--success); color: var(--success); }
 
-    .login-title {
-      font-size: 2.2rem;
-      font-weight: 300;
-      margin-bottom: 10px;
-      color: var(--primary-accent);
-      text-shadow: 0 0 16px rgba(255, 192, 170, 0.08);
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    .login-subtitle {
-      font-size: 1rem;
-      opacity: 0.8;
-      font-weight: 300;
-      line-height: 1.6;
-    }
+        .login-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
 
-    #login-form {
-      position: relative;
-      z-index: 1;
-    }
+        .login-title {
+            font-size: 2.2rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: var(--primary-accent);
+        }
 
-    .form-group {
-      margin-bottom: 20px;
-    }
+        .login-subtitle { opacity: 0.8; font-weight: 300; }
 
-    .form-label,
-    .user-type-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 400;
-      color: rgba(255,255,255,0.92);
-    }
+        .form-group { margin-bottom: 18px; }
 
-    .form-input {
-      width: 100%;
-      padding: 13px 15px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 12px;
-      color: white;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.92);
+        }
 
-    .form-input::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-    }
+        .form-input {
+            width: 100%;
+            padding: 13px 15px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
 
-    .form-input:focus {
-      outline: none;
-      border-color: rgba(255, 182, 163, 0.45);
-      box-shadow: 0 0 0 3px rgba(255, 182, 163, 0.08);
-      background: rgba(255, 255, 255, 0.10);
-    }
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(255, 182, 163, 0.45);
+            box-shadow: 0 0 0 3px rgba(255, 182, 163, 0.08);
+        }
 
-    .password-container {
-      position: relative;
-    }
+        .password-container { position: relative; }
 
-    .password-toggle {
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.75);
-      cursor: pointer;
-      font-size: 0.95rem;
-    }
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.75);
+            cursor: pointer;
+        }
 
-    .password-toggle:hover {
-      color: var(--primary-accent);
-    }
+        .user-type-options {
+            display: flex;
+            gap: 14px;
+            margin: 10px 0 20px;
+        }
 
-    .user-type-container {
-      margin: 25px 0;
-    }
+        .user-type-option { flex: 1; }
+        .user-type-option input { display: none; }
+        .user-type-option label {
+            display: block;
+            padding: 13px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 14px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+        }
 
-    .user-type-options {
-      display: flex;
-      gap: 14px;
-    }
+        .user-type-option input:checked + label {
+            background: rgba(255, 204, 187, 0.18);
+            border-color: var(--primary-accent);
+            color: var(--primary-accent);
+        }
 
-    .user-type-option {
-      flex: 1;
-      text-align: center;
-    }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
+            border: none;
+            border-radius: 14px;
+            color: #4B3A57;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
 
-    .user-type-option input[type="radio"] {
-      display: none;
-    }
+        .login-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .login-btn:disabled { background: #888; cursor: not-allowed; }
 
-    .user-type-option label {
-      display: block;
-      padding: 13px 15px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 14px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 400;
-      color: rgba(255,255,255,0.82);
-    }
+        .signup-hint {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255,255,255,0.8);
+        }
 
-    .user-type-option input[type="radio"]:checked + label {
-      background: linear-gradient(
-        135deg,
-        rgba(255, 204, 187, 0.18),
-        rgba(255, 255, 255, 0.06)
-      );
-      border-color: rgba(255, 210, 194, 0.24);
-      color: var(--primary-accent);
-      box-shadow: 0 0 18px rgba(255, 181, 156, 0.10);
-    }
+        .signup-hint a {
+            color: var(--primary-strong);
+            text-decoration: none;
+        }
 
-    .user-type-option label:hover {
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .user-type-icon {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 1.2rem;
-    }
-
-    .remember-forgot {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 22px;
-      gap: 12px;
-    }
-
-    .remember-me {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .remember-me input {
-      accent-color: var(--primary-strong);
-      margin: 0;
-    }
-
-    .remember-label {
-      font-size: 0.9rem;
-      opacity: 0.82;
-    }
-
-    .forgot-password {
-      color: var(--primary-strong);
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
-
-    .forgot-password:hover {
-      color: var(--primary-accent);
-      text-decoration: underline;
-    }
-
-    .login-btn {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
-      border: none;
-      border-radius: 14px;
-      color: #4B3A57;
-      font-size: 1.05rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 18px rgba(255, 181, 156, 0.20);
-    }
-
-    .login-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 22px rgba(255, 181, 156, 0.24);
-    }
-
-    .login-btn:disabled {
-      background: rgba(255,255,255,0.3);
-      color: rgba(75, 58, 87, 0.8);
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
-    }
-
-    .signup-link {
-      text-align: center;
-      font-size: 1rem;
-      color: rgba(255,255,255,0.82);
-    }
-
-    .signup-link a {
-      color: var(--primary-strong);
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .signup-link a:hover {
-      color: var(--primary-accent);
-      text-decoration: underline;
-    }
-
-    footer {
-      text-align: center;
-      padding: 32px 20px 40px;
-      opacity: 0.72;
-      font-size: 1rem;
-    }
-
-    @media (max-width: 768px) {
-      .navbar {
-        padding: 16px 20px;
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      .nav-links {
-        gap: 18px;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
-
-      .login-container {
-        padding: 24px 16px;
-        min-height: auto;
-      }
-
-      .login-card {
-        padding: 28px 20px;
-        border-radius: 22px;
-      }
-
-      .user-type-options {
-        flex-direction: column;
-      }
-
-      .remember-forgot {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .login-title {
-        font-size: 1.9rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .nav-links {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  </style>
+        footer { text-align: center; padding: 32px; opacity: 0.7; }
+    </style>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="logo">
-      <img src="awtadlogo1.png" alt="Awtad Logo">
-    </div>
-    <div class="nav-links">
-      <a href="awtadhp.html">Home</a>
-      <a href="signupawtad.html">Sign up</a>
-    </div>
-  </nav>
-
-  <section class="login-container">
-    <div class="login-card">
-      <div class="login-header">
-        <h1 class="login-title">Welcome Back</h1>
-        <p class="login-subtitle">Log in to continue tracking your muscle activation imbalance</p>
-      </div>
-
-      <form id="login-form">
-        <div class="form-group">
-          <label class="form-label" for="email">Email Address</label>
-          <input type="email" id="email" class="form-input" placeholder="Enter your email" required>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="awtadlogo1.png" alt="Awtad Logo">
         </div>
-
-        <div class="form-group">
-          <label class="form-label" for="password">Password</label>
-          <div class="password-container">
-            <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
-            <button type="button" class="password-toggle" id="togglePassword">
-              <i class="fas fa-eye"></i>
-            </button>
-          </div>
+        <div class="nav-links">
+            <a href="awtadhp.html">Home</a>
+            <a href="signupawtad.html">Sign Up</a>
         </div>
+    </nav>
 
-        <div class="user-type-container">
-          <label class="user-type-label">Login as:</label>
-          <div class="user-type-options">
-            <div class="user-type-option">
-              <input type="radio" id="client" name="userType" value="client" checked>
-              <label for="client">
-                <span class="user-type-icon"><i class="fas fa-user"></i></span>
-                Client
-              </label>
+    <section class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 class="login-title">Welcome Back</h1>
+                <p class="login-subtitle">Please log in to your account</p>
             </div>
-            <div class="user-type-option">
-              <input type="radio" id="coach" name="userType" value="coach">
-              <label for="coach">
-                <span class="user-type-icon"><i class="fas fa-chalkboard-teacher"></i></span>
-                Coach
-              </label>
-            </div>
-          </div>
+
+            <div id="message-container"></div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="example@mail.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="password-container">
+                        <input type="password" id="password" class="form-input" placeholder="Enter password" required>
+                        <button type="button" class="password-toggle" id="togglePassword"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Login as:</label>
+                    <div class="user-type-options">
+                        <div class="user-type-option">
+                            <input type="radio" id="client" name="userType" value="client" checked>
+                            <label for="client"><i class="fas fa-user"></i> Client</label>
+                        </div>
+                        <div class="user-type-option">
+                            <input type="radio" id="coach" name="userType" value="coach">
+                            <label for="coach"><i class="fas fa-chalkboard-teacher"></i> Coach</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">Log In</button>
+
+                <div class="signup-hint">
+                    Don't have an account? <a href="signupawtad.html">Sign up now</a>
+                </div>
+            </form>
         </div>
+    </section>
 
-        <div class="remember-forgot">
-          <div class="remember-me">
-            <input type="checkbox" id="remember">
-            <label for="remember" class="remember-label">Remember me</label>
-          </div>
-          <a href="#" class="forgot-password">Forgot password?</a>
-        </div>
+    <footer>
+        <p>&copy; 2025 AWTAD Technologies.</p>
+    </footer>
 
-        <button type="submit" class="login-btn">Log In</button>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script>
+        const loginBtn = document.getElementById('loginBtn');
+        const messageContainer = document.getElementById('message-container');
 
-        <div class="signup-link">
-          Don't have an account? <a href="signupawtad.html">Sign up</a>
-        </div>
-      </form>
-    </div>
-  </section>
+        function showMessage(text, type) {
+            messageContainer.textContent = text;
+            messageContainer.style.display = 'block';
+            messageContainer.className = type === 'error' ? 'msg-error' : 'msg-success';
+        }
 
-  <footer>
-    <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
-
-  <script>
-    const togglePassword = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('password');
-
-    togglePassword.addEventListener('click', function() {
-      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passwordInput.setAttribute('type', type);
-      this.querySelector('i').classList.toggle('fa-eye');
-      this.querySelector('i').classList.toggle('fa-eye-slash');
-    });
-
-    document.getElementById('login-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const userType = document.querySelector('input[name="userType"]:checked').value;
-      const loginBtn = document.querySelector('.login-btn');
-
-      loginBtn.innerText = "Processing ...";
-      loginBtn.disabled = true;
-
-      try {
-        const { data, error: authError } = await window.supabase.auth.signInWithPassword({
-          email: email,
-          password: password,
+        // إظهار/إخفاء الباسورد
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const input = document.getElementById('password');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
         });
 
-        if (authError) throw authError;
+        // تنفيذ عملية الدخول
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            messageContainer.style.display = 'none';
 
-        if (data.user) {
-          const tableName = (userType === 'coach') ? 'Coach' : 'Client';
-          const idCol = (userType === 'coach') ? 'coach_id' : 'client_id';
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const userType = document.querySelector('input[name="userType"]:checked').value;
 
-          const { data: profile, error: dbError } = await window.supabase
-            .from(tableName)
-            .select('*')
-            .eq(idCol, data.user.id)
-            .single();
+            loginBtn.innerText = "Verifying...";
+            loginBtn.disabled = true;
 
-          if (dbError || !profile) {
-            await window.supabase.auth.signOut();
-            throw new Error(`عذراً، هذا الحساب غير مسجل كـ ${userType === 'coach' ? 'مدرب' : 'عميل'}.`);
-          }
+            try {
+                const { data, error: authError } = await window.supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
 
-          alert("Logged in successfully!");
-          if (userType === 'coach') {
-            window.location.href = "coachawtad.html";
-          } else {
-            window.location.href = "userawtad.html";
-          }
-        }
-      } catch (err) {
-        alert("خطأ في تسجيل الدخول: " + err.message);
-      } finally {
-        loginBtn.innerText = "Log In";
-        loginBtn.disabled = false;
-      }
-    });
-  </script>
+                if (authError) throw authError;
+
+                if (data.user) {
+                    const tableName = (userType === 'coach') ? 'Coach' : 'Client';
+                    const idCol = (userType === 'coach') ? 'coach_id' : 'client_id';
+
+                    const { data: profile, error: dbError } = await window.supabase
+                        .from(tableName)
+                        .select('*')
+                        .eq(idCol, data.user.id)
+                        .single();
+
+                    if (dbError || !profile) {
+                        await window.supabase.auth.signOut();
+                        throw new Error(`This account is not registered as a ${userType}.`);
+                    }
+
+                    // نجاح الدخول
+                    window.location.href = (userType === 'coach') ? "coachawtad.html" : "userawtad.html";
+                }
+            } catch (err) {
+                let errorMsg = err.message;
+                // إذا كان الخطأ أن الإيميل/الباسورد خطأ، نعطي نصيحة بالاشتراك
+                if (errorMsg.includes("Invalid login credentials")) {
+                    errorMsg = "Incorrect email or password. If you don't have an account, please sign up.";
+                }
+                showMessage(errorMsg, "error");
+            } finally {
+                loginBtn.innerText = "Log In";
+                loginBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>
