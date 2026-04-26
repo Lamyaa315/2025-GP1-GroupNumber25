@@ -24,7 +24,12 @@
       --danger: #ff6b6b;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; min-width: 0; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      min-width: 0;
+    }
 
     body {
       min-height: 100vh;
@@ -55,50 +60,180 @@
       z-index: -1;
     }
 
-    /* --- SIDEBAR --- */
+    /* MENU BUTTON */
+    .menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1001;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .menu-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+      transform: scale(1.05);
+      border-color: rgba(255, 210, 194, 0.3);
+    }
+
+    .menu-btn i {
+      font-size: 1.5rem;
+      color: var(--primary-accent);
+      transition: all 0.3s ease;
+    }
+
+    .menu-btn.active i {
+      transform: rotate(90deg);
+    }
+
+    /* SIDEBAR - OPEN BY DEFAULT */
     .sidebar {
       width: var(--sidebar-width);
       height: calc(100vh - 24px);
       margin: 12px;
       position: fixed;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       display: flex;
       flex-direction: column;
       padding: 22px 16px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.04) 100%
+      );
       border: 1px solid var(--glass-border);
       box-shadow: var(--shadow-soft), var(--shadow-glow);
       border-radius: 26px;
       backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
       z-index: 1000;
+      overflow: hidden;
+      transition: left 0.3s ease;
     }
 
-    .sidebar-brand { text-align: center; padding-bottom: 26px; }
-    .sidebar-brand img { width: 105px; filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.2)); }
+    .sidebar.hidden {
+      left: -270px;
+    }
+
+    .sidebar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.12) 0%,
+          rgba(255, 255, 255, 0.02) 35%,
+          rgba(255, 255, 255, 0.01) 100%
+        );
+      pointer-events: none;
+    }
+
+    .sidebar-brand {
+      text-align: center;
+      padding-bottom: 26px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sidebar-brand img {
+      width: 105px;
+      filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.2));
+    }
 
     .coach-profile-mini {
+      position: relative;
+      z-index: 1;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
       padding: 14px;
       border-radius: 18px;
       margin-bottom: 18px;
     }
-    .coach-profile-mini h4 { color: var(--primary-accent); font-size: 0.92rem; margin-bottom: 4px; }
-    .coach-profile-mini p { font-size: 0.76rem; opacity: 0.72; }
+
+    .coach-profile-mini h4 {
+      color: var(--primary-accent);
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .coach-profile-mini p {
+      font-size: 0.76rem;
+      opacity: 0.72;
+      word-break: break-word;
+    }
+
+    .sidebar-nav {
+      flex-grow: 1;
+      position: relative;
+      z-index: 1;
+    }
 
     .nav-item {
-      display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 8px;
-      text-decoration: none; color: rgba(255,255,255,0.72); border-radius: 14px; transition: 0.25s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.72);
+      border-radius: 14px;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
     }
-    .nav-item:hover, .nav-item.active {
-      color: #fff; background: rgba(255, 204, 187, 0.15); border: 1px solid rgba(255, 210, 194, 0.16);
-    }
-    .nav-item i { width: 18px; text-align: center; color: var(--primary-accent); }
 
-    /* --- MAIN CONTENT --- */
+    .nav-item i {
+      width: 18px;
+      text-align: center;
+      color: var(--primary-accent);
+      font-size: 0.95rem;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 204, 187, 0.18),
+        rgba(255, 255, 255, 0.06)
+      );
+      border: 1px solid rgba(255, 210, 194, 0.16);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        0 0 18px rgba(255, 181, 156, 0.10);
+    }
+
+    .nav-item:hover {
+      transform: translateX(2px);
+    }
+
+    /* MAIN CONTENT - SHIFTED BY DEFAULT */
     .main-content {
-      margin-left: calc(var(--sidebar-width) + 36px);
-      padding: 42px 28px 42px 20px;
+      margin-left: calc(var(--sidebar-width) + 32px);
+      padding: 70px 34px 42px 34px;
+      width: calc(100% - var(--sidebar-width) - 32px);
+      transition: margin-left 0.3s ease, width 0.3s ease, padding 0.3s ease;
+    }
+
+    .main-content.expanded {
+      margin-left: 0;
+      width: 100%;
+      padding: 70px 34px 42px 80px;
     }
 
     .dashboard-header {
@@ -109,11 +244,25 @@
       align-items: start;
     }
 
-    .welcome-title { font-size: 2.25rem; font-weight: 300; margin-bottom: 10px; }
-    .welcome-subtitle { font-size: 1rem; opacity: 0.8; max-width: 600px; margin-bottom: 20px; }
+    .welcome-title {
+      font-size: 2.25rem;
+      font-weight: 300;
+      margin-bottom: 10px;
+    }
 
-    /* --- GLASS CARDS --- */
-    .stat-card, .client-card, .chart-card, .coach-badge, .modal-content {
+    .welcome-subtitle {
+      font-size: 1rem;
+      opacity: 0.8;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+
+    /* GLASS CARDS */
+    .stat-card,
+    .client-card,
+    .chart-card,
+    .coach-badge,
+    .modal-content {
       background: var(--card-bg);
       border: 1px solid var(--glass-border);
       backdrop-filter: blur(16px);
@@ -121,63 +270,158 @@
       padding: 22px;
       transition: 0.3s;
     }
-    .stat-card:hover, .client-card:hover { transform: translateY(-5px); border-color: var(--primary-accent); }
 
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 28px; }
-    .stat-card-value { font-size: 2rem; color: var(--primary-accent); font-weight: 300; }
+    .stat-card:hover,
+    .client-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary-accent);
+    }
 
-    .section-title { font-size: 1.5rem; color: var(--primary-accent); margin-bottom: 16px; margin-top: 32px; }
-    .clients-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
 
-    /* --- MODAL --- */
+    .stat-card-value {
+      font-size: 2rem;
+      color: var(--primary-accent);
+      font-weight: 300;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      color: var(--primary-accent);
+      margin-bottom: 16px;
+      margin-top: 32px;
+    }
+
+    .clients-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 22px;
+    }
+
+    /* MODAL */
     .modal {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-      z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(7px);
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(7px);
     }
-    .modal.active { display: flex; }
-    .modal-content { width: 100%; max-width: 450px; text-align: center; }
-    .modal-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
 
-    .action-btn, .modal-btn {
-      padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.05); color: white; cursor: pointer; transition: 0.3s;
+    .modal.active {
+      display: flex;
     }
-    .action-btn.primary, .modal-btn.confirm { background: var(--primary-accent); color: #4B3A57; font-weight: bold; border: none; }
 
-    .pill { font-size: 0.75rem; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; color: var(--primary-accent); }
-  
+    .modal-content {
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .action-btn,
+    .modal-btn {
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .action-btn.primary,
+    .modal-btn.confirm {
+      background: var(--primary-accent);
+      color: #4B3A57;
+      font-weight: bold;
+      border: none;
+    }
+
+    .pill {
+      font-size: 0.75rem;
+      background: rgba(255,255,255,0.1);
+      padding: 4px 10px;
+      border-radius: 20px;
+      color: var(--primary-accent);
+    }
+
     .refresh-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      color: #ffd2c2;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
 
-    padding: 12px 20px;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.15);
+    .refresh-btn:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateY(-2px) scale(1.03);
+    }
 
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(10px);
+    .refresh-btn i {
+      font-size: 14px;
+    }
 
-    color: #ffd2c2;
-    font-weight: 600;
-    cursor: pointer;
+    @media (max-width: 900px) {
+      .dashboard-header {
+        grid-template-columns: 1fr;
+      }
 
-    transition: all 0.3s ease;
-}
+      .coach-badge {
+        max-width: 100%;
+      }
+    }
 
-.refresh-btn:hover {
-    background: rgba(255,255,255,0.15);
-    transform: translateY(-2px) scale(1.03);
-}
+    @media (max-width: 768px) {
+      .main-content,
+      .main-content.expanded {
+        width: 100%;
+        margin-left: 0;
+        padding: 80px 18px 32px;
+      }
 
-.refresh-btn i {
-    font-size: 14px;
-}
+      .sidebar {
+        left: 0;
+      }
+
+      .sidebar.hidden {
+        left: -270px;
+      }
+
+      .clients-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <aside class="sidebar">
+  <div class="menu-btn active" id="menuBtn">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <img src="awtadlogo1.png" alt="AWTAD">
     </div>
@@ -188,35 +432,58 @@
     </div>
 
     <nav class="sidebar-nav">
-            <a href="coachawtad.html" class="nav-item active"><i class="fas fa-th-large"></i> <span class="nav-text">Dashboard</span></a>
-            <a href="MyAthletes.html" class="nav-item"><i class="fas fa-users"></i> <span class="nav-text">My Athletes</span></a>
-            <a href="coachschedule.html" class="nav-item"><i class="fas fa-calendar"></i> <span class="nav-text">Schedule</span></a>
-            <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> <span class="nav-text">Analytics</span></a>
+      <a href="coachawtad.html" class="nav-item active">
+        <i class="fas fa-th-large"></i>
+        <span class="nav-text">Dashboard</span>
+      </a>
+
+      <a href="MyAthletes.html" class="nav-item">
+        <i class="fas fa-users"></i>
+        <span class="nav-text">My Athletes</span>
+      </a>
+
+      <a href="coachschedule.html" class="nav-item">
+        <i class="fas fa-calendar"></i>
+        <span class="nav-text">Schedule</span>
+      </a>
+
+<a href="coach-profile.html" class="nav-item">
+  <i class="fas fa-user"></i>
+  <span class="nav-text">Profile</span>
+</a>
+
     </nav>
 
     <a href="loginawtad.html" id="logoutBtn" class="nav-item" style="margin-top: auto;">
-      <i class="fas fa-sign-out-alt"></i> <span class="nav-text">Logout</span>
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="nav-text">Logout</span>
     </a>
   </aside>
 
-  <main class="main-content">
+  <main class="main-content" id="mainContent">
     <section class="dashboard">
 
       <div class="dashboard-header">
         <div class="welcome-section">
           <h1 class="welcome-title" id="welcomeTitle">Coach Dashboard</h1>
           <p class="welcome-subtitle">Manage your athletes and monitor muscle balance data in real-time.</p>
-          <button class="action-btn primary" id="viewScheduleBtn"><i class="fas fa-calendar-alt"></i> View Schedule</button>
+          <button class="action-btn primary" id="viewScheduleBtn">
+            <i class="fas fa-calendar-alt"></i>
+            View Schedule
+          </button>
         </div>
 
         <div class="coach-badge">
           <div style="display:flex; gap:15px; align-items:center;">
-             <div style="font-size: 2rem; color: var(--primary-accent);"><i class="fas fa-user-tie"></i></div>
-             <div>
-                <h3 id="coachNameTop">Loading...</h3>
-                <p id="coachEmailTop" style="font-size:0.8rem; opacity:0.7;">—</p>
-                <span class="pill" id="coachSpecialtyTop">Specialty: —</span>
-             </div>
+            <div style="font-size: 2rem; color: var(--primary-accent);">
+              <i class="fas fa-user-tie"></i>
+            </div>
+
+            <div>
+              <h3 id="coachNameTop">Loading...</h3>
+              <p id="coachEmailTop" style="font-size:0.8rem; opacity:0.7;">—</p>
+              <span class="pill" id="coachSpecialtyTop">Specialty: —</span>
+            </div>
           </div>
         </div>
       </div>
@@ -226,28 +493,32 @@
           <h3 style="font-size: 0.9rem; opacity:0.7;">Active Clients</h3>
           <div class="stat-card-value" id="statActiveClients">0</div>
         </div>
-        
+
         <div class="stat-card">
           <h3 style="font-size: 0.9rem; opacity:0.7;">Pending Requests</h3>
           <div class="stat-card-value" id="statPendingCount">0</div>
         </div>
       </div>
 
- 
-
       <div class="clients-section">
         <h2 class="section-title">Your Active Athletes</h2>
         <div class="clients-grid" id="clientsGrid"></div>
       </div>
 
-         <div id="pendingRequestsContainer"></div>
+      <div id="pendingRequestsContainer"></div>
+
       <div class="clients-section" id="pendingSection">
-        <h2 class="section-title">Pending Requests</h2> 
-        <div id="pendingEmpty" style="opacity: 0.6; padding: 20px;">No pending requests at the moment.</div>
+        <h2 class="section-title">Pending Requests</h2>
+
+        <div id="pendingEmpty" style="opacity: 0.6; padding: 20px;">
+          No pending requests at the moment.
+        </div>
+
         <button onclick="loadPendingRequests()" class="refresh-btn">
-        <i class="fas fa-rotate-right"></i>
-        Refresh Requests
+          <i class="fas fa-rotate-right"></i>
+          Refresh Requests
         </button>
+
         <div class="clients-grid" id="pendingGrid"></div>
       </div>
 
@@ -258,6 +529,7 @@
     <div class="modal-content">
       <h3 style="color: var(--primary-accent); margin-bottom:10px;">Confirm Logout</h3>
       <p style="opacity:0.8;">Are you sure you want to log out of the AWTAD Coach Portal?</p>
+
       <div class="modal-buttons">
         <button id="cancelLogout" class="modal-btn">Cancel</button>
         <button id="confirmLogout" class="modal-btn confirm">Logout</button>
@@ -266,7 +538,16 @@
   </div>
 
   <script>
-    // Simple UI bridge for schedule buttons
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    menuBtn.addEventListener('click', function () {
+      sidebar.classList.toggle('hidden');
+      mainContent.classList.toggle('expanded');
+      menuBtn.classList.toggle('active');
+    });
+
     const sideScheduleBtn = document.getElementById('viewScheduleBtnSide');
     const topScheduleBtn = document.getElementById('viewScheduleBtn');
 

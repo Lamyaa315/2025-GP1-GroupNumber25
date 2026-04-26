@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AWTAD - Coach Profile</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      min-width: 0;
+    }
+
+    :root {
+      --sidebar-width: 220px;
+      --primary-accent: #ffd2c2;
+      --primary-strong: #ffb59c;
+      --bg-dark: #4B3A57;
+      --card-bg: rgba(255,255,255,0.08);
+      --glass-border: rgba(255,255,255,0.14);
+      --shadow-soft: 0 10px 30px rgba(0,0,0,0.22);
+      --shadow-glow: 0 0 30px rgba(255,181,156,0.12);
+      --success: #8dd3a1;
+      --danger: #ff6b6b;
+      --radius: 22px;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-dark);
+      color: white;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.30), transparent 42%),
+        radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.22), transparent 48%),
+        radial-gradient(circle at 55% 45%, rgba(255, 160, 140, 0.10), transparent 50%);
+      z-index: -2;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: -1;
+    }
+
+    .menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1001;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: 0.3s ease;
+    }
+
+    .menu-btn:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+      transform: scale(1.05);
+      border-color: rgba(255,210,194,0.3);
+    }
+
+    .menu-btn i {
+      font-size: 1.5rem;
+      color: var(--primary-accent);
+      transition: 0.3s ease;
+    }
+
+    .menu-btn.active i {
+      transform: rotate(90deg);
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      height: calc(100vh - 24px);
+      margin: 12px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft), var(--shadow-glow);
+      border-radius: 26px;
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      z-index: 1000;
+      overflow: hidden;
+      transition: left 0.3s ease;
+    }
+
+    .sidebar.hidden {
+      left: -270px;
+    }
+
+    .sidebar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      pointer-events: none;
+    }
+
+    .sidebar-brand {
+      text-align: center;
+      padding-bottom: 26px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sidebar-brand img {
+      width: 105px;
+      filter: drop-shadow(0 0 14px rgba(255,204,187,0.2));
+    }
+
+    .coach-mini-card {
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.09);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      padding: 14px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+    }
+
+    .coach-mini-card h4 {
+      color: var(--primary-accent);
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .coach-mini-card p {
+      font-size: 0.76rem;
+      opacity: 0.72;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .sidebar-nav {
+      flex-grow: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.72);
+      border-radius: 14px;
+      transition: 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-item i {
+      width: 18px;
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--primary-accent);
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(135deg, rgba(255,204,187,0.18), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,210,194,0.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 18px rgba(255,181,156,0.10);
+    }
+
+    .nav-item:hover {
+      transform: translateX(2px);
+    }
+
+    .main-content {
+      margin-left: calc(var(--sidebar-width) + 32px);
+      width: calc(100% - var(--sidebar-width) - 32px);
+      padding: 54px 34px 42px 34px;
+      transition: margin-left 0.3s ease, width 0.3s ease, padding 0.3s ease;
+    }
+
+    .main-content.expanded {
+      margin-left: 0;
+      width: 100%;
+      padding: 54px 34px 42px 80px;
+    }
+
+    .page-header {
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 2.2rem;
+      font-weight: 300;
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      opacity: 0.78;
+      line-height: 1.6;
+    }
+
+    .glass-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.05));
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.07);
+      backdrop-filter: blur(16px) saturate(135%);
+      -webkit-backdrop-filter: blur(16px) saturate(135%);
+      border-radius: var(--radius);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.07), transparent 42%);
+      pointer-events: none;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .profile-left,
+    .profile-right {
+      padding: 22px;
+    }
+
+    .profile-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      min-height: 340px;
+      justify-content: center;
+    }
+
+    .avatar-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,182,163,0.45);
+      background: rgba(255,255,255,0.06);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-accent);
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: none;
+    }
+
+    .avatar-edit {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(75,58,87,0.92);
+      color: var(--primary-accent);
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .coach-name {
+      margin-top: 14px;
+      font-size: 1.35rem;
+      color: var(--primary-accent);
+      font-weight: 600;
+    }
+
+    .coach-role {
+      margin-top: 5px;
+      opacity: 0.85;
+      font-size: 0.94rem;
+    }
+
+    .specialty-pill {
+      margin-top: 14px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 210, 194, 0.12);
+      border: 1px solid rgba(255, 210, 194, 0.22);
+      color: var(--primary-accent);
+      font-size: 0.85rem;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      gap: 12px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-header h2 {
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: var(--primary-accent);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+
+    .value {
+      padding: 10px 12px;
+      border-radius: 11px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.07);
+      font-size: 0.92rem;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 11px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.08);
+      color: white;
+      font-size: 0.92rem;
+      font-family: inherit;
+      min-height: 40px;
+    }
+
+    .select option {
+      background: #4B3A57;
+      color: white;
+    }
+
+    .btn {
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.10);
+      color: white;
+      border-radius: 999px;
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: 0.25s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: inherit;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.18);
+      border-color: rgba(255,182,163,0.35);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
+      color: #4B3A57;
+      font-weight: 700;
+      border: none;
+      box-shadow: 0 8px 18px rgba(255,181,156,0.20);
+    }
+
+    .btn.ghost {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 14, 24, 0.58);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      width: min(620px, 92vw);
+      padding: 44px 38px;
+      border-radius: 26px;
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.08) 0%,
+        rgba(255,255,255,0.05) 100%
+      );
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        var(--shadow-soft),
+        inset 0 1px 0 rgba(255,255,255,0.07);
+      backdrop-filter: blur(16px) saturate(135%);
+      -webkit-backdrop-filter: blur(16px) saturate(135%);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .modal-content::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.07) 0%,
+        transparent 42%
+      );
+      pointer-events: none;
+    }
+
+    .modal-content h3,
+    .modal-content p,
+    .modal-actions {
+      position: relative;
+      z-index: 1;
+    }
+
+    .modal-content h3 {
+      color: var(--primary-accent);
+      font-size: 1.55rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .modal-content p {
+      opacity: 0.9;
+      line-height: 1.7;
+      font-size: 1.05rem;
+      margin-bottom: 0;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 26px;
+    }
+
+    .modal-actions .btn {
+      min-width: 150px;
+      padding: 14px 24px;
+      border-radius: 16px;
+      justify-content: center;
+    }
+
+    .page-footer {
+      text-align: center;
+      padding: 26px 0 0;
+      opacity: 0.78;
+      font-size: 0.92rem;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-content,
+      .main-content.expanded {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 16px 24px;
+      }
+
+      .sidebar {
+        left: 0;
+      }
+
+      .sidebar.hidden {
+        left: -270px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="modal" id="saveModal" aria-hidden="true">
+    <div class="modal-content">
+      <h3>Changes Saved</h3>
+      <p>Your coach profile information has been updated successfully.</p>
+      <div class="modal-actions">
+        <button class="btn primary" id="saveOkBtn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="logoutModal" aria-hidden="true">
+    <div class="modal-content">
+      <h3>Confirm Logout</h3>
+      <p>Are you sure you want to log out? You'll need to log in again to access your account.</p>
+      <div class="modal-actions">
+        <button class="btn ghost" id="cancelLogoutBtn">Cancel</button>
+        <button class="btn primary" id="confirmLogoutBtn">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-btn active" id="menuBtn">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <img src="awtadlogo1.png" alt="AWTAD">
+    </div>
+
+    <div class="coach-mini-card">
+      <h4 id="coachNameSide">Coach Profile</h4>
+      <p id="coachEmailSide">Your professional information</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="coachawtad.html" class="nav-item">
+        <i class="fas fa-th-large"></i>
+        <span class="nav-text">Dashboard</span>
+      </a>
+
+      <a href="MyAthletes.html" class="nav-item">
+        <i class="fas fa-users"></i>
+        <span class="nav-text">My Athletes</span>
+      </a>
+
+      <a href="coachschedule.html" class="nav-item">
+        <i class="fas fa-calendar"></i>
+        <span class="nav-text">Schedule</span>
+      </a>
+
+
+      <a href="coach-profile.html" class="nav-item active">
+        <i class="fas fa-user"></i>
+        <span class="nav-text">Profile</span>
+      </a>
+    </nav>
+
+    <a href="#" id="logoutBtn" class="nav-item">
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="nav-text">Logout</span>
+    </a>
+  </aside>
+
+  <main class="main-content" id="mainContent">
+    <header class="page-header">
+      <h1 class="page-title">Coach Profile</h1>
+      <p class="page-subtitle">Manage your professional information and profile picture.</p>
+    </header>
+
+    <section class="profile-grid">
+      <section class="glass-card profile-left">
+        <div class="avatar-circle">
+          <span id="avatarInitials">C</span>
+          <img id="avatarImg" src="" alt="Coach Profile Picture" />
+
+          <button class="avatar-edit" id="profilePicBtn" title="Change photo">
+            <i class="fa-solid fa-camera"></i>
+          </button>
+        </div>
+
+        <input type="file" id="profilePicInput" accept="image/*" style="display:none;" />
+
+        <h2 class="coach-name" id="nameDisplay">Loading...</h2>
+        <p class="coach-role">AWTAD Coach</p>
+
+        <div class="specialty-pill" id="specialtyDisplay">
+          <i class="fa-solid fa-dumbbell"></i>
+          Specialty
+        </div>
+      </section>
+
+      <section class="glass-card profile-right">
+        <div class="card-header">
+          <h2>Professional Information</h2>
+
+          <button class="btn ghost" id="editToggleBtn">
+            <i class="fa-solid fa-pen-to-square"></i>
+            Edit Profile
+          </button>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label>First Name</label>
+            <div class="value" id="fnameValue">Loading...</div>
+            <input class="input" id="fnameInput" type="text" style="display:none;" />
+          </div>
+
+          <div class="field">
+            <label>Last Name</label>
+            <div class="value" id="lnameValue">Loading...</div>
+            <input class="input" id="lnameInput" type="text" style="display:none;" />
+          </div>
+
+          <div class="field">
+            <label>Email</label>
+            <div class="value" id="emailValue">Loading...</div>
+          </div>
+
+          <div class="field">
+            <label>Phone</label>
+            <div class="value" id="phoneValue">Loading...</div>
+            <input class="input" id="phoneInput" type="tel" style="display:none;" />
+          </div>
+
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Specialty</label>
+            <div class="value" id="specialtyValue">Loading...</div>
+
+            <select class="select" id="specialtyInput" style="display:none;">
+              <option value="">Select specialty</option>
+              <option value="Strength and Conditioning Coach">Strength and Conditioning Coach</option>
+              <option value="Sports Performance Coach">Sports Performance Coach</option>
+              <option value="Personal Trainer">Personal Trainer</option>
+              <option value="CrossFit Coach">CrossFit Coach</option>
+              <option value="Weightlifting Coach">Weightlifting Coach</option>
+              <option value="Rehabilitation Fitness Coach">Rehabilitation Fitness Coach</option>
+              <option value="Movement and Mobility Coach">Movement and Mobility Coach</option>
+              <option value="Athletic Trainer">Athletic Trainer</option>
+              <option value="Physiotherapist">Physiotherapist</option>
+              <option value="Sports Therapist">Sports Therapist</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn primary" id="saveBtn" style="display:none; margin-top: 16px;">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Save Changes
+        </button>
+      </section>
+    </section>
+
+    <footer class="page-footer">
+      <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
+    </footer>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
+    const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let currentCoach = null;
+    let isEditing = false;
+
+    document.addEventListener("DOMContentLoaded", async function () {
+      setupSidebar();
+      setupModals();
+      setupProfileButtons();
+      await loadCoachProfile();
+    });
+
+    function setupSidebar() {
+      const menuBtn = document.getElementById("menuBtn");
+      const sidebar = document.getElementById("sidebar");
+      const mainContent = document.getElementById("mainContent");
+
+      menuBtn.addEventListener("click", function () {
+        sidebar.classList.toggle("hidden");
+        mainContent.classList.toggle("expanded");
+        menuBtn.classList.toggle("active");
+      });
+    }
+
+    function setupModals() {
+      document.getElementById("cancelLogoutBtn").addEventListener("click", function () {
+        document.getElementById("logoutModal").classList.remove("show");
+      });
+
+      document.getElementById("saveOkBtn").addEventListener("click", function () {
+        document.getElementById("saveModal").classList.remove("show");
+      });
+
+      document.querySelectorAll(".modal").forEach(modal => {
+        modal.addEventListener("click", function (e) {
+          if (e.target === modal) modal.classList.remove("show");
+        });
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", function (e) {
+        e.preventDefault();
+        document.getElementById("logoutModal").classList.add("show");
+      });
+
+      document.getElementById("confirmLogoutBtn").addEventListener("click", async function () {
+        const confirmBtn = document.getElementById("confirmLogoutBtn");
+
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = "Logging out...";
+
+        const { error } = await supa.auth.signOut();
+
+        if (error) {
+          alert("Logout failed: " + error.message);
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = "Logout";
+          return;
+        }
+
+        window.location.href = "loginawtad.html";
+      });
+    }
+
+    function setupProfileButtons() {
+      document.getElementById("editToggleBtn").addEventListener("click", toggleEditMode);
+      document.getElementById("saveBtn").addEventListener("click", saveCoachProfile);
+
+      document.getElementById("profilePicBtn").addEventListener("click", function () {
+        document.getElementById("profilePicInput").click();
+      });
+
+      document.getElementById("profilePicInput").addEventListener("change", uploadProfilePicture);
+    }
+
+    async function loadCoachProfile() {
+      const { data: { user }, error: userError } = await supa.auth.getUser();
+
+      if (userError || !user) {
+        window.location.href = "loginawtad.html";
+        return;
+      }
+
+      currentUser = user;
+
+      const { data: coach, error: coachError } = await supa
+        .from("Coach")
+        .select("*")
+        .eq("coach_id", user.id)
+        .maybeSingle();
+
+      if (coachError || !coach) {
+        console.error("Could not load coach profile:", coachError);
+        setEmptyCoachProfile(user.email);
+        return;
+      }
+
+      currentCoach = coach;
+      renderCoachProfile(coach);
+    }
+
+    function setEmptyCoachProfile(email) {
+      document.getElementById("nameDisplay").textContent = "Coach";
+      document.getElementById("coachNameSide").textContent = "Coach";
+      document.getElementById("coachEmailSide").textContent = email || "—";
+      document.getElementById("fnameValue").textContent = "—";
+      document.getElementById("lnameValue").textContent = "—";
+      document.getElementById("emailValue").textContent = email || "—";
+      document.getElementById("phoneValue").textContent = "—";
+      document.getElementById("specialtyValue").textContent = "—";
+      document.getElementById("specialtyDisplay").innerHTML = `<i class="fa-solid fa-dumbbell"></i> Specialty not provided`;
+    }
+
+    function renderCoachProfile(coach) {
+      const first = coach.Fname || "";
+      const last = coach.Lname || "";
+      const fullName = `${first} ${last}`.trim() || "Coach";
+      const initials = `${first.charAt(0)}${last.charAt(0)}` || "C";
+
+      document.getElementById("nameDisplay").textContent = fullName;
+      document.getElementById("coachNameSide").textContent = fullName;
+      document.getElementById("coachEmailSide").textContent = coach.email || currentUser?.email || "—";
+
+      document.getElementById("fnameValue").textContent = first || "—";
+      document.getElementById("lnameValue").textContent = last || "—";
+      document.getElementById("emailValue").textContent = coach.email || currentUser?.email || "—";
+      document.getElementById("phoneValue").textContent = coach.Phone_Number || "—";
+      document.getElementById("specialtyValue").textContent = coach.Specialty || "—";
+      document.getElementById("specialtyDisplay").innerHTML =
+        `<i class="fa-solid fa-dumbbell"></i> ${coach.Specialty || "Specialty not provided"}`;
+
+      document.getElementById("fnameInput").value = first;
+      document.getElementById("lnameInput").value = last;
+      document.getElementById("phoneInput").value = coach.Phone_Number || "";
+      document.getElementById("specialtyInput").value = coach.Specialty || "";
+
+      const avatarImg = document.getElementById("avatarImg");
+      const avatarInitials = document.getElementById("avatarInitials");
+
+      avatarInitials.textContent = initials;
+
+      if (coach.profile_pic_url) {
+        avatarImg.src = coach.profile_pic_url;
+        avatarImg.style.display = "block";
+        avatarInitials.style.display = "none";
+      } else {
+        avatarImg.style.display = "none";
+        avatarInitials.style.display = "block";
+      }
+    }
+
+    function toggleEditMode() {
+      isEditing = !isEditing;
+
+      const editBtn = document.getElementById("editToggleBtn");
+      const saveBtn = document.getElementById("saveBtn");
+
+      ["fname", "lname", "phone", "specialty"].forEach(field => {
+        document.getElementById(`${field}Value`).style.display = isEditing ? "none" : "flex";
+        document.getElementById(`${field}Input`).style.display = isEditing ? "block" : "none";
+      });
+
+      saveBtn.style.display = isEditing ? "inline-flex" : "none";
+
+      editBtn.innerHTML = isEditing
+        ? '<i class="fa-solid fa-xmark"></i> Cancel'
+        : '<i class="fa-solid fa-pen-to-square"></i> Edit Profile';
+
+      if (!isEditing && currentCoach) {
+        renderCoachProfile(currentCoach);
+      }
+    }
+
+    async function saveCoachProfile() {
+      if (!currentUser) return;
+
+      const updates = {
+        Fname: document.getElementById("fnameInput").value.trim(),
+        Lname: document.getElementById("lnameInput").value.trim(),
+        Phone_Number: document.getElementById("phoneInput").value.trim(),
+        Specialty: document.getElementById("specialtyInput").value
+      };
+
+      const { data, error } = await supa
+        .from("Coach")
+        .update(updates)
+        .eq("coach_id", currentUser.id)
+        .select()
+        .single();
+
+      if (error) {
+        alert("Failed to save profile: " + error.message);
+        return;
+      }
+
+      currentCoach = data;
+      isEditing = false;
+      renderCoachProfile(data);
+
+      ["fname", "lname", "phone", "specialty"].forEach(field => {
+        document.getElementById(`${field}Value`).style.display = "flex";
+        document.getElementById(`${field}Input`).style.display = "none";
+      });
+
+      document.getElementById("saveBtn").style.display = "none";
+      document.getElementById("editToggleBtn").innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Edit Profile';
+      document.getElementById("saveModal").classList.add("show");
+    }
+
+    async function uploadProfilePicture(event) {
+      const file = event.target.files[0];
+
+      if (!file || !currentUser) return;
+
+      if (!file.type.startsWith("image/")) {
+        alert("Please choose an image file.");
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Profile picture must be less than 2 MB.");
+        return;
+      }
+
+      const fileExt = file.name.split(".").pop();
+      const filePath = `coach/${currentUser.id}-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supa.storage
+        .from("profile-pics")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: true
+        });
+
+      if (uploadError) {
+        alert("Image upload failed: " + uploadError.message);
+        return;
+      }
+
+      const { data: publicUrlData } = supa.storage
+        .from("profile-pics")
+        .getPublicUrl(filePath);
+
+      const profilePicUrl = publicUrlData.publicUrl;
+
+      const { data, error } = await supa
+        .from("Coach")
+        .update({ profile_pic_url: profilePicUrl })
+        .eq("coach_id", currentUser.id)
+        .select()
+        .single();
+
+      if (error) {
+        alert("Failed to save profile picture: " + error.message);
+        return;
+      }
+
+      currentCoach = data;
+      renderCoachProfile(data);
+    }
+  </script>
+</body>
+</html>

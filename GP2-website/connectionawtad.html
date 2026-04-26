@@ -1151,6 +1151,42 @@
       const data = await res.json();
       return data;
     }
+async function saveSignalPreviewToSession(clientId, rawPlot) {
+  if (!rawPlot) {
+    console.warn("No signal preview received from backend.");
+    return false;
+  }
+
+  const { data: latestSession, error: latestSessionError } = await window.supabase
+    .from("Session")
+    .select("session_id")
+    .eq("client_id", clientId)
+    .order("session_date", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (latestSessionError || !latestSession) {
+    console.error("Could not find latest session:", latestSessionError?.message);
+    return false;
+  }
+
+  console.log("Latest session found:", latestSession.session_id);
+
+  const { error: updateError } = await window.supabase
+    .from("Session")
+    .update({
+      signal_preview: rawPlot
+    })
+    .eq("session_id", latestSession.session_id);
+
+  if (updateError) {
+    console.error("Failed to save signal preview:", updateError.message);
+    return false;
+  }
+
+  console.log("Signal preview saved successfully.");
+  return true;
+}
 
     const menuBtn = document.getElementById('menuBtn');
     const sidebar = document.getElementById('sidebar');
@@ -1351,6 +1387,17 @@
             client_id: user.id,
             exercise_type: "Squat"
           });
+          console.log("Analysis result from backend:", result);
+
+          if (result.raw_plot) {
+            const signalSaved = await saveSignalPreviewToSession(user.id, result.raw_plot);
+
+            if (!signalSaved) {
+              showMessage("Session analyzed, but signal preview was not saved.");
+            }
+          } else {
+            console.warn("Backend did not return raw_plot.");
+          }
 
           if (animationId) cancelAnimationFrame(animationId);
 

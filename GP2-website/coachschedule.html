@@ -15,129 +15,776 @@
       --bg-dark: #4B3A57;
       --card-bg: rgba(255, 255, 255, 0.08);
       --glass-border: rgba(255, 255, 255, 0.14);
-      --transition: all 0.3s ease;
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.22);
+      --shadow-glow: 0 0 30px rgba(255, 181, 156, 0.12);
+      --success: #8dd3a1;
+      --danger: #ff6b6b;
+      --warning: #ffd1b3;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; min-width: 0; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      min-width: 0;
+    }
 
     body {
       min-height: 100vh;
-      background: #4B3A57;
+      background: var(--bg-dark);
       overflow-x: hidden;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: white;
       position: relative;
     }
 
-    /* Background Gradients */
     body::before {
-      content: ""; position: fixed; inset: 0;
-      background: radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.30), transparent 42%),
-                  radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.22), transparent 48%);
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.30), transparent 42%),
+        radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.22), transparent 48%);
       z-index: -2;
     }
-    body::after { content: ""; position: fixed; inset: 0; backdrop-filter: blur(2px); z-index: -1; }
 
-    /* SIDEBAR (Identical to Dashboard) */
-    .sidebar {
-      width: var(--sidebar-width); height: calc(100vh - 24px); margin: 12px;
-      position: fixed; top: 0; left: 0; display: flex; flex-direction: column;
-      padding: 22px 16px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
-      border: 1px solid var(--glass-border); border-radius: 26px; backdrop-filter: blur(22px) saturate(140%); z-index: 1000;
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: -1;
     }
-    .sidebar-brand { text-align: center; padding-bottom: 26px; }
-    .sidebar-brand img { width: 105px; filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.2)); }
-    .coach-profile-mini { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.09); padding: 14px; border-radius: 18px; margin-bottom: 18px; }
-    .coach-profile-mini h4 { color: var(--primary-accent); font-size: 0.92rem; margin-bottom: 4px; }
-    .coach-profile-mini p { font-size: 0.76rem; opacity: 0.72; }
 
-    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 8px; text-decoration: none; color: rgba(255,255,255,0.72); border-radius: 14px; transition: 0.25s; }
-    .nav-item:hover, .nav-item.active { color: #fff; background: rgba(255, 204, 187, 0.15); border: 1px solid rgba(255, 210, 194, 0.16); }
-    .nav-item i { width: 18px; text-align: center; color: var(--primary-accent); }
+    .menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1001;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
 
-    /* MAIN CONTENT */
-    .main-content { margin-left: calc(var(--sidebar-width) + 36px); padding: 42px 28px 42px 20px; }
+    .menu-btn:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+      transform: scale(1.05);
+      border-color: rgba(255, 210, 194, 0.3);
+    }
 
-    .welcome-title { font-size: 2.25rem; font-weight: 300; margin-bottom: 10px; }
-    .welcome-subtitle { font-size: 1rem; opacity: 0.8; margin-bottom: 30px; }
+    .menu-btn i {
+      font-size: 1.5rem;
+      color: var(--primary-accent);
+      transition: all 0.3s ease;
+    }
 
-    /* CALENDAR NAV */
-    .schedule-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: var(--card-bg); padding: 15px 25px; border-radius: 20px; border: 1px solid var(--glass-border); }
-    .date-controls { display: flex; align-items: center; gap: 15px; }
-    .nav-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: 0.3s; }
-    .nav-btn:hover { background: var(--primary-accent); color: #4B3A57; }
-    .current-date { font-size: 1.2rem; font-weight: 500; color: var(--primary-accent); min-width: 200px; text-align: center; }
+    .menu-btn.active i {
+      transform: rotate(90deg);
+    }
 
-    .view-tabs { display: flex; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 30px; }
-    .view-tab { padding: 8px 20px; border: none; background: transparent; color: white; border-radius: 25px; cursor: pointer; transition: 0.3s; }
-    .view-tab.active { background: var(--primary-accent); color: #4B3A57; font-weight: bold; }
+    .sidebar {
+      width: var(--sidebar-width);
+      height: calc(100vh - 24px);
+      margin: 12px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft), var(--shadow-glow);
+      border-radius: 26px;
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      z-index: 1000;
+      overflow: hidden;
+      transition: left 0.3s ease;
+    }
 
-    /* SCHEDULE GRID */
-    .schedule-container { background: var(--card-bg); border-radius: 26px; border: 1px solid var(--glass-border); padding: 30px; backdrop-filter: blur(15px); }
-    
-    .day-schedule.active, .weekly-schedule.active { display: block; animation: fadeIn 0.4s ease; }
-    .day-schedule, .weekly-schedule { display: none; }
+    .sidebar.hidden {
+      left: -270px;
+    }
 
-    /* SESSION CARDS */
-    .sessions-list { display: grid; gap: 15px; }
-    .session-card { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 18px; padding: 20px; transition: 0.3s; cursor: pointer; }
-    .session-card:hover { transform: scale(1.01); border-color: var(--primary-accent); background: rgba(255,255,255,0.1); }
-    
-    .session-time { color: var(--primary-accent); font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-    .session-client { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-    .client-avatar { width: 35px; height: 35px; border-radius: 50%; background: var(--primary-accent); color: #4B3A57; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; }
-    
-    .status-badge { font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; float: right; }
-    .confirmed { background: rgba(141, 211, 161, 0.15); color: #8dd3a1; }
+    .sidebar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.12) 0%,
+          rgba(255, 255, 255, 0.02) 35%,
+          rgba(255, 255, 255, 0.01) 100%
+        );
+      pointer-events: none;
+    }
 
-    /* WEEKLY COLUMNS */
-    .week-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
-    .day-column { background: rgba(255,255,255,0.03); border-radius: 15px; padding: 15px; min-height: 150px; text-align: center; border: 1px solid transparent; }
-    .day-column.today { border-color: var(--primary-accent); background: rgba(255, 210, 194, 0.05); }
-    .day-name { font-size: 0.8rem; opacity: 0.6; margin-bottom: 5px; }
-    .day-number { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; }
+    .sidebar-brand {
+      text-align: center;
+      padding-bottom: 26px;
+      position: relative;
+      z-index: 1;
+    }
 
-    /* MODAL */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(7px); }
-    .modal.active { display: flex; }
-    .modal-content { background: #4B3A57; border: 1px solid var(--glass-border); padding: 30px; border-radius: 25px; width: 90%; max-width: 450px; }
-    .modal-btn { padding: 12px 20px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; }
-    .btn-primary { background: var(--primary-accent); color: #4B3A57; }
+    .sidebar-brand img {
+      width: 105px;
+      filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.2));
+    }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .coach-profile-mini {
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.09);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      padding: 14px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+    }
+
+    .coach-profile-mini h4 {
+      color: var(--primary-accent);
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .coach-profile-mini p {
+      font-size: 0.76rem;
+      opacity: 0.72;
+      word-break: break-word;
+    }
+
+    .sidebar-nav {
+      flex-grow: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.72);
+      border-radius: 14px;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-item i {
+      width: 18px;
+      text-align: center;
+      color: var(--primary-accent);
+      font-size: 0.95rem;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(135deg, rgba(255,204,187,0.18), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,210,194,0.16);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        0 0 18px rgba(255,181,156,0.10);
+    }
+
+    .nav-item:hover {
+      transform: translateX(2px);
+    }
+
+    .main-content {
+      margin-left: calc(var(--sidebar-width) + 32px);
+      padding: 70px 34px 42px 34px;
+      width: calc(100% - var(--sidebar-width) - 32px);
+      transition: margin-left 0.3s ease, width 0.3s ease, padding 0.3s ease;
+    }
+
+    .main-content.expanded {
+      margin-left: 0;
+      width: 100%;
+      padding: 70px 34px 42px 80px;
+    }
+
+    .welcome-title {
+      font-size: 2.25rem;
+      font-weight: 300;
+      margin-bottom: 10px;
+    }
+
+    .welcome-subtitle {
+      font-size: 1rem;
+      opacity: 0.8;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .section-heading {
+      color: var(--primary-accent);
+      font-size: 1.45rem;
+      font-weight: 500;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pending-section {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 26px;
+      padding: 26px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .pending-subtitle {
+      opacity: 0.75;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+
+    .pending-list {
+      display: grid;
+      gap: 15px;
+    }
+
+    .schedule-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      background: var(--card-bg);
+      padding: 15px 25px;
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+      gap: 16px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .date-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--glass-border);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: inherit;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-accent);
+      color: #4B3A57;
+      transform: translateY(-2px);
+    }
+
+    .current-date {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--primary-accent);
+      min-width: 220px;
+      text-align: center;
+    }
+
+    .view-tabs {
+      display: flex;
+      background: rgba(0,0,0,0.2);
+      padding: 5px;
+      border-radius: 30px;
+    }
+
+    .view-tab {
+      padding: 8px 20px;
+      border: none;
+      background: transparent;
+      color: white;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: inherit;
+    }
+
+    .view-tab.active {
+      background: var(--primary-accent);
+      color: #4B3A57;
+      font-weight: bold;
+    }
+
+    .schedule-container {
+      background: var(--card-bg);
+      border-radius: 26px;
+      border: 1px solid var(--glass-border);
+      padding: 30px;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .day-schedule,
+    .weekly-schedule {
+      display: none;
+    }
+
+    .day-schedule.active,
+    .weekly-schedule.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .sessions-list {
+      display: grid;
+      gap: 15px;
+    }
+
+    .session-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 20px;
+      transition: 0.3s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .session-card:hover {
+      transform: scale(1.01);
+      border-color: var(--primary-accent);
+      background: rgba(255,255,255,0.1);
+    }
+
+    .pending-request-card {
+      border-color: rgba(255, 209, 179, 0.28);
+      background: rgba(255, 209, 179, 0.06);
+    }
+
+    .accepted-meeting-card {
+      border-color: rgba(141, 211, 161, 0.20);
+      background: rgba(141, 211, 161, 0.05);
+    }
+
+    .session-time {
+      color: var(--primary-accent);
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .session-client {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .client-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--primary-accent);
+      color: #4B3A57;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.82rem;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .client-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .client-name {
+      font-weight: 600;
+      color: white;
+    }
+
+    .session-note {
+      opacity: 0.72;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      width: fit-content;
+    }
+
+    .pending {
+      background: rgba(255, 209, 179, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(255, 209, 179, 0.28);
+    }
+
+    .accepted {
+      background: rgba(141, 211, 161, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(141, 211, 161, 0.28);
+    }
+
+    .rejected {
+      background: rgba(255, 107, 107, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(255, 107, 107, 0.28);
+    }
+
+    .empty-state {
+      text-align: center;
+      opacity: 0.7;
+      padding: 42px 20px;
+      border: 1px dashed rgba(255,255,255,0.15);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.035);
+    }
+
+    .empty-state i {
+      color: var(--primary-accent);
+      font-size: 2.4rem;
+      margin-bottom: 14px;
+    }
+
+    .week-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 12px;
+    }
+
+    .day-column {
+      background: rgba(255,255,255,0.03);
+      border-radius: 15px;
+      padding: 15px;
+      min-height: 190px;
+      border: 1px solid transparent;
+    }
+
+    .day-column.today {
+      border-color: var(--primary-accent);
+      background: rgba(255, 210, 194, 0.05);
+    }
+
+    .day-name {
+      font-size: 0.8rem;
+      opacity: 0.6;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+
+    .day-number {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-align: center;
+      color: var(--primary-accent);
+    }
+
+    .week-meeting {
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(141,211,161,0.08);
+      border: 1px solid rgba(141,211,161,0.16);
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+
+    .week-meeting:hover {
+      background: rgba(255,255,255,0.10);
+      transform: translateY(-2px);
+    }
+
+    .week-meeting-time {
+      color: var(--primary-accent);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 14, 24, 0.58);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      width: min(560px, 92vw);
+      padding: 34px;
+      border-radius: 26px;
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.08) 0%,
+        rgba(255,255,255,0.05) 100%
+      );
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        var(--shadow-soft),
+        inset 0 1px 0 rgba(255,255,255,0.07);
+      backdrop-filter: blur(16px) saturate(135%);
+      -webkit-backdrop-filter: blur(16px) saturate(135%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .modal-content::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.07), transparent 42%);
+      pointer-events: none;
+    }
+
+    .modal-content > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .modal-title {
+      color: var(--primary-accent);
+      margin-bottom: 18px;
+      font-size: 1.45rem;
+      font-weight: 600;
+    }
+
+    .modal-text {
+      opacity: 0.9;
+      line-height: 1.8;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    }
+
+    .modal-btn {
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: inherit;
+      flex: 1;
+      min-width: 130px;
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
+      color: #4B3A57;
+      box-shadow: 0 8px 18px rgba(255, 181, 156, 0.20);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.16);
+    }
+
+    .btn-danger {
+      background: rgba(255, 107, 107, 0.17);
+      color: #ffb1b1;
+      border: 1px solid rgba(255, 107, 107, 0.30);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1000px) {
+      .schedule-nav {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .date-controls {
+        justify-content: center;
+      }
+
+      .view-tabs {
+        justify-content: center;
+      }
+
+      .week-days {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-content,
+      .main-content.expanded {
+        width: 100%;
+        margin-left: 0;
+        padding: 80px 18px 32px;
+      }
+
+      .sidebar {
+        left: 0;
+      }
+
+      .sidebar.hidden {
+        left: -270px;
+      }
+
+      .week-days {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-actions {
+        flex-direction: column;
+      }
+
+      .modal-btn {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <aside class="sidebar">
+  <div class="menu-btn active" id="menuBtn">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <img src="awtadlogo1.png" alt="AWTAD">
     </div>
+
     <div class="coach-profile-mini">
       <h4 id="coachNameSide">Loading...</h4>
       <p id="coachEmailSide">—</p>
     </div>
+
     <nav class="sidebar-nav">
-        <a href="coachawtad.html" class="nav-item"><i class="fas fa-th-large"></i> <span class="nav-text">Dashboard</span></a>
-        <a href="MyAthletes.html" class="nav-item"><i class="fas fa-users"></i> <span class="nav-text">My Athletes</span></a>
-        <a href="coachschedule.html" class="nav-item active"><i class="fas fa-calendar"></i> <span class="nav-text">Schedule</span></a>
-        <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> <span class="nav-text">Analytics</span></a>
+      <a href="coachawtad.html" class="nav-item">
+        <i class="fas fa-th-large"></i>
+        <span class="nav-text">Dashboard</span>
+      </a>
+
+      <a href="MyAthletes.html" class="nav-item">
+        <i class="fas fa-users"></i>
+        <span class="nav-text">My Athletes</span>
+      </a>
+
+      <a href="coachschedule.html" class="nav-item active">
+        <i class="fas fa-calendar"></i>
+        <span class="nav-text">Schedule</span>
+      </a>
+
+      <a href="coach-profile.html" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span class="nav-text">Profile</span>
+      </a>
     </nav>
-    <a href="loginawtad.html" id="logoutBtn" class="nav-item" style="margin-top: auto;">
-      <i class="fas fa-sign-out-alt"></i> <span class="nav-text">Logout</span>
+
+    <a href="#" id="logoutBtn" class="nav-item" style="margin-top: auto;">
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="nav-text">Logout</span>
     </a>
   </aside>
 
-  <main class="main-content">
+  <main class="main-content" id="mainContent">
     <h1 class="welcome-title">Training Schedule</h1>
-    <p class="welcome-subtitle">Manage and track your athlete sessions.</p>
+    <p class="welcome-subtitle">
+      Review new meeting requests first. Accepted meetings will be added to the schedule on their requested date.
+    </p>
+
+    <section class="pending-section">
+      <h2 class="section-heading">
+        <i class="fas fa-inbox"></i>
+        New Meeting Requests
+      </h2>
+
+      <p class="pending-subtitle">
+        These requests appear here immediately, regardless of the requested date. Accepting a request will move it into your schedule.
+      </p>
+
+      <div class="pending-list" id="pendingRequestsList"></div>
+
+      <div id="noPendingRequests" class="empty-state" style="display:none;">
+        <i class="fas fa-check-circle"></i>
+        <p>No pending meeting requests right now.</p>
+      </div>
+    </section>
 
     <div class="schedule-nav">
       <div class="date-controls">
-        <button class="nav-btn" id="prevDay"><i class="fas fa-chevron-left"></i></button>
-        <div class="current-date" id="currentDate">Monday, December 9</div>
-        <button class="nav-btn" id="nextDay"><i class="fas fa-chevron-right"></i></button>
-        <button class="nav-btn" id="todayBtn" style="width: auto; padding: 0 15px; border-radius: 15px;">Today</button>
+        <button class="nav-btn" id="prevDay">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <div class="current-date" id="currentDate">Loading...</div>
+
+        <button class="nav-btn" id="nextDay">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <button class="nav-btn" id="todayBtn" style="width: auto; padding: 0 15px; border-radius: 15px;">
+          Today
+        </button>
       </div>
 
       <div class="view-tabs">
@@ -147,193 +794,545 @@
     </div>
 
     <div class="schedule-container">
+      <h2 class="section-heading">
+        <i class="fas fa-calendar-check"></i>
+        Accepted Schedule
+      </h2>
+
       <div class="day-schedule active" id="dayView">
-        <div class="sessions-list" id="daySessionsList">
-          </div>
-        <div id="dayNoSessions" style="display: none; text-align: center; opacity: 0.5; padding: 40px;">
-            <i class="fas fa-calendar-times fa-3x" style="margin-bottom: 15px;"></i>
-            <p>No sessions scheduled for this day.</p>
+        <div class="sessions-list" id="daySessionsList"></div>
+
+        <div id="dayNoSessions" class="empty-state" style="display: none;">
+          <i class="fas fa-calendar-times"></i>
+          <p>No accepted meetings for this day.</p>
         </div>
       </div>
 
       <div class="weekly-schedule" id="weekView">
-        <div class="week-days" id="weekDays">
-          </div>
+        <div class="week-days" id="weekDays"></div>
       </div>
     </div>
   </main>
 
-  <div class="modal" id="sessionModal">
+  <div class="modal" id="meetingModal">
     <div class="modal-content">
-      <h3 id="modalTitle" style="color: var(--primary-accent); margin-bottom: 20px;">Session Details</h3>
-      <div style="opacity: 0.8; line-height: 1.8;">
-          <p><strong>Athlete:</strong> <span id="modalClient"></span></p>
-          <p><strong>Time:</strong> <span id="modalTime"></span></p>
-          <p><strong>Type:</strong> <span id="modalType"></span></p>
-          <p style="margin-top: 10px;"><strong>Notes:</strong> <br><span id="modalNotes"></span></p>
+      <h3 class="modal-title" id="modalTitle">Meeting Request</h3>
+
+      <div class="modal-text">
+        <p><strong>Athlete:</strong> <span id="modalClient"></span></p>
+        <p><strong>Date:</strong> <span id="modalDate"></span></p>
+        <p><strong>Time:</strong> <span id="modalTime"></span></p>
+        <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+        <p><strong>Requested at:</strong> <span id="modalRequestedAt"></span></p>
+        <p style="margin-top: 10px;"><strong>Reason:</strong><br><span id="modalReason"></span></p>
       </div>
-      <div style="display: flex; gap: 10px; margin-top: 25px;">
-          <button class="modal-btn" id="closeModal" style="flex: 1; background: rgba(255,255,255,0.1); color: white;">Close</button>
-          <button class="modal-btn btn-primary" id="startSession" style="flex: 2;">Start Session</button>
+
+      <div class="modal-actions" id="meetingModalActions">
+        <button class="modal-btn btn-secondary" id="closeMeetingModal">Close</button>
       </div>
     </div>
   </div>
-<script>
-    // 1. Configuration & Global Variables
+
+  <div class="modal" id="logoutModal">
+    <div class="modal-content">
+      <h3 class="modal-title">Confirm Logout</h3>
+      <p class="modal-text">
+        Are you sure you want to log out? You'll need to log in again to access your account.
+      </p>
+
+      <div class="modal-actions">
+        <button class="modal-btn btn-secondary" id="cancelLogoutBtn">Cancel</button>
+        <button class="modal-btn btn-primary" id="confirmLogoutBtn">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
     const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
     const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentCoach = null;
     let currentDate = new Date();
+    let meetingRequests = [];
+    let selectedMeeting = null;
 
-    // Sample Data (Tip: You can later replace this with a supa.from('Session') fetch)
-    const sessions = [
-      { id: 1, client: "Norah Al-Mutairi", initials: "NA", type: "Squat Analysis", date: "2026-03-28", startTime: "10:00", endTime: "11:00", status: "confirmed", notes: "Focus on VL activation." },
-      { id: 2, client: "Ahmed Hassan", initials: "AH", type: "Jump Analysis", date: "2026-03-28", startTime: "14:00", endTime: "15:00", status: "confirmed", notes: "Check gastro imbalance." }
-    ];
+    document.addEventListener("DOMContentLoaded", async function () {
+      setupSidebar();
+      setupControls();
+      setupModals();
+      await initCoach();
+    });
 
-    /**
-     * 2. Auth & Profile Initialization
-     * Fetches the logged-in coach and updates the sidebar.
-     */
-    async function initCoach() {
-        const { data: { user } } = await supa.auth.getUser();
-        
-        if (!user) { 
-            window.location.href = "loginawtad.html"; 
-            return; 
-        }
+    function setupSidebar() {
+      const menuBtn = document.getElementById("menuBtn");
+      const sidebar = document.getElementById("sidebar");
+      const mainContent = document.getElementById("mainContent");
 
-        const { data: coach, error } = await supa
-            .from('Coach')
-            .select('*')
-            .eq('email', user.email)
-            .single();
-
-        if (coach) {
-            currentCoach = coach;
-            // Update Sidebar IDs
-            document.getElementById('coachNameSide').innerText = `${coach.Fname} ${coach.Lname}`;
-            document.getElementById('coachEmailSide').innerText = coach.email;
-            
-            // Now that coach is loaded, show the calendar
-            updateDisplay(); 
-        } else {
-            console.error("Coach profile not found.");
-            document.getElementById('coachNameSide').innerText = "Profile Error";
-        }
+      menuBtn.addEventListener("click", function () {
+        sidebar.classList.toggle("hidden");
+        mainContent.classList.toggle("expanded");
+        menuBtn.classList.toggle("active");
+      });
     }
 
-    /**
-     * 3. UI Display Logic
-     */
+    function setupControls() {
+      document.getElementById("prevDay").onclick = function () {
+        currentDate.setDate(currentDate.getDate() - 1);
+        updateDisplay();
+      };
+
+      document.getElementById("nextDay").onclick = function () {
+        currentDate.setDate(currentDate.getDate() + 1);
+        updateDisplay();
+      };
+
+      document.getElementById("todayBtn").onclick = function () {
+        currentDate = new Date();
+        updateDisplay();
+      };
+
+      document.querySelectorAll(".view-tab").forEach(tab => {
+        tab.onclick = function (e) {
+          document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+          e.target.classList.add("active");
+
+          const view = e.target.getAttribute("data-view");
+
+          document.getElementById("dayView").classList.toggle("active", view === "day");
+          document.getElementById("weekView").classList.toggle("active", view === "week");
+
+          updateDisplay();
+        };
+      });
+    }
+
+    function setupModals() {
+      const meetingModal = document.getElementById("meetingModal");
+      const logoutModal = document.getElementById("logoutModal");
+
+      document.getElementById("closeMeetingModal").onclick = function () {
+        meetingModal.classList.remove("active");
+      };
+
+      meetingModal.addEventListener("click", function (e) {
+        if (e.target === meetingModal) {
+          meetingModal.classList.remove("active");
+        }
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", function (e) {
+        e.preventDefault();
+        logoutModal.classList.add("active");
+      });
+
+      document.getElementById("cancelLogoutBtn").addEventListener("click", function () {
+        logoutModal.classList.remove("active");
+      });
+
+      logoutModal.addEventListener("click", function (e) {
+        if (e.target === logoutModal) {
+          logoutModal.classList.remove("active");
+        }
+      });
+
+      document.getElementById("confirmLogoutBtn").addEventListener("click", async function () {
+        const btn = document.getElementById("confirmLogoutBtn");
+
+        btn.disabled = true;
+        btn.textContent = "Logging out...";
+
+        const { error } = await supa.auth.signOut();
+
+        if (error) {
+          alert("Logout failed: " + error.message);
+          btn.disabled = false;
+          btn.textContent = "Logout";
+          return;
+        }
+
+        window.location.href = "loginawtad.html";
+      });
+    }
+
+    async function initCoach() {
+      const { data: { user }, error: userError } = await supa.auth.getUser();
+
+      if (userError || !user) {
+        window.location.href = "loginawtad.html";
+        return;
+      }
+
+      const { data: coach, error } = await supa
+        .from("Coach")
+        .select("*")
+        .eq("email", user.email)
+        .maybeSingle();
+
+      if (!coach || error) {
+        console.error("Coach profile not found.", error);
+        document.getElementById("coachNameSide").innerText = "Profile Error";
+        document.getElementById("coachEmailSide").innerText = user.email || "—";
+        return;
+      }
+
+      currentCoach = coach;
+
+      document.getElementById("coachNameSide").innerText =
+        `${coach.Fname || ""} ${coach.Lname || ""}`.trim() || "Coach";
+
+      document.getElementById("coachEmailSide").innerText = coach.email || user.email || "—";
+
+      await loadMeetingRequests();
+    }
+
+    async function loadMeetingRequests() {
+      const { data: relationships, error } = await supa
+        .from("Client_Coach_Relationship")
+        .select(`
+          request_id,
+          client_id,
+          coach_id,
+          status,
+          meeting_requested_date,
+          meeting_requested_time,
+          meeting_reason,
+          meeting_status,
+          meeting_requested_at
+        `)
+        .eq("coach_id", currentCoach.coach_id)
+        .eq("status", "accepted")
+        .not("meeting_status", "is", null)
+        .not("meeting_requested_date", "is", null)
+        .not("meeting_requested_time", "is", null)
+        .order("meeting_requested_at", { ascending: false });
+
+      if (error) {
+        console.error("Meeting requests error:", error);
+        meetingRequests = [];
+        renderPendingRequests();
+        updateDisplay();
+        return;
+      }
+
+      if (!relationships || relationships.length === 0) {
+        meetingRequests = [];
+        renderPendingRequests();
+        updateDisplay();
+        return;
+      }
+
+      const clientIds = relationships.map(rel => rel.client_id);
+
+      const { data: clients, error: clientError } = await supa
+        .from("Client")
+        .select("client_id, Fname, Lname, email, Phone_Number, profile_pic_url")
+        .in("client_id", clientIds);
+
+      if (clientError) {
+        console.error("Client loading error:", clientError);
+      }
+
+      meetingRequests = relationships.map(rel => {
+        const client = (clients || []).find(c => c.client_id === rel.client_id);
+
+        return {
+          ...rel,
+          Client: client || null
+        };
+      });
+
+      renderPendingRequests();
+      updateDisplay();
+    }
+
+    function renderPendingRequests() {
+      const list = document.getElementById("pendingRequestsList");
+      const empty = document.getElementById("noPendingRequests");
+
+      const pending = meetingRequests.filter(req => req.meeting_status === "pending");
+
+      list.innerHTML = "";
+
+      if (pending.length === 0) {
+        empty.style.display = "block";
+        return;
+      }
+
+      empty.style.display = "none";
+
+      pending.forEach(req => {
+        list.innerHTML += getMeetingCardHTML(req, "pending");
+      });
+    }
+
     function updateDisplay() {
-        const options = { weekday: 'long', month: 'long', day: 'numeric' };
-        document.getElementById('currentDate').innerText = currentDate.toLocaleDateString('en-US', options);
+      const options = {
+        weekday: "long",
+        month: "long",
+        day: "numeric"
+      };
+
+      document.getElementById("currentDate").innerText =
+        currentDate.toLocaleDateString("en-US", options);
+
+      const activeView = document.querySelector(".view-tab.active")?.getAttribute("data-view") || "day";
+
+      if (activeView === "day") {
         loadDayView();
+      } else {
+        loadWeekView();
+      }
     }
 
     function loadDayView() {
-        const list = document.getElementById('daySessionsList');
-        const empty = document.getElementById('dayNoSessions');
-        
-        // Format date to match YYYY-MM-DD for filtering
-        const dateStr = currentDate.getFullYear() + '-' + 
-                        String(currentDate.getMonth() + 1).padStart(2, '0') + '-' + 
-                        String(currentDate.getDate()).padStart(2, '0');
-        
-        const filtered = sessions.filter(s => s.date === dateStr);
+      const list = document.getElementById("daySessionsList");
+      const empty = document.getElementById("dayNoSessions");
 
-        list.innerHTML = "";
-        if (filtered.length === 0) { 
-            empty.style.display = "block"; 
-            return; 
-        }
-        empty.style.display = "none";
+      const dateStr = toLocalDateString(currentDate);
 
-        filtered.forEach(s => {
-            list.innerHTML += `
-                <div class="session-card" onclick="openModal(${s.id})">
-                    <span class="status-badge confirmed">Confirmed</span>
-                    <div class="session-time"><i class="far fa-clock"></i> ${s.startTime} - ${s.endTime}</div>
-                    <div class="session-client">
-                        <div class="client-avatar">${s.initials}</div>
-                        <div class="client-name">${s.client}</div>
-                    </div>
-                    <div style="font-size: 0.9rem; opacity: 0.7;">${s.type}</div>
-                </div>
-            `;
-        });
+      const acceptedForDay = meetingRequests.filter(req => {
+        return req.meeting_status === "accepted" &&
+          req.meeting_requested_date === dateStr;
+      });
+
+      list.innerHTML = "";
+
+      if (acceptedForDay.length === 0) {
+        empty.style.display = "block";
+        return;
+      }
+
+      empty.style.display = "none";
+
+      acceptedForDay.forEach(req => {
+        list.innerHTML += getMeetingCardHTML(req, "accepted");
+      });
     }
 
     function loadWeekView() {
-        const container = document.getElementById('weekDays');
-        container.innerHTML = "";
-        const start = new Date(currentDate);
-        start.setDate(currentDate.getDate() - currentDate.getDay());
+      const container = document.getElementById("weekDays");
+      container.innerHTML = "";
 
-        for (let i=0; i<7; i++) {
-            const d = new Date(start);
-            d.setDate(start.getDate() + i);
-            const isToday = d.toDateString() === new Date().toDateString();
-            
-            container.innerHTML += `
-                <div class="day-column ${isToday ? 'today' : ''}">
-                    <div class="day-name">${d.toLocaleDateString('en-US', {weekday: 'short'})}</div>
-                    <div class="day-number">${d.getDate()}</div>
-                    <div style="font-size: 0.7rem; opacity: 0.5;">0 sessions</div>
-                </div>
-            `;
-        }
-    }
+      const start = new Date(currentDate);
+      start.setDate(currentDate.getDate() - currentDate.getDay());
 
-    function openModal(id) {
-        const s = sessions.find(x => x.id === id);
-        if (!s) return;
-        document.getElementById('modalClient').innerText = s.client;
-        document.getElementById('modalTime').innerText = `${s.startTime} - ${s.endTime}`;
-        document.getElementById('modalType').innerText = s.type;
-        document.getElementById('modalNotes').innerText = s.notes;
-        document.getElementById('sessionModal').classList.add('active');
-    }
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
 
-    /**
-     * 4. Event Listeners
-     */
-    document.addEventListener('DOMContentLoaded', () => {
-        // Start Auth check
-        initCoach(); 
+        const dateStr = toLocalDateString(d);
+        const isToday = d.toDateString() === new Date().toDateString();
 
-        // Nav Handlers
-        document.getElementById('prevDay').onclick = () => { currentDate.setDate(currentDate.getDate() - 1); updateDisplay(); };
-        document.getElementById('nextDay').onclick = () => { currentDate.setDate(currentDate.getDate() + 1); updateDisplay(); };
-        document.getElementById('todayBtn').onclick = () => { currentDate = new Date(); updateDisplay(); };
-
-        // View Tabs
-        document.querySelectorAll('.view-tab').forEach(tab => {
-            tab.onclick = (e) => {
-                document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
-                e.target.classList.add('active');
-                const view = e.target.getAttribute('data-view');
-                document.getElementById('dayView').classList.toggle('active', view === 'day');
-                document.getElementById('weekView').classList.toggle('active', view === 'week');
-                if (view === 'week') loadWeekView();
-            };
+        const acceptedMeetings = meetingRequests.filter(req => {
+          return req.meeting_status === "accepted" &&
+            req.meeting_requested_date === dateStr;
         });
 
-        // Modal Close
-        document.getElementById('closeModal').onclick = () => document.getElementById('sessionModal').classList.remove('active');
-        
-        // Logout Logic
-        document.getElementById('logoutBtn').onclick = async (e) => {
-            e.preventDefault();
-            if (confirm("Are you sure you want to logout?")) {
-                await supa.auth.signOut();
-                window.location.href = "loginawtad.html";
+        container.innerHTML += `
+          <div class="day-column ${isToday ? "today" : ""}">
+            <div class="day-name">${d.toLocaleDateString("en-US", { weekday: "short" })}</div>
+            <div class="day-number">${d.getDate()}</div>
+
+            ${
+              acceptedMeetings.length === 0
+                ? `<div style="font-size:0.75rem; opacity:0.5;">No accepted meetings</div>`
+                : acceptedMeetings.map(m => getWeekMeetingHTML(m)).join("")
             }
-        };
-    });
+          </div>
+        `;
+      }
+    }
+
+    function getMeetingCardHTML(req, mode) {
+      const client = req.Client || {};
+      const fullName = `${client.Fname || ""} ${client.Lname || ""}`.trim() || "Athlete";
+      const initials = getInitials(client.Fname, client.Lname);
+      const status = req.meeting_status || "pending";
+
+      const cardClass = mode === "pending" ? "pending-request-card" : "accepted-meeting-card";
+
+      return `
+        <div class="session-card ${cardClass}" onclick="openMeetingModal('${req.request_id}')">
+          <div class="status-badge ${status}">
+            <i class="fas ${status === "accepted" ? "fa-check-circle" : "fa-hourglass-half"}"></i>
+            ${capitalize(status)}
+          </div>
+
+          <div class="session-time">
+            <i class="far fa-clock"></i>
+            ${formatDateOnly(req.meeting_requested_date)} at ${formatTimeOnly(req.meeting_requested_time)}
+          </div>
+
+          <div class="session-client">
+            <div class="client-avatar">
+              ${
+                client.profile_pic_url
+                  ? `<img src="${client.profile_pic_url}" alt="Client profile picture">`
+                  : initials
+              }
+            </div>
+
+            <div>
+              <div class="client-name">${fullName}</div>
+              <div style="font-size:0.8rem; opacity:0.65;">${client.email || ""}</div>
+            </div>
+          </div>
+
+          <div class="session-note">
+            <strong>Reason:</strong> ${req.meeting_reason || "No reason provided"}
+          </div>
+
+          <div class="session-note">
+            <strong>Requested at:</strong> ${formatDateTime(req.meeting_requested_at)}
+          </div>
+        </div>
+      `;
+    }
+
+    function getWeekMeetingHTML(req) {
+      const client = req.Client || {};
+      const fullName = `${client.Fname || ""} ${client.Lname || ""}`.trim() || "Athlete";
+
+      return `
+        <div class="week-meeting" onclick="openMeetingModal('${req.request_id}')">
+          <div class="week-meeting-time">${formatTimeOnly(req.meeting_requested_time)}</div>
+          <div>${fullName}</div>
+          <div style="font-size:0.72rem; opacity:0.65;">Accepted</div>
+        </div>
+      `;
+    }
+
+    function openMeetingModal(requestId) {
+      const req = meetingRequests.find(item => item.request_id === requestId);
+
+      if (!req) return;
+
+      selectedMeeting = req;
+
+      const client = req.Client || {};
+      const fullName = `${client.Fname || ""} ${client.Lname || ""}`.trim() || "Athlete";
+      const status = req.meeting_status || "pending";
+
+      document.getElementById("modalTitle").innerText =
+        status === "accepted" ? "Scheduled Meeting" : "New Meeting Request";
+
+      document.getElementById("modalClient").innerText = fullName;
+      document.getElementById("modalDate").innerText = formatDateOnly(req.meeting_requested_date);
+      document.getElementById("modalTime").innerText = formatTimeOnly(req.meeting_requested_time);
+      document.getElementById("modalStatus").innerText = capitalize(status);
+      document.getElementById("modalRequestedAt").innerText = formatDateTime(req.meeting_requested_at);
+      document.getElementById("modalReason").innerText = req.meeting_reason || "No reason provided";
+
+      const actions = document.getElementById("meetingModalActions");
+
+      if (status === "pending") {
+        actions.innerHTML = `
+          <button class="modal-btn btn-secondary" onclick="closeMeetingModal()">Close</button>
+          <button class="modal-btn btn-danger" onclick="respondToMeeting('rejected')">Reject</button>
+          <button class="modal-btn btn-primary" onclick="respondToMeeting('accepted')">Accept</button>
+        `;
+      } else {
+        actions.innerHTML = `
+          <button class="modal-btn btn-secondary" onclick="closeMeetingModal()">Close</button>
+        `;
+      }
+
+      document.getElementById("meetingModal").classList.add("active");
+    }
+
+    function closeMeetingModal() {
+      document.getElementById("meetingModal").classList.remove("active");
+    }
+
+    async function respondToMeeting(newStatus) {
+      if (!selectedMeeting) return;
+
+      const { error } = await supa
+        .from("Client_Coach_Relationship")
+        .update({
+          meeting_status: newStatus
+        })
+        .eq("request_id", selectedMeeting.request_id)
+        .eq("coach_id", currentCoach.coach_id)
+        .eq("status", "accepted");
+
+      if (error) {
+        alert("Could not update meeting request: " + error.message);
+        return;
+      }
+
+      await loadMeetingRequests();
+      closeMeetingModal();
+
+      if (newStatus === "accepted") {
+        alert("Meeting accepted. It has been added to the schedule on its requested date.");
+      } else {
+        alert("Meeting request rejected.");
+      }
+    }
+
+    function getInitials(first, last) {
+      const f = first ? first.charAt(0).toUpperCase() : "";
+      const l = last ? last.charAt(0).toUpperCase() : "";
+      return `${f}${l}` || "A";
+    }
+
+    function toLocalDateString(date) {
+      return (
+        date.getFullYear() + "-" +
+        String(date.getMonth() + 1).padStart(2, "0") + "-" +
+        String(date.getDate()).padStart(2, "0")
+      );
+    }
+
+    function formatDateOnly(dateValue) {
+      if (!dateValue) return "N/A";
+
+      const date = new Date(dateValue + "T00:00:00");
+
+      if (isNaN(date.getTime())) return "N/A";
+
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      });
+    }
+
+    function formatDateTime(dateValue) {
+      if (!dateValue) return "N/A";
+
+      const date = new Date(dateValue);
+
+      if (isNaN(date.getTime())) return "N/A";
+
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+
+    function formatTimeOnly(timeValue) {
+      if (!timeValue) return "N/A";
+
+      const fakeDate = new Date(`2000-01-01T${timeValue}`);
+
+      if (isNaN(fakeDate.getTime())) return timeValue;
+
+      return fakeDate.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+
+    function capitalize(text) {
+      if (!text) return "N/A";
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
   </script>
 </body>
 </html>

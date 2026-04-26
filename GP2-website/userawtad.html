@@ -11,7 +11,7 @@
 
   <style>
     :root {
-      --sidebar-width: 190px;
+      --sidebar-width: 220px;
       --primary-accent: #ffd2c2;
       --primary-strong: #ffb59c;
       --bg-dark: #4B3A57;
@@ -96,34 +96,34 @@
       transform: rotate(90deg);
     }
 
-    .sidebar {
-      width: var(--sidebar-width);
-      height: calc(100vh - 24px);
-      margin: 12px;
-      position: fixed;
-      top: 0;
-      left: -250px;
-      display: flex;
-      flex-direction: column;
-      padding: 22px 16px;
-      background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0.04) 100%
-      );
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--shadow-soft), var(--shadow-glow);
-      border-radius: 26px;
-      backdrop-filter: blur(22px) saturate(140%);
-      -webkit-backdrop-filter: blur(22px) saturate(140%);
-      z-index: 1000;
-      overflow: hidden;
-      transition: left 0.3s ease;
-    }
+.sidebar {
+  width: var(--sidebar-width);
+  height: calc(100vh - 24px);
+  margin: 12px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 16px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-soft), var(--shadow-glow);
+  border-radius: 26px;
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  z-index: 1000;
+  overflow: hidden;
+  transition: left 0.3s ease;
+}
 
-    .sidebar.active {
-      left: 0;
-    }
+.sidebar.hidden {
+  left: -270px;
+}
 
     .sidebar::before {
       content: "";
@@ -224,17 +224,18 @@
       color: var(--primary-accent);
     }
 
-    .main-content {
-      margin-left: 0;
-      padding: 70px 34px 42px 80px;
-      width: 100%;
-      transition: margin-left 0.3s ease, width 0.3s ease;
-    }
+.main-content {
+  margin-left: calc(var(--sidebar-width) + 32px);
+  padding: 70px 34px 42px 34px;
+  width: calc(100% - var(--sidebar-width) - 32px);
+  transition: margin-left 0.3s ease, width 0.3s ease, padding 0.3s ease;
+}
 
-    .main-content.shifted {
-      margin-left: calc(var(--sidebar-width) + 32px);
-      width: calc(100% - var(--sidebar-width) - 32px);
-    }
+.main-content.expanded {
+  margin-left: 0;
+  width: 100%;
+  padding: 70px 34px 42px 80px;
+}
 
     .dashboard-header {
       margin-bottom: 34px;
@@ -757,14 +758,21 @@
       }
     }
 
-    @media (max-width: 768px) {
-      .main-content,
-      .main-content.shifted {
-        width: 100%;
-        margin-left: 0;
-        padding: 20px 18px;
-      }
+@media (max-width: 768px) {
+  .main-content,
+  .main-content.expanded {
+    width: 100%;
+    margin-left: 0;
+    padding: 80px 18px 32px;
+  }
 
+  .sidebar {
+    left: 0;
+  }
+
+  .sidebar.hidden {
+    left: -270px;
+  }
       .welcome-title {
         font-size: 2rem;
       }
@@ -812,7 +820,7 @@
 </head>
 <body>
 
-  <div class="menu-btn" id="menuBtn">
+  <div class="menu-btn active" id="menuBtn">
     <i class="fas fa-bars"></i>
   </div>
 
@@ -834,6 +842,10 @@
       <a href="FindCoach.html" class="nav-item">
         <i class="fas fa-user-tie"></i>
         <span class="nav-text">Find a Coach</span>
+      </a>
+      <a href="my-coach.html" class="nav-item ">
+        <i class="fas fa-id-card"></i>
+        <span class="nav-text">My Coach</span>
       </a>
       <a href="sesstionsawtad.html" class="nav-item">
         <i class="fas fa-calendar"></i>
@@ -1058,19 +1070,11 @@
       const sidebar = document.getElementById('sidebar');
       const mainContent = document.getElementById('mainContent');
 
-      menuBtn.addEventListener('click', function () {
-        sidebar.classList.toggle('active');
-        mainContent.classList.toggle('shifted');
-        menuBtn.classList.toggle('active');
-      });
-
-      document.addEventListener('click', function (e) {
-        if (!sidebar.contains(e.target) && !menuBtn.contains(e.target) && sidebar.classList.contains('active')) {
-          sidebar.classList.remove('active');
-          mainContent.classList.remove('shifted');
-          menuBtn.classList.remove('active');
-        }
-      });
+menuBtn.addEventListener('click', function () {
+  sidebar.classList.toggle('hidden');
+  mainContent.classList.toggle('expanded');
+  menuBtn.classList.toggle('active');
+});
 
       const logoutBtn = document.getElementById('logoutBtn');
       const logoutModal = document.getElementById('logoutModal');

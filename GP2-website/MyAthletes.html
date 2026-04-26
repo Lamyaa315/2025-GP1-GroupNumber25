@@ -20,8 +20,13 @@
       --shadow-glow: 0 0 30px rgba(255, 181, 156, 0.12);
     }
 
-    /* Keep exact styling from Dashboard */
-    * { margin: 0; padding: 0; box-sizing: border-box; min-width: 0; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      min-width: 0;
+    }
+
     body {
       min-height: 100vh;
       background: #4B3A57;
@@ -30,123 +35,465 @@
       color: white;
       position: relative;
     }
+
     body::before {
-      content: ""; position: fixed; inset: 0;
-      background: radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.30), transparent 42%),
-                  radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.22), transparent 48%);
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.30), transparent 42%),
+        radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.22), transparent 48%);
       z-index: -2;
     }
-    body::after { content: ""; position: fixed; inset: 0; backdrop-filter: blur(2px); z-index: -1; }
 
-    /* SIDEBAR (Exact same as Dashboard) */
-    .sidebar {
-      width: var(--sidebar-width); height: calc(100vh - 24px); margin: 12px;
-      position: fixed; top: 0; left: 0; display: flex; flex-direction: column;
-      padding: 22px 16px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
-      border: 1px solid var(--glass-border); border-radius: 26px; backdrop-filter: blur(22px) saturate(140%); z-index: 1000;
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: -1;
     }
-    .sidebar-brand { text-align: center; padding-bottom: 26px; }
-    .sidebar-brand img { width: 105px; filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.2)); }
-    .coach-profile-mini { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.09); padding: 14px; border-radius: 18px; margin-bottom: 18px; }
-    .coach-profile-mini h4 { color: var(--primary-accent); font-size: 0.92rem; margin-bottom: 4px; }
-    .coach-profile-mini p { font-size: 0.76rem; opacity: 0.72; }
-    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 8px; text-decoration: none; color: rgba(255,255,255,0.72); border-radius: 14px; transition: 0.25s; }
-    .nav-item:hover, .nav-item.active { color: #fff; background: rgba(255, 204, 187, 0.15); border: 1px solid rgba(255, 210, 194, 0.16); }
-    .nav-item i { width: 18px; text-align: center; color: var(--primary-accent); }
 
-    /* MAIN CONTENT */
-    .main-content { margin-left: calc(var(--sidebar-width) + 36px); padding: 42px 28px 42px 20px; }
+    /* MENU BUTTON */
+    .menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1001;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .menu-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+      transform: scale(1.05);
+      border-color: rgba(255, 210, 194, 0.3);
+    }
+
+    .menu-btn i {
+      font-size: 1.5rem;
+      color: var(--primary-accent);
+      transition: all 0.3s ease;
+    }
+
+    .menu-btn.active i {
+      transform: rotate(90deg);
+    }
+
+    /* SIDEBAR - OPEN BY DEFAULT */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: calc(100vh - 24px);
+      margin: 12px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 16px;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.04) 100%
+      );
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft), var(--shadow-glow);
+      border-radius: 26px;
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      z-index: 1000;
+      overflow: hidden;
+      transition: left 0.3s ease;
+    }
+
+    .sidebar.hidden {
+      left: -270px;
+    }
+
+    .sidebar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.12) 0%,
+          rgba(255, 255, 255, 0.02) 35%,
+          rgba(255, 255, 255, 0.01) 100%
+        );
+      pointer-events: none;
+    }
+
+    .sidebar-brand {
+      text-align: center;
+      padding-bottom: 26px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sidebar-brand img {
+      width: 105px;
+      filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.2));
+    }
+
+    .coach-profile-mini {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      padding: 14px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+    }
+
+    .coach-profile-mini h4 {
+      color: var(--primary-accent);
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .coach-profile-mini p {
+      font-size: 0.76rem;
+      opacity: 0.72;
+      word-break: break-word;
+    }
+
+    .sidebar-nav {
+      flex-grow: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.72);
+      border-radius: 14px;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-item i {
+      width: 18px;
+      text-align: center;
+      color: var(--primary-accent);
+      font-size: 0.95rem;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 204, 187, 0.18),
+        rgba(255, 255, 255, 0.06)
+      );
+      border: 1px solid rgba(255, 210, 194, 0.16);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        0 0 18px rgba(255, 181, 156, 0.10);
+    }
+
+    .nav-item:hover {
+      transform: translateX(2px);
+    }
+
+    /* MAIN CONTENT - SHIFTED BY DEFAULT */
+    .main-content {
+      margin-left: calc(var(--sidebar-width) + 32px);
+      padding: 70px 34px 42px 34px;
+      width: calc(100% - var(--sidebar-width) - 32px);
+      transition: margin-left 0.3s ease, width 0.3s ease, padding 0.3s ease;
+    }
+
+    .main-content.expanded {
+      margin-left: 0;
+      width: 100%;
+      padding: 70px 34px 42px 80px;
+    }
 
     /* HEADER & SEARCH */
-    .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
-    .welcome-title { font-size: 2.25rem; font-weight: 300; margin-bottom: 10px; }
-    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 40px;
+      gap: 20px;
+    }
+
+    .welcome-title {
+      font-size: 2.25rem;
+      font-weight: 300;
+      margin-bottom: 10px;
+    }
+
     .search-box {
-        position: relative; width: 320px;
+      position: relative;
+      width: 320px;
     }
+
     .search-box input {
-        width: 100%; padding: 12px 15px 12px 40px; background: var(--card-bg);
-        border: 1px solid var(--glass-border); border-radius: 15px; color: white;
-        outline: none; backdrop-filter: blur(10px); transition: 0.3s;
+      width: 100%;
+      padding: 12px 15px 12px 40px;
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      color: white;
+      outline: none;
+      backdrop-filter: blur(10px);
+      transition: 0.3s;
     }
-    .search-box input:focus { border-color: var(--primary-accent); box-shadow: 0 0 15px rgba(255,210,194,0.1); }
-    .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--primary-accent); opacity: 0.7; }
 
-    /* GRID & CARDS (Matched to "GA gavi" card style) */
-    .athletes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+    .search-box input:focus {
+      border-color: var(--primary-accent);
+      box-shadow: 0 0 15px rgba(255,210,194,0.1);
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary-accent);
+      opacity: 0.7;
+    }
+
+    /* GRID & CARDS */
+    .athletes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
     .athlete-card {
-        background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 22px;
-        padding: 22px; backdrop-filter: blur(16px); transition: 0.3s;
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 22px;
+      padding: 22px;
+      backdrop-filter: blur(16px);
+      transition: 0.3s;
     }
-    .athlete-card:hover { transform: translateY(-5px); border-color: var(--primary-accent); }
 
-    .card-top { display: flex; gap: 15px; align-items: center; margin-bottom: 20px; }
+    .athlete-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary-accent);
+    }
+
+    .card-top {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
     .profile-circle {
-        width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--primary-accent);
-        display: flex; align-items: center; justify-content: center; font-weight: bold;
-        background: rgba(255, 210, 194, 0.1); color: var(--primary-accent); overflow: hidden;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid var(--primary-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      background: rgba(255, 210, 194, 0.1);
+      color: var(--primary-accent);
+      overflow: hidden;
     }
-    .profile-circle img { width: 100%; height: 100%; object-fit: cover; }
 
-    .athlete-meta h3 { font-size: 1.1rem; color: var(--primary-accent); margin-bottom: 4px; }
-    .pill { display: inline-block; font-size: 0.75rem; background: rgba(141, 211, 161, 0.15); color: #8dd3a1; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(141, 211, 161, 0.2); }
+    .profile-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-    .contact-info { font-size: 0.85rem; opacity: 0.6; line-height: 1.6; margin-bottom: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; }
+    .athlete-meta h3 {
+      font-size: 1.1rem;
+      color: var(--primary-accent);
+      margin-bottom: 4px;
+    }
+
+    .pill {
+      display: inline-block;
+      font-size: 0.75rem;
+      background: rgba(141, 211, 161, 0.15);
+      color: #8dd3a1;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(141, 211, 161, 0.2);
+    }
+
+    .contact-info {
+      font-size: 0.85rem;
+      opacity: 0.6;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: 15px;
+    }
 
     .btn-action {
-        display: block; width: 100%; padding: 12px; background: var(--primary-accent);
-        color: #4B3A57; text-align: center; text-decoration: none; border-radius: 12px;
-        font-weight: 700; transition: 0.3s; border: none; cursor: pointer;
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: var(--primary-accent);
+      color: #4B3A57;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 700;
+      transition: 0.3s;
+      border: none;
+      cursor: pointer;
     }
-    .btn-action:hover { opacity: 0.9; transform: scale(1.02); }
+
+    .btn-action:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
 
     /* MODAL */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(7px); }
-    .modal.active { display: flex; }
-    .modal-content { background: var(--card-bg); border: 1px solid var(--glass-border); padding: 28px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; }
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(7px);
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      padding: 28px;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-content,
+      .main-content.expanded {
+        width: 100%;
+        margin-left: 0;
+        padding: 80px 18px 32px;
+      }
+
+      .sidebar {
+        left: 0;
+      }
+
+      .sidebar.hidden {
+        left: -270px;
+      }
+
+      .athletes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <aside class="sidebar">
+  <div class="menu-btn active" id="menuBtn">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <img src="awtadlogo1.png" alt="AWTAD">
     </div>
+
     <div class="coach-profile-mini">
       <h4 id="coachNameSide">Loading...</h4>
       <p id="coachEmailSide">—</p>
     </div>
+
     <nav class="sidebar-nav">
-        <a href="coachawtad.html" class="nav-item"><i class="fas fa-th-large"></i> <span class="nav-text">Dashboard</span></a>
-        <a href="MyAthletes.html" class="nav-item active"><i class="fas fa-users"></i> <span class="nav-text">My Athletes</span></a>
-        <a href="coachschedule.html" class="nav-item"><i class="fas fa-calendar"></i> <span class="nav-text">Schedule</span></a>
-        <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> <span class="nav-text">Analytics</span></a>
+      <a href="coachawtad.html" class="nav-item">
+        <i class="fas fa-th-large"></i>
+        <span class="nav-text">Dashboard</span>
+      </a>
+
+      <a href="MyAthletes.html" class="nav-item active">
+        <i class="fas fa-users"></i>
+        <span class="nav-text">My Athletes</span>
+      </a>
+
+      <a href="coachschedule.html" class="nav-item">
+        <i class="fas fa-calendar"></i>
+        <span class="nav-text">Schedule</span>
+      </a>
+
+ <a href="coach-profile.html" class="nav-item">
+  <i class="fas fa-user"></i>
+  <span class="nav-text">Profile</span>
+</a>
     </nav>
+
     <a href="loginawtad.html" id="logoutBtn" class="nav-item" style="margin-top: auto;">
-      <i class="fas fa-sign-out-alt"></i> <span class="nav-text">Logout</span>
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="nav-text">Logout</span>
     </a>
   </aside>
 
-  <main class="main-content">
+  <main class="main-content" id="mainContent">
     <section class="page-header">
-        <div>
-            <h1 class="welcome-title">My Athletes</h1>
-            <p style="opacity: 0.7;">View and manage your connected athletes.</p>
-        </div>
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="athleteSearch" placeholder="Search by name or email...">
-        </div>
+      <div>
+        <h1 class="welcome-title">My Athletes</h1>
+        <p style="opacity: 0.7;">View and manage your connected athletes.</p>
+      </div>
+
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="athleteSearch" placeholder="Search by name or email...">
+      </div>
     </section>
 
-    <div class="athletes-grid" id="athletesGrid">
-        </div>
+    <div class="athletes-grid" id="athletesGrid"></div>
   </main>
 
   <div id="logoutModal" class="modal">
     <div class="modal-content">
       <h3 style="color: var(--primary-accent); margin-bottom:10px;">Confirm Logout</h3>
       <p style="opacity:0.8; margin-bottom: 20px;">Are you sure you want to log out?</p>
+
       <div style="display: flex; gap: 10px; justify-content: center;">
         <button id="cancelLogout" class="btn-action" style="background: rgba(255,255,255,0.1); color: white;">Cancel</button>
         <button id="confirmLogout" class="btn-action">Logout</button>
@@ -162,79 +509,109 @@
     let currentCoach = null;
     let athletesList = [];
 
-    async function init() {
-        const { data: { user } } = await supa.auth.getUser();
-        if (!user) { window.location.href = "loginawtad.html"; return; }
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
 
-        // Load Coach Info for Sidebar
-        const { data: coach } = await supa.from('Coach').select('*').eq('email', user.email).single();
-        if (coach) {
-            currentCoach = coach;
-            document.getElementById('coachNameSide').innerText = `${coach.Fname} ${coach.Lname}`;
-            document.getElementById('coachEmailSide').innerText = coach.email;
-            fetchAthletes();
-        }
+    menuBtn.addEventListener('click', function () {
+      sidebar.classList.toggle('hidden');
+      mainContent.classList.toggle('expanded');
+      menuBtn.classList.toggle('active');
+    });
+
+    async function init() {
+      const { data: { user } } = await supa.auth.getUser();
+
+      if (!user) {
+        window.location.href = "loginawtad.html";
+        return;
+      }
+
+      const { data: coach } = await supa
+        .from('Coach')
+        .select('*')
+        .eq('email', user.email)
+        .single();
+
+      if (coach) {
+        currentCoach = coach;
+        document.getElementById('coachNameSide').innerText = `${coach.Fname} ${coach.Lname}`;
+        document.getElementById('coachEmailSide').innerText = coach.email;
+        fetchAthletes();
+      }
     }
 
     async function fetchAthletes() {
-        // Fetch accepted relationships
-        const { data, error } = await supa
-            .from('Client_Coach_Relationship')
-            .select('Client(*)')
-            .eq('coach_id', currentCoach.coach_id)
-            .eq('status', 'accepted');
+      const { data, error } = await supa
+        .from('Client_Coach_Relationship')
+        .select('Client(*)')
+        .eq('coach_id', currentCoach.coach_id)
+        .eq('status', 'accepted');
 
-        if (!error && data) {
-            athletesList = data.map(item => item.Client);
-            renderAthletes(athletesList);
-        }
+      if (!error && data) {
+        athletesList = data.map(item => item.Client);
+        renderAthletes(athletesList);
+      }
     }
 
     function renderAthletes(list) {
-        const grid = document.getElementById('athletesGrid');
-        grid.innerHTML = list.length === 0 ? '<p style="opacity:0.5;">No connected athletes found.</p>' : '';
-        
-        list.forEach(ath => {
-            const initials = `${ath.Fname[0]}${ath.Lname[0]}`;
-            const profileDisplay = ath.profile_pic_url 
-                ? `<img src="${ath.profile_pic_url}">` 
-                : initials;
+      const grid = document.getElementById('athletesGrid');
+      grid.innerHTML = list.length === 0 ? '<p style="opacity:0.5;">No connected athletes found.</p>' : '';
 
-            grid.innerHTML += `
-                <div class="athlete-card">
-                    <div class="card-top">
-                        <div class="profile-circle">${profileDisplay}</div>
-                        <div class="athlete-meta">
-                            <h3>${ath.Fname} ${ath.Lname}</h3>
-                            <span class="pill">Connected</span>
-                        </div>
-                    </div>
-                    <div class="contact-info">
-                        <div><i class="fas fa-envelope"></i> ${ath.email}</div>
-                        <div><i class="fas fa-phone"></i> ${ath.Phone_Number || 'Not provided'}</div>
-                    </div>
-                    <a href="athlete-dashboard.html?id=${ath.client_id}" class="btn-action">View Profile</a>
-                </div>
-            `;
-        });
+      list.forEach(ath => {
+        const firstInitial = ath.Fname ? ath.Fname[0] : "";
+        const lastInitial = ath.Lname ? ath.Lname[0] : "";
+        const initials = `${firstInitial}${lastInitial}` || "A";
+
+        const profileDisplay = ath.profile_pic_url
+          ? `<img src="${ath.profile_pic_url}">`
+          : initials;
+
+        grid.innerHTML += `
+          <div class="athlete-card">
+            <div class="card-top">
+              <div class="profile-circle">${profileDisplay}</div>
+
+              <div class="athlete-meta">
+                <h3>${ath.Fname || ""} ${ath.Lname || ""}</h3>
+                <span class="pill">Connected</span>
+              </div>
+            </div>
+
+            <div class="contact-info">
+              <div><i class="fas fa-envelope"></i> ${ath.email || "N/A"}</div>
+              <div><i class="fas fa-phone"></i> ${ath.Phone_Number || 'Not provided'}</div>
+            </div>
+
+            <a href="athlete-dashboard.html?id=${ath.client_id}" class="btn-action">View Profile</a>
+          </div>
+        `;
+      });
     }
 
-    // Search Filtering
     document.getElementById('athleteSearch').addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = athletesList.filter(ath => 
-            `${ath.Fname} ${ath.Lname}`.toLowerCase().includes(term) || 
-            ath.email.toLowerCase().includes(term)
-        );
-        renderAthletes(filtered);
+      const term = e.target.value.toLowerCase();
+
+      const filtered = athletesList.filter(ath =>
+        `${ath.Fname || ""} ${ath.Lname || ""}`.toLowerCase().includes(term) ||
+        (ath.email || "").toLowerCase().includes(term)
+      );
+
+      renderAthletes(filtered);
     });
 
-    // Logout
-    document.getElementById('logoutBtn').onclick = () => document.getElementById('logoutModal').classList.add('active');
-    document.getElementById('cancelLogout').onclick = () => document.getElementById('logoutModal').classList.remove('active');
+    document.getElementById('logoutBtn').onclick = (e) => {
+      e.preventDefault();
+      document.getElementById('logoutModal').classList.add('active');
+    };
+
+    document.getElementById('cancelLogout').onclick = () => {
+      document.getElementById('logoutModal').classList.remove('active');
+    };
+
     document.getElementById('confirmLogout').onclick = async () => {
-        await supa.auth.signOut();
-        window.location.href = "loginawtad.html";
+      await supa.auth.signOut();
+      window.location.href = "loginawtad.html";
     };
 
     window.onload = init;

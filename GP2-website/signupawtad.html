@@ -1,540 +1,998 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWTAD - Sign Up</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-accent: #ffd2c2;
-            --primary-strong: #ffb59c;
-            --bg-dark: #4B3A57;
-            --card-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.14);
-            --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.22);
-            --shadow-glow: 0 0 30px rgba(255, 181, 156, 0.12);
-            --success: #8dd3a1;
-            --danger: #ff6b6b;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <title>AWTAD - Sign Up</title>
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: #4B3A57;
-            overflow-x: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-            position: relative;
-        }
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background:
-                radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.30), transparent 42%),
-                radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.22), transparent 48%),
-                radial-gradient(circle at 55% 45%, rgba(255, 160, 140, 0.10), transparent 50%);
-            z-index: -2;
-        }
+  <style>
+    :root {
+      --bg-dark: #4B3A57;
+      --bg-deep: #382A44;
+      --primary-accent: #FFD2C2;
+      --primary-strong: #FFB59C;
+      --text-soft: rgba(255, 255, 255, 0.78);
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --card-bg-hover: rgba(255, 255, 255, 0.12);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.28);
+      --shadow-glow: 0 0 35px rgba(255, 181, 156, 0.16);
+      --success: #8dd3a1;
+      --danger: #ff8a8a;
+      --max-width: 1400px;
+    }
 
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            z-index: -1;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      min-width: 0;
+    }
 
-        .navbar {
-            position: static;
-            width: 100%;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(18px) saturate(140%);
-            -webkit-backdrop-filter: blur(18px) saturate(140%);
-            border-bottom: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-soft);
-        }
+    body {
+      min-height: 100vh;
+      background: var(--bg-dark);
+      color: white;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            height: 100px;
-            margin: -15px 0;
-        }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255, 182, 163, 0.28), transparent 36%),
+        radial-gradient(circle at 88% 22%, rgba(255, 209, 194, 0.18), transparent 34%),
+        radial-gradient(circle at 50% 82%, rgba(255, 181, 156, 0.18), transparent 44%);
+      z-index: -3;
+    }
 
-        .logo img {
-            height: 100%;
-            width: auto;
-            max-height: 100px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.15));
-        }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black, transparent 80%);
+      z-index: -2;
+      pointer-events: none;
+    }
 
-        .nav-links {
-            display: flex;
-            gap: 28px;
-            align-items: center;
-        }
+    /* NAVBAR - SAME STYLE AS LANDING PAGE */
+    .navbar {
+      position: static;
+      z-index: 1000;
+      width: 100%;
+      margin: 0;
+      padding: 20px 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.075);
+      border-bottom: 1px solid var(--glass-border);
+      border-radius: 0;
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    }
 
-        .nav-links a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            font-weight: 300;
-            transition: all 0.3s ease;
-            position: relative;
-        }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: white;
+    }
 
-        .nav-links a:hover {
-            color: var(--primary-accent);
-        }
+    .logo img {
+      width: 115px;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 14px rgba(255, 210, 194, 0.16));
+    }
 
-        .nav-links a::after {
-            content: "";
-            position: absolute;
-            width: 0;
-            height: 1px;
-            left: 0;
-            bottom: -6px;
-            background: var(--primary-accent);
-            transition: width 0.3s ease;
-        }
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
 
-        .nav-links a:hover::after {
-            width: 100%;
-        }
+    .logo-text strong {
+      color: var(--primary-accent);
+      font-size: 1.25rem;
+      letter-spacing: 0.08em;
+    }
 
-        .signup-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: calc(100vh - 160px);
-            padding: 40px 20px;
-        }
+    .logo-text span {
+      font-size: 0.88rem;
+      color: var(--text-soft);
+    }
 
-        .signup-card {
-            width: 100%;
-            max-width: 540px;
-            padding: 38px 32px;
-            border-radius: 26px;
-            background: linear-gradient(
-                180deg,
-                rgba(255,255,255,0.08) 0%,
-                rgba(255,255,255,0.05) 100%
-            );
-            border: 1px solid var(--glass-border);
-            box-shadow:
-                var(--shadow-soft),
-                var(--shadow-glow),
-                inset 0 1px 0 rgba(255,255,255,0.07);
-            backdrop-filter: blur(18px) saturate(135%);
-            -webkit-backdrop-filter: blur(18px) saturate(135%);
-            position: relative;
-            overflow: hidden;
-        }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        /* تنسيق رسائل التنبيه داخل الصفحة */
-        #message-container {
-            display: none;
-            padding: 14px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 0.95rem;
-            animation: fadeIn 0.4s ease;
-        }
+    .nav-links a {
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
+      font-size: 1.05rem;
+      padding: 10px 14px;
+      border-radius: 999px;
+      transition: 0.25s ease;
+    }
 
-        .msg-error {
-            background: rgba(255, 107, 107, 0.15);
-            border: 1px solid var(--danger);
-            color: #ff8787;
-        }
+    .nav-links a:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.08);
+    }
 
-        .msg-success {
-            background: rgba(141, 211, 161, 0.15);
-            border: 1px solid var(--success);
-            color: var(--success);
-        }
+    .nav-links .login-link {
+      color: var(--primary-accent);
+      border: 1px solid rgba(255, 210, 194, 0.16);
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    .nav-links .signup-link {
+      color: #4B3A57;
+      background: linear-gradient(135deg, #FFD7C8, #FFBFA9);
+      font-weight: 700;
+      box-shadow: 0 10px 22px rgba(255, 181, 156, 0.18);
+    }
 
-        .signup-header {
-            text-align: center;
-            margin-bottom: 28px;
-            position: relative;
-            z-index: 1;
-        }
+    .nav-links .signup-link:hover {
+      color: #4B3A57;
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #FFE0D3, #FFC6B2);
+    }
 
-        .signup-title {
-            font-size: 2.2rem;
-            font-weight: 300;
-            margin-bottom: 10px;
-            color: var(--primary-accent);
-            text-shadow: 0 0 16px rgba(255, 192, 170, 0.08);
-        }
+.signup-page {
+  width: min(100% - 40px, 560px);
+  min-height: auto;
+  margin: 0 auto;
+  padding: 38px 0 28px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
 
-        .signup-subtitle {
-            opacity: 0.8;
-            font-weight: 300;
-        }
+    .signup-card {
+      width: 100%;
+      padding: 34px;
+      border-radius: 30px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.055));
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        var(--shadow-soft),
+        var(--shadow-glow),
+        inset 0 1px 0 rgba(255,255,255,0.07);
+      backdrop-filter: blur(20px) saturate(135%);
+      -webkit-backdrop-filter: blur(20px) saturate(135%);
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.8s ease both;
+    }
 
-        .form-group {
-            margin-bottom: 18px;
-        }
+    .signup-card::before {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      right: -70px;
+      top: -70px;
+      background: rgba(255, 210, 194, 0.12);
+      pointer-events: none;
+    }
 
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 400;
-            color: rgba(255,255,255,0.92);
-        }
+    .signup-header {
+      text-align: center;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
+    }
 
-        .form-input {
-            width: 100%;
-            padding: 13px 15px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
+    .signup-title {
+      font-size: 2.1rem;
+      font-weight: 300;
+      margin-bottom: 8px;
+      color: var(--primary-accent);
+      text-shadow: 0 0 16px rgba(255, 192, 170, 0.08);
+    }
 
-        .form-input:focus {
-            outline: none;
-            border-color: rgba(255, 182, 163, 0.45);
-            box-shadow: 0 0 0 3px rgba(255, 182, 163, 0.08);
-        }
+    .signup-subtitle {
+      color: var(--text-soft);
+      font-weight: 300;
+      line-height: 1.5;
+    }
 
-        .user-type-options {
-            display: flex;
-            gap: 14px;
-            margin-top: 10px;
-        }
+    #message-container {
+      display: none;
+      padding: 14px;
+      border-radius: 14px;
+      margin-bottom: 18px;
+      text-align: center;
+      font-size: 0.95rem;
+      animation: fadeIn 0.4s ease;
+      position: relative;
+      z-index: 1;
+    }
 
-        .user-type-option {
-            flex: 1;
-        }
+    .msg-error {
+      background: rgba(255, 107, 107, 0.15);
+      border: 1px solid var(--danger);
+      color: #ff9b9b;
+    }
 
-        .user-type-option input[type="radio"] {
-            display: none;
-        }
+    .msg-success {
+      background: rgba(141, 211, 161, 0.15);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
 
-        .user-type-option label {
-            display: block;
-            padding: 13px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 14px;
-            cursor: pointer;
-            text-align: center;
-            transition: 0.3s;
-        }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+    }
 
-        .user-type-option input[type="radio"]:checked + label {
-            background: rgba(255, 204, 187, 0.18);
-            border-color: var(--primary-accent);
-            color: var(--primary-accent);
-        }
+    .form-group {
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
 
-        .password-container {
-            position: relative;
-        }
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
 
-        .password-toggle {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.75);
-            cursor: pointer;
-        }
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.9);
+      font-size: 0.94rem;
+    }
 
-        .password-requirements {
-            margin-top: 10px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            font-size: 0.85rem;
-            display: none;
-        }
+    .form-input {
+      width: 100%;
+      padding: 13px 15px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      color: white;
+      font-size: 1rem;
+      transition: all 0.25s ease;
+      font-family: inherit;
+    }
 
-        .password-requirements.show { display: block; }
+    .form-input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
 
-        .requirement {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 6px;
-            color: var(--danger);
-        }
+    .form-input:focus {
+      outline: none;
+      border-color: rgba(255, 182, 163, 0.45);
+      box-shadow: 0 0 0 3px rgba(255, 182, 163, 0.08);
+    }
 
-        .requirement.valid { color: var(--success); }
+    .user-type-options {
+      display: flex;
+      gap: 14px;
+      margin-top: 10px;
+    }
 
-        .signup-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
-            border: none;
-            border-radius: 14px;
-            color: #4B3A57;
-            font-size: 1.05rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-        }
+    .user-type-option {
+      flex: 1;
+    }
 
-        .signup-btn:hover { transform: translateY(-2px); opacity: 0.9; }
-        .signup-btn:disabled { background: #888; cursor: not-allowed; transform: none; }
+    .user-type-option input[type="radio"] {
+      display: none;
+    }
 
-        .login-hint { text-align: center; margin-top: 20px; color: rgba(255,255,255,0.8); }
-        .login-hint a { color: var(--primary-strong); text-decoration: none; }
+    .user-type-option label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 13px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 15px;
+      cursor: pointer;
+      text-align: center;
+      transition: 0.25s;
+    }
 
-        footer { text-align: center; padding: 32px; opacity: 0.7; }
+    .user-type-option input[type="radio"]:checked + label {
+      background: rgba(255, 204, 187, 0.18);
+      border-color: var(--primary-accent);
+      color: var(--primary-accent);
+      box-shadow: 0 0 22px rgba(255, 181, 156, 0.08);
+    }
 
-        @media (max-width: 768px) {
-            .user-type-options { flex-direction: column; }
-        }
-    </style>
+    .password-container {
+      position: relative;
+    }
+
+    .password-container .form-input {
+      padding-right: 44px;
+    }
+select.form-input {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #FFD2C2 50%),
+    linear-gradient(135deg, #FFD2C2 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) 50%,
+    calc(100% - 14px) 50%;
+  background-size:
+    6px 6px,
+    6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 44px;
+}
+
+select.form-input option {
+  background: #4B3A57;
+  color: white;
+}
+
+    .password-toggle {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.75);
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .password-requirements {
+      margin-top: 10px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    .password-requirements.show {
+      display: block;
+    }
+
+    .requirement {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      color: var(--danger);
+    }
+
+    .requirement:last-child {
+      margin-bottom: 0;
+    }
+
+    .requirement.valid {
+      color: var(--success);
+    }
+
+    .upload-box {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px dashed rgba(255,255,255,0.2);
+      border-radius: 18px;
+      transition: 0.25s;
+    }
+
+    .upload-box:hover {
+      border-color: rgba(255, 210, 194, 0.35);
+      background: rgba(255,255,255,0.07);
+    }
+
+    .avatar-preview {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      background: rgba(255, 210, 194, 0.12);
+      border: 2px solid rgba(255, 210, 194, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      color: var(--primary-accent);
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .avatar-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .upload-content p {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.92rem;
+      margin-bottom: 8px;
+    }
+
+    .upload-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 13px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.13);
+      color: var(--primary-accent);
+      cursor: pointer;
+      transition: 0.25s;
+      font-size: 0.9rem;
+    }
+
+    .upload-btn:hover {
+      background: rgba(255,255,255,0.12);
+      transform: translateY(-2px);
+    }
+
+    .file-name {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.58);
+      word-break: break-all;
+    }
+
+    .signup-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
+      border: none;
+      border-radius: 15px;
+      color: #4B3A57;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.25s;
+      margin-top: 6px;
+      box-shadow: 0 12px 25px rgba(255, 181, 156, 0.2);
+    }
+
+    .signup-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 30px rgba(255, 181, 156, 0.24);
+    }
+
+    .signup-btn:disabled {
+      background: #888;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .login-hint {
+      text-align: center;
+      margin-top: 18px;
+      color: rgba(255,255,255,0.78);
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-hint a {
+      color: var(--primary-strong);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer {
+      text-align: center;
+      padding: 28px;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 760px) {
+      .navbar {
+        padding: 12px 16px;
+      }
+
+      .logo img {
+        width: 78px;
+      }
+
+      .logo-text {
+        display: none;
+      }
+
+      .nav-links {
+        gap: 4px;
+      }
+
+      .nav-links a {
+        font-size: 0.85rem;
+        padding: 9px 10px;
+      }
+
+      .signup-page {
+        width: min(100% - 24px, 680px);
+        padding: 34px 0;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .user-type-options {
+        flex-direction: column;
+      }
+
+      .signup-card {
+        padding: 26px 20px;
+      }
+
+      .upload-box {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .avatar-preview {
+        margin: 0 auto;
+      }
+
+      .upload-actions {
+        justify-content: center;
+      }
+    }
+  </style>
 </head>
-<body>
-    <nav class="navbar">
-        <div class="logo">
-            <img src="awtadlogo1.png" alt="Awtad Logo">
-        </div>
-        <div class="nav-links">
-            <a href="awtadhp.html">Home</a>
-            <a href="#">About Us</a>
-            <a href="loginawtad.html">Log In</a>
-        </div>
-    </nav>
 
-    <section class="signup-container">
-        <div class="signup-card">
-            <div class="signup-header">
-                <h1 class="signup-title">Create Account</h1>
-                <p class="signup-subtitle">Join AWTAD to track muscle activation</p>
+<body>
+  <nav class="navbar">
+    <a href="awtadhp.html" class="logo">
+      <img src="awtadlogo1.png" alt="AWTAD Logo">
+      <div class="logo-text">
+        <strong>AWTAD</strong>
+        <span>EMG-based movement insight</span>
+      </div>
+    </a>
+
+    <div class="nav-links">
+      <a href="awtadhp.html">Home</a>
+      <a href="loginawtad.html" class="login-link">Log In</a>
+    </div>
+  </nav>
+
+  <main class="signup-page">
+    <section class="signup-card">
+      <div class="signup-header">
+        <h1 class="signup-title">Create Account</h1>
+        <p class="signup-subtitle">Choose your role and set up your AWTAD profile.</p>
+      </div>
+
+      <div id="message-container"></div>
+
+      <form id="signup-form">
+        <div class="form-group full">
+          <label class="form-label">I am signing up as:</label>
+
+          <div class="user-type-options">
+            <div class="user-type-option">
+              <input type="radio" id="client" name="userType" value="client" checked>
+              <label for="client"><i class="fas fa-user"></i> Client</label>
             </div>
 
-            <div id="message-container"></div>
-
-            <form id="signup-form">
-                <div class="form-group">
-                    <label class="form-label">I am signing up as:</label>
-                    <div class="user-type-options">
-                        <div class="user-type-option">
-                            <input type="radio" id="client" name="userType" value="client" checked>
-                            <label for="client"><i class="fas fa-user"></i> Client</label>
-                        </div>
-                        <div class="user-type-option">
-                            <input type="radio" id="coach" name="userType" value="coach">
-                            <label for="coach"><i class="fas fa-chalkboard-teacher"></i> Coach</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group" id="specialty-group" style="display:none;">
-                    <label class="form-label" for="specialty">Specialty</label>
-                    <input type="text" id="specialty" class="form-input" placeholder="e.g. Physiotherapy">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="fullname">Full Name</label>
-                    <input type="text" id="fullname" class="form-input" placeholder="Enter full name" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="email">Email Address</label>
-                    <input type="email" id="email" class="form-input" placeholder="Enter email" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="phone">Phone Number</label>
-                    <input type="tel" id="phone" class="form-input" placeholder="10-digit phone" required maxlength="10">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
-                    <div class="password-container">
-                        <input type="password" id="password" class="form-input" placeholder="Create password" required>
-                        <button type="button" class="password-toggle"><i class="fas fa-eye"></i></button>
-                    </div>
-                    <div class="password-requirements" id="passwordRequirements">
-                        <div class="requirement" id="lengthReq"><i class="fas fa-times"></i> 12+ characters</div>
-                        <div class="requirement" id="lowercaseReq"><i class="fas fa-times"></i> Lowercase letter</div>
-                        <div class="requirement" id="digitReq"><i class="fas fa-times"></i> Digit (0-9)</div>
-                        <div class="requirement" id="specialReq"><i class="fas fa-times"></i> Special character</div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="confirm-password">Confirm Password</label>
-                    <div class="password-container">
-                        <input type="password" id="confirm-password" class="form-input" placeholder="Confirm password" required>
-                        <button type="button" class="password-toggle"><i class="fas fa-eye"></i></button>
-                    </div>
-                </div>
-
-                <button type="submit" class="signup-btn" id="submitBtn">Create Account</button>
-
-                <div class="login-hint">
-                    Already have an account? <a href="loginawtad.html">Log in</a>
-                </div>
-            </form>
+            <div class="user-type-option">
+              <input type="radio" id="coach" name="userType" value="coach">
+              <label for="coach"><i class="fas fa-user-tie"></i> Coach</label>
+            </div>
+          </div>
         </div>
+
+        <div class="form-group full">
+          <label class="form-label">Profile Picture <span style="opacity:0.55;">(optional)</span></label>
+
+          <div class="upload-box">
+            <div class="avatar-preview" id="avatarPreview">
+              <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="upload-content">
+              <p>Upload a clear profile picture for your account.</p>
+
+              <div class="upload-actions">
+                <label for="profilePic" class="upload-btn">
+                  <i class="fa-solid fa-upload"></i>
+                  Choose Image
+                </label>
+
+                <span class="file-name" id="fileName">No file selected</span>
+              </div>
+
+              <input
+                type="file"
+                id="profilePic"
+                class="file-input"
+                accept="image/png, image/jpeg, image/jpg, image/webp"
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="fname">First Name</label>
+            <input type="text" id="fname" class="form-input" placeholder="First name" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="lname">Last Name</label>
+            <input type="text" id="lname" class="form-input" placeholder="Last name" required>
+          </div>
+
+            <div class="form-group full" id="specialty-group" style="display:none;">
+            <label class="form-label" for="specialty">Coach Specialty</label>
+
+            <select id="specialty" class="form-input">
+                <option value="">Select your specialty</option>
+                <option value="Strength & Conditioning Coach">Strength & Conditioning Coach</option>
+                <option value="Sports Coach">Sports Coach</option>
+                <option value="Personal Trainer">Personal Trainer</option>
+                <option value="CrossFit Coach">CrossFit Coach</option>
+                <option value="Weightlifting Coach">Weightlifting Coach</option>
+                <option value="Bodybuilding Coach">Bodybuilding Coach</option>
+                <option value="Physiotherapist">Physiotherapist</option>
+                <option value="Sports Rehabilitation Specialist">Sports Rehabilitation Specialist</option>
+                <option value="Athletic Trainer">Athletic Trainer</option>
+                <option value="Movement / Biomechanics Specialist">Movement / Biomechanics Specialist</option>
+                <option value="Other">Other</option>
+            </select>
+            </div>
+
+          <div class="form-group full">
+            <label class="form-label" for="email">Email Address</label>
+            <input type="email" id="email" class="form-input" placeholder="Enter email" required>
+          </div>
+
+          <div class="form-group full">
+            <label class="form-label" for="phone">Phone Number</label>
+            <input type="tel" id="phone" class="form-input" placeholder="10-digit phone number" required maxlength="10">
+          </div>
+
+          <div class="form-group full">
+            <label class="form-label" for="password">Password</label>
+
+            <div class="password-container">
+              <input type="password" id="password" class="form-input" placeholder="Create password" required>
+              <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+
+            <div class="password-requirements" id="passwordRequirements">
+              <div class="requirement" id="lengthReq"><i class="fas fa-times"></i> 12+ characters</div>
+              <div class="requirement" id="lowercaseReq"><i class="fas fa-times"></i> Lowercase letter</div>
+              <div class="requirement" id="digitReq"><i class="fas fa-times"></i> Digit (0-9)</div>
+              <div class="requirement" id="specialReq"><i class="fas fa-times"></i> Special character</div>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label class="form-label" for="confirm-password">Confirm Password</label>
+
+            <div class="password-container">
+              <input type="password" id="confirm-password" class="form-input" placeholder="Confirm password" required>
+              <button type="button" class="password-toggle" aria-label="Toggle confirm password visibility">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="signup-btn" id="submitBtn">
+          Create Account
+        </button>
+
+        <div class="login-hint">
+          Already have an account? <a href="loginawtad.html">Log in</a>
+        </div>
+      </form>
     </section>
+  </main>
 
-    <footer>
-        <p>&copy; 2025 AWTAD Technologies.</p>
-    </footer>
+  <footer>
+    <p>&copy; 2025 AWTAD Technologies. Advancing human performance through EMG-based movement awareness.</p>
+  </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
-    <script>
-        const passwordInput = document.getElementById('password');
-        const confirmPasswordInput = document.getElementById('confirm-password');
-        const specialtyGroup = document.getElementById('specialty-group');
-        const specialtyInput = document.getElementById('specialty');
-        const userTypeRadios = document.querySelectorAll('input[name="userType"]');
-        const messageContainer = document.getElementById('message-container');
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
 
-        // دالة إظهار الرسائل
-        function showMessage(text, type) {
-            messageContainer.textContent = text;
-            messageContainer.style.display = 'block';
-            messageContainer.className = type === 'error' ? 'msg-error' : 'msg-success';
-            messageContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  <script>
+    const passwordInput = document.getElementById("password");
+    const confirmPasswordInput = document.getElementById("confirm-password");
+    const specialtyGroup = document.getElementById("specialty-group");
+    const specialtyInput = document.getElementById("specialty");
+    const userTypeRadios = document.querySelectorAll('input[name="userType"]');
+    const messageContainer = document.getElementById("message-container");
+    const profilePicInput = document.getElementById("profilePic");
+    const avatarPreview = document.getElementById("avatarPreview");
+    const fileName = document.getElementById("fileName");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function showMessage(text, type) {
+      messageContainer.textContent = text;
+      messageContainer.style.display = "block";
+      messageContainer.className = type === "error" ? "msg-error" : "msg-success";
+      messageContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    userTypeRadios.forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        if (e.target.value === "coach") {
+          specialtyGroup.style.display = "block";
+          specialtyInput.required = true;
+        } else {
+          specialtyGroup.style.display = "none";
+          specialtyInput.required = false;
+          specialtyInput.value = "";
+        }
+      });
+    });
+
+    document.querySelectorAll(".password-toggle").forEach(btn => {
+      btn.addEventListener("click", function () {
+        const input = this.previousElementSibling;
+        input.type = input.type === "password" ? "text" : "password";
+
+        this.querySelector("i").classList.toggle("fa-eye");
+        this.querySelector("i").classList.toggle("fa-eye-slash");
+      });
+    });
+
+    passwordInput.addEventListener("input", function () {
+      const val = this.value;
+      document.getElementById("passwordRequirements").classList.add("show");
+
+      updateReq("lengthReq", val.length >= 12);
+      updateReq("lowercaseReq", /[a-z]/.test(val));
+      updateReq("digitReq", /\d/.test(val));
+      updateReq("specialReq", /[!@#$%^&*]/.test(val));
+    });
+
+    function updateReq(id, isValid) {
+      const el = document.getElementById(id);
+
+      if (el) {
+        el.classList.toggle("valid", isValid);
+        el.querySelector("i").className = isValid ? "fas fa-check" : "fas fa-times";
+      }
+    }
+
+    function isPasswordValid(password) {
+      return (
+        password.length >= 12 &&
+        /[a-z]/.test(password) &&
+        /\d/.test(password) &&
+        /[!@#$%^&*]/.test(password)
+      );
+    }
+
+    profilePicInput.addEventListener("change", function () {
+      const file = this.files[0];
+
+      if (!file) {
+        fileName.textContent = "No file selected";
+        avatarPreview.innerHTML = '<i class="fa-solid fa-user"></i>';
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        showMessage("Please upload an image file only.", "error");
+        this.value = "";
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        showMessage("Profile picture must be less than 2 MB.", "error");
+        this.value = "";
+        return;
+      }
+
+      fileName.textContent = file.name;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        avatarPreview.innerHTML = `<img src="${e.target.result}" alt="Profile preview">`;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    async function uploadProfilePicture(client, userId, userType) {
+      const file = profilePicInput.files[0];
+
+      if (!file) {
+        return null;
+      }
+
+      const fileExt = file.name.split(".").pop();
+      const imagePath = `${userType}/${userId}-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await client.storage
+        .from("profile-pictures")
+        .upload(imagePath, file, {
+          cacheControl: "3600",
+          upsert: true
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = client.storage
+        .from("profile-pictures")
+        .getPublicUrl(imagePath);
+
+      return data.publicUrl;
+    }
+
+    document.getElementById("signup-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      messageContainer.style.display = "none";
+
+      const fname = document.getElementById("fname").value.trim();
+      const lname = document.getElementById("lname").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      const userType = document.querySelector('input[name="userType"]:checked').value;
+      const specialty = specialtyInput.value.trim();
+
+      if (!fname || !lname || !email || !phone || !password) {
+        showMessage("Please fill in all required fields.", "error");
+        return;
+      }
+
+      if (!/^\d{10}$/.test(phone)) {
+        showMessage("Phone number must be exactly 10 digits.", "error");
+        return;
+      }
+
+      if (!isPasswordValid(password)) {
+        showMessage("Password does not meet the requirements.", "error");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showMessage("Passwords do not match.", "error");
+        return;
+      }
+
+if (userType === "coach" && !specialty) {
+  showMessage("Please select the coach specialty.", "error");
+  return;
+}
+
+      submitBtn.innerText = "Creating account...";
+      submitBtn.disabled = true;
+
+      try {
+        const client = window.supabase;
+
+        const { data, error: authError } = await client.auth.signUp({
+          email: email,
+          password: password
+        });
+
+        if (authError) {
+          throw authError;
         }
 
-        // إظهار/إخفاء تخصص المدرب
-        userTypeRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                if (e.target.value === 'coach') {
-                    specialtyGroup.style.display = 'block';
-                    specialtyInput.required = true;
-                } else {
-                    specialtyGroup.style.display = 'none';
-                    specialtyInput.required = false;
-                }
-            });
-        });
-
-        // إظهار/إخفاء كلمة المرور
-        document.querySelectorAll('.password-toggle').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const input = this.previousElementSibling;
-                input.type = input.type === 'password' ? 'text' : 'password';
-                this.querySelector('i').classList.toggle('fa-eye');
-                this.querySelector('i').classList.toggle('fa-eye-slash');
-            });
-        });
-
-        // التحقق من قوة كلمة المرور
-        passwordInput.addEventListener('input', function() {
-            const val = this.value;
-            document.getElementById('passwordRequirements').classList.add('show');
-            updateReq('lengthReq', val.length >= 12);
-            updateReq('lowercaseReq', /[a-z]/.test(val));
-            updateReq('digitReq', /\d/.test(val));
-            updateReq('specialReq', /[!@#$%^&*]/.test(val));
-        });
-
-        function updateReq(id, isValid) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.classList.toggle('valid', isValid);
-                el.querySelector('i').className = isValid ? 'fas fa-check' : 'fas fa-times';
-            }
+        if (!data.user) {
+          throw new Error("Signup failed. No user was returned.");
         }
 
-        // إرسال البيانات
-        document.getElementById('signup-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            messageContainer.style.display = 'none'; // إخفاء أي رسالة قديمة
+        let profilePicUrl = null;
 
-            const fullName = document.getElementById('fullname').value;
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-            const password = passwordInput.value;
-            const userType = document.querySelector('input[name="userType"]:checked').value;
-            const specialty = specialtyInput.value;
-            const submitBtn = document.getElementById('submitBtn');
+        try {
+          profilePicUrl = await uploadProfilePicture(client, data.user.id, userType);
+        } catch (uploadErr) {
+          console.error("Profile picture upload failed:", uploadErr.message);
+          showMessage("Account created, but profile picture upload failed. Please upload it later from your profile.", "error");
+        }
 
-            if (password !== confirmPasswordInput.value) {
-                showMessage("Passwords do not match!", "error");
-                return;
-            }
+        const tableName = userType === "coach" ? "Coach" : "Client";
+        const idCol = userType === "coach" ? "coach_id" : "client_id";
 
-            submitBtn.innerText = "Processing...";
-            submitBtn.disabled = true;
+        const insertData = {
+          [idCol]: data.user.id,
+          Fname: fname,
+          Lname: lname,
+          email: email,
+          Phone_Number: phone,
+          profile_pic_url: profilePicUrl
+        };
 
-            try {
-                const client = window.supabase;
-                const { data, error: authError } = await client.auth.signUp({
-                    email: email,
-                    password: password,
-                });
+        if (userType === "coach") {
+          insertData.Specialty = specialty;
+        }
 
-                if (authError) throw authError;
+        if (userType === "client") {
+          insertData.request_status = "none";
+        }
 
-                if (data.user) {
-                    const nameParts = fullName.split(' ');
-                    const fname = nameParts[0];
-                    const lname = nameParts.slice(1).join(' ') || '';
-                    const tableName = (userType === 'coach') ? 'Coach' : 'Client';
-                    const idCol = (userType === 'coach') ? 'coach_id' : 'client_id';
+        const { error: dbError } = await client
+          .from(tableName)
+          .insert([insertData]);
 
-                    const insertData = {
-                        [idCol]: data.user.id,
-                        Fname: fname,
-                        Lname: lname,
-                        email: email,
-                        Phone_Number: phone
-                    };
+        if (dbError) {
+          throw dbError;
+        }
 
-                    if (userType === 'coach') {
-                        insertData.Specialty = specialty;
-                    }
+        showMessage("Account created successfully. Redirecting...", "success");
 
-                    const { error: dbError } = await client
-                        .from(tableName)
-                        .insert([insertData]);
+        setTimeout(() => {
+          if (userType === "coach") {
+            window.location.href = "coachawtad.html";
+          } else {
+            window.location.href = "userawtad.html";
+          }
+        }, 900);
 
-                    if (dbError) throw dbError;
+      } catch (err) {
+        console.error(err);
 
-                    // توجيه تلقائي عند النجاح
-                    window.location.href = "userawtad.html";
-                }
-            } catch (err) {
-                let errorMsg = err.message;
-                if (err.message.includes("already registered")) {
-                    errorMsg = "This email is already registered. Try logging in.";
-                }
-                showMessage(errorMsg, "error");
-            } finally {
-                submitBtn.innerText = "Create Account";
-                submitBtn.disabled = false;
-            }
-        });
-    </script>
+        let errorMsg = err.message || "Signup failed.";
+
+        if (errorMsg.toLowerCase().includes("already registered")) {
+          errorMsg = "This email is already registered. Try logging in.";
+        }
+
+        showMessage(errorMsg, "error");
+      } finally {
+        submitBtn.innerText = "Create Account";
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>

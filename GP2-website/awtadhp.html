@@ -1,543 +1,1083 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AWTAD - Advanced EMG Analysis</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWTAD | Smart EMG Muscle Balance Monitoring</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
+    :root {
+      --bg-dark: #4B3A57;
+      --bg-deep: #382A44;
+      --primary-accent: #FFD2C2;
+      --primary-strong: #FFB59C;
+      --text-soft: rgba(255, 255, 255, 0.78);
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --card-bg-hover: rgba(255, 255, 255, 0.12);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.28);
+      --shadow-glow: 0 0 35px rgba(255, 181, 156, 0.16);
+      --success: #8dd3a1;
+      --danger: #ff8a8a;
+      --max-width: 1400px;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      min-width: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
-      margin: 0;
       min-height: 100vh;
-      background: #4B3A57;
-      overflow-x: hidden;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-dark);
       color: white;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+      position: relative;
     }
 
-    /* طبقة الإضاءة */
     body::before {
       content: "";
       position: fixed;
       inset: 0;
       background:
-        radial-gradient(circle at 30% 25%, rgba(255, 182, 193, 0.35), transparent 70%),
-        radial-gradient(circle at 70% 40%, rgba(255, 160, 160, 0.3), transparent 70%),
-        radial-gradient(circle at 50% 80%, rgba(255, 200, 180, 0.25), transparent 75%);
-      z-index: -1;
+        radial-gradient(circle at 12% 18%, rgba(255, 182, 163, 0.28), transparent 36%),
+        radial-gradient(circle at 88% 22%, rgba(255, 209, 194, 0.18), transparent 34%),
+        radial-gradient(circle at 50% 82%, rgba(255, 181, 156, 0.18), transparent 44%);
+      z-index: -3;
     }
 
-    /* شريط التنقل */
-    .navbar {
-      position: static;
-      top: 0;
-      width: 100%;
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 1000;
-      background: rgba(75, 58, 87, 0.8);
-      backdrop-filter: blur(10px);
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black, transparent 80%);
+      z-index: -2;
+      pointer-events: none;
     }
+
+    .page-shell {
+      width: min(var(--max-width), calc(100% - 80px));
+      margin: 0 auto;
+    }
+
+    /* NAVBAR */
+.navbar {
+  position: static;
+  z-index: 1000;
+  width: 100%;
+  margin: 0;
+  padding: 20px 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.075);
+  border-bottom: 1px solid var(--glass-border);
+  border-radius: 0;
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+}
 
     .logo {
-      font-size: 1.8rem;
-      font-weight: 700;
-      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: white;
     }
+
+    .logo img {
+      width: 115px;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 14px rgba(255, 210, 194, 0.16));
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+.logo-text strong {
+  color: var(--primary-accent);
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+}
+
+.logo-text span {
+  font-size: 0.88rem;
+  color: var(--text-soft);
+}
 
     .nav-links {
       display: flex;
-      gap: 30px;
+      align-items: center;
+      gap: 10px;
     }
 
     .nav-links a {
-      color: white;
+      color: rgba(255, 255, 255, 0.78);
       text-decoration: none;
-      font-weight: 300;
-      transition: all 0.3s ease;
-      position: relative;
+      font-size: 1.05rem;
+      padding: 10px 14px;
+      border-radius: 999px;
+      transition: 0.25s ease;
     }
 
     .nav-links a:hover {
-      color: #ffccbb;
+      color: white;
+      background: rgba(255, 255, 255, 0.08);
     }
 
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 1px;
-      bottom: -5px;
-      left: 0;
-      background-color: #ffccbb;
-      transition: width 0.3s ease;
+    .nav-links .login-link {
+      color: var(--primary-accent);
+      border: 1px solid rgba(255, 210, 194, 0.16);
     }
 
-    .nav-links a:hover::after {
-      width: 100%;
+    .nav-links .signup-link {
+      color: #4B3A57;
+      background: linear-gradient(135deg, #FFD7C8, #FFBFA9);
+      font-weight: 700;
+      box-shadow: 0 10px 22px rgba(255, 181, 156, 0.18);
     }
 
-    /* القسم الرئيسي */
+    .nav-links .signup-link:hover {
+      color: #4B3A57;
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #FFE0D3, #FFC6B2);
+    }
+
+    /* HERO */
     .hero {
-      display: flex;
-      justify-content: center;
+      min-height: calc(100vh - 96px);
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
       align-items: center;
-      height: 100vh;
-      position: relative;
-      padding: 0 20px;
+      gap: 54px;
+      padding: 50px 0 60px;
     }
 
-    /* الحاوية الرئيسية للصورة والنص */
-    .main-container {
+    .hero-copy {
+      animation: fadeUp 0.9s ease both;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      background: rgba(255, 210, 194, 0.12);
+      border: 1px solid rgba(255, 210, 194, 0.2);
+      border-radius: 999px;
+      color: var(--primary-accent);
+      font-size: 0.86rem;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.45rem, 6vw, 5.4rem);
+      line-height: 0.98;
+      font-weight: 300;
+      letter-spacing: -0.05em;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 span {
+      color: var(--primary-accent);
+      font-weight: 600;
+      text-shadow: 0 0 24px rgba(255, 210, 194, 0.12);
+    }
+
+    .hero-description {
+      max-width: 680px;
+      color: var(--text-soft);
+      font-size: 1.08rem;
+      line-height: 1.8;
+      margin-bottom: 30px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 34px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 13px 20px;
+      border-radius: 15px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: 0.25s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #FFD7C8, #FFBFA9);
+      color: #4B3A57;
+      box-shadow: 0 12px 25px rgba(255, 181, 156, 0.24);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 34px rgba(255, 181, 156, 0.28);
+    }
+
+    .btn-secondary {
+      color: white;
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 210, 194, 0.22);
+    }
+
+    .hero-proof {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 680px;
+    }
+
+    .proof-card {
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: 18px;
+      padding: 16px;
+      backdrop-filter: blur(12px);
+    }
+
+    .proof-card strong {
+      display: block;
+      color: var(--primary-accent);
+      font-size: 1.15rem;
+      margin-bottom: 5px;
+    }
+
+    .proof-card span {
+      color: rgba(255,255,255,0.68);
+      font-size: 0.84rem;
+      line-height: 1.4;
+    }
+
+    /* VISUAL */
+    .hero-visual {
+      position: relative;
+      min-height: 560px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 80px;
-      max-width: 1400px;
-      width: 100%;
+      animation: fadeUp 0.9s ease 0.15s both;
     }
 
-    /* صورة الأعصاب */
-    .neural-image-container {
-      position: relative;
-      flex-shrink: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .neural-image {
-      width: 500px;
-      height: 500px;
-      border-radius: 50%;
-      background: 
-        url('nerves2.png') center/contain no-repeat;
-      box-shadow: 
-        0 0 80px rgba(255, 182, 193, 0.6),
-        inset 0 0 100px rgba(255, 182, 193, 0.4);
-      animation: pulse 8s infinite alternate;
-      filter: brightness(1.2) contrast(1.1);
-      position: relative;
-      z-index: 2;
-    }
-
-    @keyframes pulse {
-      0% {
-        box-shadow: 
-          0 0 80px rgba(255, 182, 193, 0.6),
-          inset 0 0 100px rgba(255, 182, 193, 0.4);
-        transform: scale(1);
-      }
-      100% {
-        box-shadow: 
-          0 0 120px rgba(255, 182, 193, 0.8),
-          inset 0 0 120px rgba(255, 182, 193, 0.5);
-        transform: scale(1.02);
-      }
-    }
-
-    /* النص حول الصورة */
-    .banner-text {
+    .visual-orbit {
       position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      pointer-events: none;
+      width: min(520px, 100%);
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 210, 194, 0.12);
+      box-shadow: inset 0 0 60px rgba(255, 210, 194, 0.06);
+      animation: rotateSlow 22s linear infinite;
+    }
+
+    .visual-orbit::before,
+    .visual-orbit::after {
+      content: "";
+      position: absolute;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--primary-accent);
+      box-shadow: 0 0 22px rgba(255, 210, 194, 0.65);
+    }
+
+    .visual-orbit::before {
+      top: 10%;
+      left: 18%;
+    }
+
+    .visual-orbit::after {
+      bottom: 13%;
+      right: 14%;
+    }
+
+    .neural-card {
+      position: relative;
+      width: min(430px, 90vw);
+      aspect-ratio: 1 / 1;
+      border-radius: 40px;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.035)),
+        url("nerves2.png") center / contain no-repeat;
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow:
+        0 24px 70px rgba(0,0,0,0.34),
+        0 0 80px rgba(255, 181, 156, 0.24),
+        inset 0 0 80px rgba(255, 210, 194, 0.09);
+      overflow: hidden;
+    }
+
+    .neural-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      transform: translateX(-120%);
+      animation: shine 5.5s ease-in-out infinite;
+    }
+
+    .floating-card {
+      position: absolute;
+      width: 210px;
+      background: rgba(255, 255, 255, 0.085);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px;
+      padding: 16px;
+      backdrop-filter: blur(18px);
+      box-shadow: 0 16px 34px rgba(0,0,0,0.22);
+    }
+
+    .floating-card i {
+      color: var(--primary-accent);
+      margin-bottom: 9px;
+      font-size: 1.25rem;
+    }
+
+    .floating-card h3 {
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      color: white;
+    }
+
+    .floating-card p {
+      color: rgba(255,255,255,0.66);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .float-1 {
+      top: 74px;
+      left: 2px;
+      animation: float 5s ease-in-out infinite;
+    }
+
+    .float-2 {
+      right: -4px;
+      top: 170px;
+      animation: float 5.5s ease-in-out 0.6s infinite;
+    }
+
+    .float-3 {
+      left: 46px;
+      bottom: 70px;
+      animation: float 6s ease-in-out 1s infinite;
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 92px 0;
+    }
+
+    .section-header {
+      max-width: 760px;
+      margin-bottom: 34px;
+    }
+
+    .section-kicker {
+      color: var(--primary-accent);
+      font-size: 0.88rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.3rem);
+      line-height: 1.08;
+      font-weight: 300;
+      letter-spacing: -0.035em;
+      margin-bottom: 14px;
+    }
+
+    .section-title span {
+      color: var(--primary-accent);
+      font-weight: 600;
+    }
+
+    .section-description {
+      color: var(--text-soft);
+      line-height: 1.8;
+      font-size: 1rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 24px;
+      min-height: 230px;
+      backdrop-filter: blur(16px);
+      transition: 0.28s ease;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .feature-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-6px);
+      background: var(--card-bg-hover);
+      border-color: rgba(255, 210, 194, 0.28);
+      box-shadow: 0 18px 38px rgba(0,0,0,0.24);
+    }
+
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4B3A57;
+      background: linear-gradient(135deg, #FFD7C8, #FFBFA9);
+      margin-bottom: 18px;
+      box-shadow: 0 12px 24px rgba(255, 181, 156, 0.18);
+    }
+
+    .feature-card h3 {
+      color: var(--primary-accent);
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .feature-card p {
+      color: rgba(255,255,255,0.72);
+      line-height: 1.7;
+      font-size: 0.94rem;
+    }
+
+    /* HOW IT WORKS */
+    .workflow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      counter-reset: step;
+    }
+
+    .workflow-step {
+      position: relative;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 22px;
+      padding: 22px;
+      min-height: 190px;
+      backdrop-filter: blur(14px);
+    }
+
+    .workflow-step::before {
+      counter-increment: step;
+      content: "0" counter(step);
+      display: inline-flex;
+      width: 42px;
+      height: 42px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      color: #4B3A57;
+      font-weight: 800;
+      background: linear-gradient(135deg, #FFD7C8, #FFBFA9);
+      margin-bottom: 18px;
+    }
+
+    .workflow-step h3 {
+      color: var(--primary-accent);
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+    }
+
+    .workflow-step p {
+      color: rgba(255,255,255,0.72);
+      line-height: 1.65;
+      font-size: 0.9rem;
+    }
+
+    /* ROLE SECTION */
+    .role-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .role-card {
+      position: relative;
+      background: rgba(255,255,255,0.075);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 26px;
+      padding: 30px;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+    }
+
+    .role-card::after {
+      content: "";
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      right: -70px;
+      top: -70px;
+      border-radius: 50%;
+      background: rgba(255, 210, 194, 0.11);
+    }
+
+    .role-card h3 {
+      color: var(--primary-accent);
+      font-size: 1.45rem;
+      margin-bottom: 12px;
+      position: relative;
       z-index: 1;
     }
 
-    .text-item {
-      position: absolute;
-      color: white;
-      font-weight: 300;
-      font-size: 1rem;
-      opacity: 0;
-      animation: fadeIn 2s ease forwards;
-      text-align: center;
-      width: 220px;
+    .role-card p {
+      color: rgba(255,255,255,0.74);
+      line-height: 1.75;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .role-list {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .role-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: rgba(255,255,255,0.78);
+      font-size: 0.92rem;
       line-height: 1.5;
-      text-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
-      background: rgba(75, 58, 87, 0.7);
-      padding: 15px;
-      border-radius: 10px;
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    @keyframes fadeIn {
-      to {
-        opacity: 1;
-      }
+    .role-list i {
+      color: var(--success);
+      margin-top: 4px;
     }
 
-    .text-1 {
-      top: 15%;
-      left: -250px;
-      animation-delay: 0.8s;
+    /* CTA */
+    .cta-panel {
+      margin: 80px 0 30px;
+      padding: 44px;
+      border-radius: 32px;
+      background:
+        linear-gradient(135deg, rgba(255, 210, 194, 0.16), rgba(255,255,255,0.055));
+      border: 1px solid rgba(255, 210, 194, 0.18);
+      box-shadow: var(--shadow-soft), var(--shadow-glow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
     }
 
-    .text-2 {
-      top: 15%;
-      right: -250px;
-      animation-delay: 1.2s;
-    }
-
-    .text-3 {
-      bottom: 15%;
-      left: -250px;
-      animation-delay: 1.6s;
-    }
-
-    .text-4 {
-      bottom: 15%;
-      right: -250px;
-      animation-delay: 2s;
-    }
-
-    .text-5 {
-      top: 50%;
-      left: -280px;
-      transform: translateY(-50%);
-      animation-delay: 2.4s;
-    }
-
-    .text-6 {
-      top: 50%;
-      right: -280px;
-      transform: translateY(-50%);
-      animation-delay: 2.8s;
-    }
-
-    /* النص الرئيسي */
-    .main-text {
-      max-width: 500px;
-      text-align: left;
-    }
-
-    .main-text h1 {
-      font-size: 2.8rem;
+    .cta-panel h2 {
+      font-size: clamp(1.8rem, 3vw, 2.7rem);
       font-weight: 300;
-      margin-bottom: 25px;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: fadeInUp 1.5s ease forwards;
-      animation-delay: 0.5s;
-      line-height: 1.2;
+      letter-spacing: -0.035em;
+      margin-bottom: 10px;
     }
 
-    .main-text p {
-      font-size: 1.2rem;
-      font-weight: 300;
+    .cta-panel h2 span {
+      color: var(--primary-accent);
+      font-weight: 600;
+    }
+
+    .cta-panel p {
+      color: var(--text-soft);
       line-height: 1.7;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: fadeInUp 1.5s ease forwards;
-      animation-delay: 1s;
-      margin-bottom: 25px;
+      max-width: 670px;
     }
-      
 
-      .logo {
-          display: flex;
-          align-items: center;
-          height: 100px; /* Desired logo size */
-          margin: -15px 0; /* Compensate by pulling logo outside navbar */
+    footer {
+      padding: 34px 0 44px;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.9rem;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin-top: 34px;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
       }
-
-          .logo img {
-              height: 100%;
-              width: auto;
-              max-height: 100px;
-              object-fit: contain;
-          }
-
-    @keyframes fadeInUp {
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    /* الأيقونات */
-    .icons {
-      display: flex;
-      gap: 30px;
-      margin: 30px 0;
-      opacity: 0;
-      animation: fadeIn 2s ease forwards;
-      animation-delay: 1.5s;
-    }
-
-    .icon {
-      font-size: 2.5rem;
-      opacity: 0.7;
-      transition: all 0.3s ease;
-    }
-
-    .icon:hover {
-      opacity: 1;
-      transform: translateY(-5px);
-    }
-
-    /* زر الدعوة */
-    .cta-button {
-      margin-top: 20px;
-      padding: 15px 40px;
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: white;
-      font-size: 1.1rem;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      opacity: 0;
-      animation: fadeIn 1.5s ease forwards;
-      animation-delay: 2s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .cta-button:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.5);
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(255, 182, 193, 0.3);
-    }
-
-    /* قسم المعلومات */
-    .info-section {
-      padding: 120px 40px;
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 50px;
-    }
-
-    .info-card {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
-      padding: 40px 30px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.5s ease;
-      text-align: center;
-    }
-
-    .info-card.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .info-card h3 {
-      font-size: 1.6rem;
-      margin-bottom: 20px;
-      font-weight: 400;
-      color: #ffccbb;
-    }
-
-    .info-card p {
-      font-weight: 300;
-      line-height: 1.7;
-      font-size: 1.1rem;
-    }
-
-    /* التذييل */
-    footer {
-      text-align: center;
-      padding: 40px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      font-weight: 300;
-      opacity: 0.7;
-      font-size: 1rem;
-    }
-
-    /* التجاوب مع الشاشات المختلفة */
-    @media (max-width: 1200px) {
-      .main-container {
-        gap: 60px;
-      }
-      
-      .neural-image {
-        width: 400px;
-        height: 400px;
-      }
-      
-      .text-1, .text-2, .text-3, .text-4, .text-5, .text-6 {
-        display: none;
+    @keyframes rotateSlow {
+      to {
+        transform: rotate(360deg);
       }
     }
 
-    @media (max-width: 1024px) {
-      .main-container {
+    @keyframes shine {
+      0%, 45% {
+        transform: translateX(-120%);
+      }
+      70%, 100% {
+        transform: translateX(120%);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-12px);
+      }
+    }
+
+    @media (max-width: 1080px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 70px;
+      }
+
+      .hero-visual {
+        min-height: 470px;
+        order: -1;
+      }
+
+      .hero-copy {
+        text-align: center;
+      }
+
+      .hero-description,
+      .hero-proof {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero-actions {
+        justify-content: center;
+      }
+
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .workflow {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .cta-panel {
         flex-direction: column;
-        gap: 50px;
-        text-align: center;
-      }
-      
-      .main-text {
-        text-align: center;
-        max-width: 700px;
-      }
-      
-      .neural-image {
-        width: 350px;
-        height: 350px;
+        align-items: flex-start;
       }
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 760px) {
       .navbar {
-        padding: 15px 20px;
+        top: 8px;
+        width: calc(100% - 20px);
+        padding: 10px 12px;
+      }
+
+      .logo img {
+        width: 70px;
+      }
+
+      .logo-text {
+        display: none;
       }
 
       .nav-links {
-        gap: 15px;
+        gap: 4px;
       }
 
-      .neural-image {
-        width: 300px;
-        height: 300px;
+      .nav-links a {
+        font-size: 0.82rem;
+        padding: 9px 10px;
       }
 
-      .main-text h1 {
-        font-size: 2.2rem;
+      .page-shell {
+        width: min(100% - 24px, var(--max-width));
       }
 
-      .main-text p {
-        font-size: 1.1rem;
+      .hero {
+        padding: 48px 0 56px;
       }
 
-      .info-section {
-        padding: 80px 20px;
+      .hero-visual {
+        min-height: 410px;
+      }
+
+      .neural-card {
+        width: min(330px, 82vw);
+        border-radius: 30px;
+      }
+
+      .visual-orbit {
+        width: min(380px, 92vw);
+      }
+
+      .floating-card {
+        position: static;
+        width: 100%;
+        margin-top: 10px;
+        animation: none;
+      }
+
+      .hero-visual {
+        display: grid;
+        gap: 10px;
+      }
+
+      .visual-orbit {
+        display: none;
+      }
+
+      .hero-proof,
+      .features-grid,
+      .workflow,
+      .role-section {
         grid-template-columns: 1fr;
-        gap: 30px;
       }
-    }
 
-    @media (max-width: 480px) {
-      .neural-image {
-        width: 250px;
-        height: 250px;
+      .section {
+        padding: 68px 0;
       }
-      
-      .main-text h1 {
-        font-size: 1.8rem;
+
+      .cta-panel {
+        padding: 28px;
       }
-      
-      .main-text p {
-        font-size: 1rem;
-      }
-      
-      .icons {
-        gap: 20px;
-      }
-      
-      .icon {
-        font-size: 2rem;
+
+      .hero-actions .btn {
+        width: 100%;
       }
     }
   </style>
 </head>
+
 <body>
-  <!-- شريط التنقل -->
-    <nav class="navbar">
-        <div class="logo"><img src="awtadlogo1.png" alt="Awtad Logo"></div>
-        <div class="nav-links">
-            <a href="awtadhp.html">Home</a>
-            <a href="loginawtad.html">Log In</a>
-            <a href="signupawtad.html">Sign In</a>
-        </div>
-    </nav>
-
-  <!-- القسم الرئيسي -->
-  <section class="hero">
-    <div class="main-container">
-      <!-- صورة الأعصاب مع النص المحيط -->
-      <div class="neural-image-container">
-        <div class="neural-image">
-          
-        </div>
+  <nav class="navbar">
+    <a href="awtadhp.html" class="logo">
+      <img src="awtadlogo1.png" alt="AWTAD Logo">
+      <div class="logo-text">
+        <strong>AWTAD</strong>
+        <span>EMG-based movement insight</span>
       </div>
+    </a>
 
-      <!-- النص الرئيسي -->
-      <div class="main-text">
-          <h1>Revolutionizing Muscle Imbalance Analysis</h1>
-          <p>AWTAD utilizes cutting-edge EMG sensor technology to precisely measure and analyze muscle activity, helping athletes and patients achieve optimal physical performance and recovery.</p>
-          <p>Our advanced neural signal processing algorithms detect even the slightest imbalances, providing actionable insights for targeted interventions.</p>
-
-
-
-          <!-- زر الدعوة -->
-          <!-- <button class="cta-button">Discover Our System</button>-->
-      </div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="loginawtad.html" class="login-link">Log In</a>
+      <a href="signupawtad.html" class="signup-link">Sign Up</a>
     </div>
-  </section>
+  </nav>
 
-  <!-- قسم المعلومات -->
-  <section class="info-section">
-    <div class="info-card">
-  <h3>Data Analytics</h3>
-  <p>Comprehensive data analysis and visualization tools to track progress and identify patterns in muscle activity over time.</p>
-</div>
+  <main>
+    <section class="hero page-shell">
+      <div class="hero-copy">
+        <div class="eyebrow">
+          <i class="fa-solid fa-wave-square"></i>
+          Smart EMG monitoring for athletic movement
+        </div>
 
-<div class="info-card">
-  <h3>Wireless Connectivity</h3>
-  <p>Seamless wireless data transmission from sensors to our platform, allowing freedom of movement during assessments.</p>
-</div>
+        <h1>
+          See muscle balance
+          <span>before imbalance becomes a problem.</span>
+        </h1>
 
-<div class="info-card">
-  <h3>Customized Reports</h3>
-  <p>Generate detailed personalized reports with actionable recommendations based on individual muscle performance data.</p>
-</div>
+        <p class="hero-description">
+          AWTAD helps athletes and coaches review muscle activation during exercise using wireless surface EMG sensors.
+          The platform captures movement sessions, analyzes left-right activation balance, and presents clear feedback
+          through visual dashboards.
+        </p>
 
-<div class="info-card">
-  <h3>Multi-Muscle Monitoring</h3>
-  <p>Simultaneously track multiple muscle groups to provide a complete picture of muscular coordination and balance.</p>
-</div>
+        <div class="hero-actions">
+          <a href="signupawtad.html" class="btn btn-primary">
+            Get Started
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
 
-<div class="info-card">
-  <h3>Mobile Integration</h3>
-  <p>Access your muscle data anytime, anywhere through our mobile application with real-time notifications and alerts.</p>
-</div>
+          <a href="loginawtad.html" class="btn btn-secondary">
+            Already have an account?
+            <i class="fa-solid fa-right-to-bracket"></i>
+          </a>
+        </div>
 
-<div class="info-card">
-  <h3>Clinical Validation</h3>
-  <p>Our technology is clinically validated and trusted by healthcare professionals and sports medicine experts worldwide.</p>
-</div>
-  </section>
+        <div class="hero-proof">
+          <div class="proof-card">
+            <strong>Wireless</strong>
+            <span>Movement-friendly EMG session workflow.</span>
+          </div>
 
-  <!-- التذييل -->
-  <footer>
-    <p>&copy; 2023 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
+          <div class="proof-card">
+            <strong>Visual</strong>
+            <span>Signal preview, SI, and dominant-side results.</span>
+          </div>
+
+          <div class="proof-card">
+            <strong>Connected</strong>
+            <span>Coach-client feedback through one platform.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="visual-orbit"></div>
+
+        <div class="neural-card" aria-label="EMG signal visual"></div>
+
+        <div class="floating-card float-1">
+          <i class="fa-solid fa-chart-line"></i>
+          <h3>Session Insights</h3>
+          <p>Review exercise results with symmetry index and balance status.</p>
+        </div>
+
+        <div class="floating-card float-2">
+          <i class="fa-solid fa-dumbbell"></i>
+          <h3>Athlete-Focused</h3>
+          <p>Designed for guided training sessions and movement awareness.</p>
+        </div>
+
+        <div class="floating-card float-3">
+          <i class="fa-solid fa-user-tie"></i>
+          <h3>Coach Feedback</h3>
+          <p>Coaches can review sessions and send feedback to connected athletes.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell" id="features">
+      <div class="section-header">
+        <div class="section-kicker">What AWTAD offers</div>
+        <h2 class="section-title">
+          A clearer way to understand <span>muscle activation balance.</span>
+        </h2>
+        <p class="section-description">
+          AWTAD combines EMG session recording, analysis results, and coach feedback in one simple platform.
+          It is built to support athlete awareness and training decisions, not to diagnose medical conditions.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-wave-square"></i>
+          </div>
+          <h3>EMG Signal Preview</h3>
+          <p>
+            After a session, users can view a downsampled signal preview that gives a clear visual glimpse of the recorded muscle activity.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-scale-balanced"></i>
+          </div>
+          <h3>Symmetry Index</h3>
+          <p>
+            The system summarizes left-right muscle activation balance using a symmetry index that is easy to read and compare.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-location-arrow"></i>
+          </div>
+          <h3>Dominant Side Detection</h3>
+          <p>
+            AWTAD highlights which side showed stronger activation during the recorded exercise to support better movement awareness.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-user-group"></i>
+          </div>
+          <h3>Coach-Client Connection</h3>
+          <p>
+            Athletes can connect with a coach, allowing the coach to view sessions, review performance indicators, and provide feedback.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-comment-dots"></i>
+          </div>
+          <h3>Session Feedback</h3>
+          <p>
+            Coaches can write feedback on a selected session, and the client can see it later inside their session history.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-table-columns"></i>
+          </div>
+          <h3>Simple Dashboards</h3>
+          <p>
+            Clean dashboards help clients and coaches view sessions, results, and training records without complex clinical interfaces.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell">
+      <div class="section-header">
+        <div class="section-kicker">How it works</div>
+        <h2 class="section-title">
+          From sensor placement to <span>actionable feedback.</span>
+        </h2>
+      </div>
+
+      <div class="workflow">
+        <div class="workflow-step">
+          <h3>Connect Sensors</h3>
+          <p>
+            The user follows the placement guide and connects the EMG sensors before starting the movement session.
+          </p>
+        </div>
+
+        <div class="workflow-step">
+          <h3>Record Exercise</h3>
+          <p>
+            The athlete performs the selected exercise while the system records muscle activation from both sides.
+          </p>
+        </div>
+
+        <div class="workflow-step">
+          <h3>Analyze Balance</h3>
+          <p>
+            AWTAD processes the session and presents key outputs such as signal preview, symmetry index, and dominant side.
+          </p>
+        </div>
+
+        <div class="workflow-step">
+          <h3>Review Feedback</h3>
+          <p>
+            Connected coaches can review session details and send comments that appear for the client.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell">
+      <div class="section-header">
+        <div class="section-kicker">Built for two views</div>
+        <h2 class="section-title">
+          One platform for <span>athletes and coaches.</span>
+        </h2>
+      </div>
+
+      <div class="role-section">
+        <div class="role-card">
+          <h3>For Athletes</h3>
+          <p>
+            AWTAD helps athletes view their sessions and understand basic muscle activation balance after performing guided exercises.
+          </p>
+
+          <ul class="role-list">
+            <li><i class="fa-solid fa-check"></i> Start guided EMG sessions.</li>
+            <li><i class="fa-solid fa-check"></i> View symmetry index and dominant side.</li>
+            <li><i class="fa-solid fa-check"></i> See coach feedback inside session records.</li>
+            <li><i class="fa-solid fa-check"></i> Track previous training sessions.</li>
+          </ul>
+        </div>
+
+        <div class="role-card">
+          <h3>For Coaches</h3>
+          <p>
+            Coaches can manage connected athletes, open session history, review results, and provide feedback in a structured way.
+          </p>
+
+          <ul class="role-list">
+            <li><i class="fa-solid fa-check"></i> View connected athletes.</li>
+            <li><i class="fa-solid fa-check"></i> Open each athlete’s session history.</li>
+            <li><i class="fa-solid fa-check"></i> Review signal preview, SI, and dominant side.</li>
+            <li><i class="fa-solid fa-check"></i> Send session-specific feedback.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="cta-panel">
+        <div>
+          <h2>Ready to explore <span>AWTAD?</span></h2>
+          <p>
+            Create an account to begin using the platform, or log in to continue reviewing your EMG sessions and feedback.
+          </p>
+        </div>
+
+        <a href="signupawtad.html" class="btn btn-primary">
+          Sign Up Now
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="page-shell">
+    <p>&copy; 2025 AWTAD Technologies. Advancing human performance through EMG-based movement awareness.</p>
   </footer>
 
   <script>
-    // جعل بطاقات المعلومات تظهر عند التمرير
-    document.addEventListener('DOMContentLoaded', function() {
-      const infoCards = document.querySelectorAll('.info-card');
-      
+    document.addEventListener("DOMContentLoaded", function () {
+      const cards = document.querySelectorAll(".feature-card");
+
       const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry, index) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
+            setTimeout(() => {
+              entry.target.classList.add("visible");
+            }, index * 80);
           }
         });
-      }, { threshold: 0.2 });
-      
-      infoCards.forEach(card => {
-        observer.observe(card);
-      });
+      }, { threshold: 0.18 });
+
+      cards.forEach(card => observer.observe(card));
     });
   </script>
 </body>

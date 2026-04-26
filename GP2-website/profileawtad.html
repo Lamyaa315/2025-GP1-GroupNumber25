@@ -9,19 +9,23 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      min-width: 0;
+    }
 
-    :root{
-      --sidebar-width: 190px;
+    :root {
+      --sidebar-width: 220px;
       --primary-accent: #ffd2c2;
       --primary-strong: #ffb59c;
       --bg-dark: #4B3A57;
       --card-bg: rgba(255,255,255,0.08);
       --card-bg-strong: rgba(255,255,255,0.10);
       --border: rgba(255,255,255,0.15);
-      --border2: rgba(255,255,255,0.10);
       --text: #ffffff;
-      --muted: rgba(255,255,255,0.85);
+      --muted: rgba(255,255,255,0.78);
       --shadow-soft: 0 10px 30px rgba(0,0,0,0.22);
       --shadow-glow: 0 0 30px rgba(255,181,156,0.12);
       --success: #8dd3a1;
@@ -30,7 +34,7 @@
       --glass-border: rgba(255,255,255,0.14);
     }
 
-    body{
+    body {
       min-height: 100vh;
       background: var(--bg-dark);
       color: var(--text);
@@ -39,8 +43,8 @@
       position: relative;
     }
 
-    body::before{
-      content:"";
+    body::before {
+      content: "";
       position: fixed;
       inset: 0;
       background:
@@ -50,8 +54,8 @@
       z-index: -2;
     }
 
-    body::after{
-      content:"";
+    body::after {
+      content: "";
       position: fixed;
       inset: 0;
       backdrop-filter: blur(2px);
@@ -59,14 +63,13 @@
       z-index: -1;
     }
 
-    /* MENU BUTTON */
     .menu-btn {
       position: fixed;
       top: 20px;
       left: 20px;
       width: 50px;
       height: 50px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
       border: 1px solid var(--glass-border);
       border-radius: 15px;
       display: flex;
@@ -76,42 +79,37 @@
       z-index: 1001;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
+      transition: 0.3s ease;
     }
 
     .menu-btn:hover {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
       transform: scale(1.05);
-      border-color: rgba(255, 210, 194, 0.3);
+      border-color: rgba(255,210,194,0.3);
     }
 
     .menu-btn i {
       font-size: 1.5rem;
       color: var(--primary-accent);
-      transition: all 0.3s ease;
+      transition: 0.3s ease;
     }
 
     .menu-btn.active i {
       transform: rotate(90deg);
     }
 
-    /* SIDEBAR */
     .sidebar {
       width: var(--sidebar-width);
       height: calc(100vh - 24px);
       margin: 12px;
       position: fixed;
       top: 0;
-      left: -250px;
+      left: 0;
       display: flex;
       flex-direction: column;
       padding: 22px 16px;
-      background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0.04) 100%
-      );
-      border: 1px solid rgba(255,255,255,0.14);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid var(--glass-border);
       box-shadow: var(--shadow-soft), var(--shadow-glow);
       border-radius: 26px;
       backdrop-filter: blur(22px) saturate(140%);
@@ -121,8 +119,8 @@
       transition: left 0.3s ease;
     }
 
-    .sidebar.active {
-      left: 0;
+    .sidebar.hidden {
+      left: -270px;
     }
 
     .sidebar::before {
@@ -130,13 +128,7 @@
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      background:
-        linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.12) 0%,
-          rgba(255, 255, 255, 0.02) 35%,
-          rgba(255, 255, 255, 0.01) 100%
-        );
+      background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       pointer-events: none;
     }
 
@@ -149,14 +141,14 @@
 
     .sidebar-brand img {
       width: 105px;
-      filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.2));
+      filter: drop-shadow(0 0 14px rgba(255,204,187,0.2));
     }
 
     .user-mini-card {
       position: relative;
       z-index: 1;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.09);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
       padding: 14px;
       border-radius: 18px;
@@ -191,7 +183,7 @@
       text-decoration: none;
       color: rgba(255,255,255,0.72);
       border-radius: 14px;
-      transition: all 0.25s ease;
+      transition: 0.25s ease;
       position: relative;
       overflow: hidden;
     }
@@ -200,76 +192,38 @@
       width: 18px;
       text-align: center;
       font-size: 0.95rem;
+      color: var(--primary-accent);
     }
 
     .nav-item:hover,
     .nav-item.active {
       color: #fff;
-      background: linear-gradient(
-        135deg,
-        rgba(255, 204, 187, 0.18),
-        rgba(255, 255, 255, 0.06)
-      );
-      border: 1px solid rgba(255, 210, 194, 0.16);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.06),
-        0 0 18px rgba(255, 181, 156, 0.10);
+      background: linear-gradient(135deg, rgba(255,204,187,0.18), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,210,194,0.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 18px rgba(255,181,156,0.10);
     }
 
     .nav-item:hover {
       transform: translateX(2px);
     }
 
-    .nav-item.active i,
-    .nav-item:hover i {
-      color: var(--primary-accent);
-    }
-
-    /* MAIN */
-    .main-content{
-      margin-left: 0;
-      padding: 70px 34px 42px 80px;
-      width: 100%;
-      transition: margin-left 0.3s ease, width 0.3s ease;
-    }
-
-    .main-content.shifted {
+    .main-content {
       margin-left: calc(var(--sidebar-width) + 32px);
       width: calc(100% - var(--sidebar-width) - 32px);
+      padding: 54px 34px 42px 34px;
+      transition: margin-left 0.3s ease, width 0.3s ease, padding 0.3s ease;
     }
 
-    .dashboard-header{
-      display:flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      margin: 6px 0 22px;
-      flex-wrap: wrap;
+    .main-content.expanded {
+      margin-left: 0;
+      width: 100%;
+      padding: 54px 34px 42px 80px;
     }
 
-    .dashboard-title{
-      font-size: 2.2rem;
-      font-weight: 300;
-      color: white;
-      text-shadow: 0 0 18px rgba(255, 190, 170, 0.08);
-    }
-
-    .header-actions{
-      display:flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .glass-card{
-      background: linear-gradient(
-        180deg,
-        rgba(255,255,255,0.08) 0%,
-        rgba(255,255,255,0.05) 100%
-      );
+    .glass-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.05));
       border: 1px solid rgba(255,255,255,0.14);
-      box-shadow:
-        var(--shadow-soft),
-        inset 0 1px 0 rgba(255,255,255,0.07);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.07);
       backdrop-filter: blur(16px) saturate(135%);
       -webkit-backdrop-filter: blur(16px) saturate(135%);
       border-radius: var(--radius);
@@ -277,316 +231,437 @@
       overflow: hidden;
     }
 
-    .glass-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, transparent 42%);
-      pointer-events:none;
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.07), transparent 42%);
+      pointer-events: none;
     }
 
-    .btn{
+    .btn {
       border: 1px solid rgba(255,255,255,0.25);
       background: rgba(255,255,255,0.10);
-      color:white;
+      color: white;
       border-radius: 999px;
       padding: 10px 16px;
-      cursor:pointer;
+      cursor: pointer;
       transition: 0.25s;
-      display:inline-flex;
-      align-items:center;
+      display: inline-flex;
+      align-items: center;
       gap: 10px;
       font-family: inherit;
+      text-decoration: none;
     }
 
-    .btn:hover{
+    .btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 18px rgba(0,0,0,0.18);
       border-color: rgba(255,182,163,0.35);
     }
 
-    .btn.primary{
+    .btn.primary {
       background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
       color: #4B3A57;
       font-weight: 700;
       border: none;
-      box-shadow: 0 8px 18px rgba(255, 181, 156, 0.20);
+      box-shadow: 0 8px 18px rgba(255,181,156,0.20);
     }
 
-    .btn.primary:hover{
-      box-shadow: 0 12px 22px rgba(255, 181, 156, 0.24);
-    }
-
-    .btn.ghost{
+    .btn.ghost {
       background: rgba(255,255,255,0.08);
     }
 
-    .btn.small{
+    .btn.small {
       padding: 8px 14px;
       font-size: 0.92rem;
     }
 
-    .btn.full{
+    .btn.full {
       width: 100%;
       justify-content: center;
     }
 
-    .profile-grid{
-      display:grid;
-      grid-template-columns: 1fr 2fr;
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
       gap: 18px;
       margin-bottom: 18px;
     }
 
     .profile-left,
-    .profile-right{
+    .profile-right {
       padding: 22px;
     }
 
-    .profile-left{
-      display:flex;
+    .profile-left {
+      display: flex;
       flex-direction: column;
-      align-items:center;
-      text-align:center;
+      align-items: center;
+      text-align: center;
+      min-height: 340px;
+      justify-content: center;
     }
 
-    .avatar-wrap{
+    .avatar-wrap {
       width: 100%;
-      display:flex;
-      justify-content:center;
-      margin-top: 8px;
+      display: flex;
+      justify-content: center;
     }
 
-    .avatar-circle{
-      width: 140px;
-      height: 140px;
+    .avatar-circle {
+      width: 115px;
+      height: 115px;
       border-radius: 50%;
-      border: 2px solid rgba(255,182,163,0.30);
+      border: 2px solid rgba(255,182,163,0.45);
       background: rgba(255,255,255,0.06);
       position: relative;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-accent);
+      font-size: 2rem;
+      font-weight: 700;
     }
 
-    .avatar-edit{
-      position:absolute;
-      right: 10px;
-      bottom: 10px;
-      width: 36px;
-      height: 36px;
+    .avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: none;
+    }
+
+    .avatar-edit {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       border: 1px solid rgba(255,255,255,0.22);
-      background: rgba(75,58,87,0.90);
+      background: rgba(75,58,87,0.92);
       color: var(--primary-accent);
-      cursor:pointer;
+      cursor: pointer;
+      z-index: 2;
     }
 
-    .name{
+    .name {
       margin-top: 14px;
-      font-size: 22px;
+      font-size: 1.35rem;
       color: var(--primary-accent);
-      font-weight: 500;
-    }
-
-    .subtitle{
-      margin-top: 4px;
-      opacity: 0.9;
-    }
-
-    .stats{
-      width: 100%;
-      display:flex;
-      justify-content: space-between;
-      margin-top: 16px;
-      gap: 10px;
-    }
-
-    .stat{
-      flex: 1;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 12px;
-      padding: 10px;
-    }
-
-    .stat-value{
-      font-size: 18px;
       font-weight: 600;
-      color: var(--primary-accent);
     }
 
-    .stat-label{
-      font-size: 12px;
-      opacity: 0.9;
-      margin-top: 3px;
+    .subtitle {
+      margin-top: 5px;
+      opacity: 0.85;
+      font-size: 0.94rem;
     }
 
-    .bio{
-      margin-top: 14px;
-      opacity: 0.9;
-      line-height: 1.6;
-    }
-
-    .card-header{
-      display:flex;
-      align-items:center;
+    .card-header {
+      display: flex;
+      align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
       gap: 12px;
       flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
     }
 
-    .card-header h2{
-      font-size: 1.2rem;
-      font-weight: 400;
+    .card-header h2 {
+      font-size: 1.35rem;
+      font-weight: 500;
       color: var(--primary-accent);
     }
 
-    .form-grid{
-      display:grid;
+    .form-grid {
+      display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 12px;
+      gap: 14px 18px;
+      position: relative;
+      z-index: 1;
     }
 
-    .field label{
-      display:block;
-      font-size: 12px;
+    .field label {
+      display: block;
+      font-size: 0.82rem;
       opacity: 0.9;
       margin-bottom: 6px;
     }
 
-    .value{
+    .value {
       padding: 10px 12px;
-      border-radius: 10px;
+      border-radius: 11px;
       border: 1px solid rgba(255,255,255,0.14);
       background: rgba(255,255,255,0.07);
-      font-size: 14px;
+      font-size: 0.92rem;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
     }
 
-    .input{
+    .input {
       width: 100%;
       padding: 10px 12px;
-      border-radius: 10px;
+      border-radius: 11px;
       border: 1px solid rgba(255,255,255,0.18);
       background: rgba(255,255,255,0.08);
       color: white;
-      font-size: 14px;
+      font-size: 0.92rem;
       font-family: inherit;
+      min-height: 40px;
     }
 
-    textarea.input{ min-height: 100px; resize: vertical; }
+    .my-coach-card {
+      padding: 26px;
+      margin-top: 18px;
+    }
 
-    .page-footer{
-      text-align:center;
-      padding: 28px 0 0;
+    .coach-connected {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 24px;
+      align-items: center;
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.065);
+      border: 1px solid rgba(255,255,255,0.12);
+      min-height: 145px;
+    }
+
+    .coach-avatar {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      border: 2px solid var(--primary-accent);
+      background: rgba(255,210,194,0.12);
+      color: var(--primary-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      font-weight: 800;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .coach-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .coach-info h3 {
+      color: var(--primary-accent);
+      font-size: 1.35rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .coach-info p {
+      opacity: 0.82;
+      font-size: 0.94rem;
+      line-height: 1.7;
+    }
+
+    .coach-info i {
+      color: var(--primary-accent);
+      width: 20px;
+      margin-right: 8px;
+    }
+
+    .coach-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(141,211,161,0.14);
+      border: 1px solid rgba(141,211,161,0.25);
+      color: var(--success);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .coach-empty {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 38px 26px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.05);
+      border: 1px dashed rgba(255,255,255,0.18);
+      min-height: 170px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .coach-empty i {
+      font-size: 2.4rem;
+      color: var(--primary-accent);
+    }
+
+    .coach-empty h3 {
+      color: var(--primary-accent);
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .coach-empty p {
+      opacity: 0.75;
+      line-height: 1.6;
+      max-width: 620px;
+    }
+
+    .page-footer {
+      text-align: center;
+      padding: 26px 0 0;
       opacity: 0.78;
-      font-size: 0.96rem;
+      font-size: 0.92rem;
       margin-top: 6px;
     }
 
-    .modal{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.65);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index: 9999;
-      padding: 18px;
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 14, 24, 0.58);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+    .modal.show {
+      display: flex;
     }
 
-    .modal.show{ display:flex; }
+.modal-content {
+  width: min(620px, 92vw);
+  padding: 44px 38px;
+  border-radius: 26px;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.08) 0%,
+    rgba(255,255,255,0.05) 100%
+  );
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    var(--shadow-soft),
+    inset 0 1px 0 rgba(255,255,255,0.07);
+  backdrop-filter: blur(16px) saturate(135%);
+  -webkit-backdrop-filter: blur(16px) saturate(135%);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.modal-content::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.07) 0%,
+    transparent 42%
+  );
+  pointer-events: none;
+}
 
-    .modal-content{
-      width: min(420px, 92vw);
-      background: rgba(75,58,87,0.96);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 16px;
-      padding: 22px;
-      box-shadow: var(--shadow-soft);
-      text-align:center;
-    }
-
-    .modal-icon{
+.modal-content h3,
+.modal-content p,
+.modal-actions {
+  position: relative;
+  z-index: 1;
+}
+    .modal-icon {
       font-size: 2.6rem;
       margin-bottom: 10px;
     }
 
-    .modal-icon.success{ color: #4ade80; }
-    .modal-icon.warn{ color: var(--primary-accent); }
+    .modal-icon.success { color: #4ade80; }
+    .modal-icon.warn { color: var(--primary-accent); }
 
-    .modal-content h3{
+    .modal-content h3 {
       color: var(--primary-accent);
       font-weight: 500;
       margin-bottom: 8px;
     }
 
-    .modal-content p{
+    .modal-content p {
       opacity: 0.9;
       line-height: 1.5;
       margin-bottom: 14px;
     }
 
-    .modal-actions{
-      display:flex;
+    .modal-actions {
+      display: flex;
       gap: 10px;
-      justify-content:center;
+      justify-content: center;
       flex-wrap: wrap;
     }
 
-    @media (max-width: 980px){
-      .profile-grid{ grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 1024px) {
-      :root { --sidebar-width: 82px; }
-
-      .sidebar {
-        padding: 18px 10px;
-        border-radius: 22px;
+    @media (max-width: 1100px) {
+      .profile-grid {
+        grid-template-columns: 1fr;
       }
 
-      .sidebar-brand img,
-      .nav-text,
-      .user-mini-card {
-        display: none;
+      .coach-connected {
+        grid-template-columns: auto 1fr;
       }
 
-      .nav-item {
-        justify-content: center;
-        padding: 12px;
-      }
-
-      .nav-item i {
-        width: auto;
+      .coach-status {
+        grid-column: 1 / -1;
+        width: fit-content;
       }
     }
 
-    @media (max-width: 768px){
+    @media (max-width: 768px) {
       .main-content,
-      .main-content.shifted{
+      .main-content.expanded {
         margin-left: 0;
         width: 100%;
-        padding: 20px 16px 24px;
+        padding: 80px 16px 24px;
       }
 
-      .dashboard-header{ flex-direction: column; align-items:flex-start; }
-      .form-grid{ grid-template-columns: 1fr; }
-
-      .header-actions{
-        width: 100%;
+      .sidebar {
+        left: 0;
       }
 
-      .header-actions .btn{
-        width: 100%;
-        justify-content: center;
+      .sidebar.hidden {
+        left: -270px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .coach-connected {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .coach-avatar {
+        margin: 0 auto;
+      }
+
+      .coach-status {
+        margin: 0 auto;
       }
     }
   </style>
 </head>
 
 <body>
-  <!-- Save Modal -->
   <div class="modal" id="saveModal" aria-hidden="true">
     <div class="modal-content">
       <div class="modal-icon success"><i class="fa-solid fa-circle-check"></i></div>
@@ -596,20 +671,21 @@
     </div>
   </div>
 
-  <!-- Logout Modal -->
-  <div class="modal" id="logoutModal" aria-hidden="true">
-    <div class="modal-content">
-      <div class="modal-icon warn"><i class="fa-solid fa-right-from-bracket"></i></div>
-      <h3>Log Out</h3>
-      <p>Are you sure you want to log out?</p>
-      <div class="modal-actions">
-        <button class="btn ghost" id="cancelLogoutBtn">Cancel</button>
-        <button class="btn primary" id="confirmLogoutBtn">Yes, Log Out</button>
-      </div>
+<div class="modal" id="logoutModal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Confirm Logout</h3>
+    <p>
+      Are you sure you want to log out? You'll need to log in again to access your account.
+    </p>
+
+    <div class="modal-actions">
+      <button class="btn ghost" id="cancelLogoutBtn">Cancel</button>
+      <button class="btn primary" id="confirmLogoutBtn">Logout</button>
     </div>
   </div>
+</div>
 
-  <div class="menu-btn" id="menuBtn">
+  <div class="menu-btn active" id="menuBtn">
     <i class="fas fa-bars"></i>
   </div>
 
@@ -628,14 +704,22 @@
         <i class="fas fa-th-large"></i>
         <span class="nav-text">Dashboard</span>
       </a>
+
       <a href="FindCoach.html" class="nav-item">
         <i class="fas fa-user-tie"></i>
         <span class="nav-text">Find a Coach</span>
       </a>
+
+            <a href="my-coach.html" class="nav-item ">
+        <i class="fas fa-id-card"></i>
+        <span class="nav-text">My Coach</span>
+      </a>
+
       <a href="sesstionsawtad.html" class="nav-item">
         <i class="fas fa-calendar"></i>
         <span class="nav-text">Sessions</span>
       </a>
+
       <a href="profileawtad.html" class="nav-item active">
         <i class="fas fa-user"></i>
         <span class="nav-text">Profile</span>
@@ -649,85 +733,77 @@
   </aside>
 
   <main class="main-content" id="mainContent">
-    <header class="dashboard-header">
-      <h1 class="dashboard-title" id="profileTitle">Profile</h1>
-
-      <div class="header-actions">
-        <button class="btn small ghost" id="editToggleBtn">
-          <i class="fa-solid fa-pen-to-square"></i> Edit Profile
-        </button>
-      </div>
-    </header>
-
     <section class="profile-grid">
       <section class="glass-card profile-left">
-
         <div class="avatar-wrap">
           <div class="avatar-circle" id="avatarCircle">
+            <span id="avatarInitials">U</span>
 
-            <img id="avatarImg"
-                 src=""
-                 alt="Profile Picture"
-                 style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:none;" />
+            <img id="avatarImg" src="" alt="Profile Picture" />
 
             <button class="avatar-edit" id="profilePicBtn" title="Change photo">
               <i class="fa-solid fa-camera"></i>
             </button>
-
           </div>
         </div>
 
-        <input type="file"
-               id="profilePicInput"
-               accept="image/*"
-               style="display:none;" />
+        <input type="file" id="profilePicInput" accept="image/*" style="display:none;" />
 
-        <h2 class="name" id="nameDisplay">—</h2>
-        <p class="subtitle" id="titleDisplay">—</p>
-
-       
-
-        <p class="bio" id="bioDisplay">—</p>
-
-        <button class="btn ghost full" id="shareBtn">
-          <i class="fa-solid fa-share-nodes"></i> Share Profile
-        </button>
+        <h2 class="name" id="nameDisplay">Loading...</h2>
+        <p class="subtitle" id="titleDisplay">AWTAD Client</p>
       </section>
 
       <section class="glass-card profile-right">
         <div class="card-header">
           <h2>Personal Information</h2>
+
+          <button class="btn small ghost" id="editToggleBtn">
+            <i class="fa-solid fa-pen-to-square"></i> Edit Profile
+          </button>
         </div>
 
         <div class="form-grid">
           <div class="field">
             <label>First Name</label>
-            <div class="value" id="fnameValue">—</div>
+            <div class="value" id="fnameValue">Loading...</div>
             <input class="input" id="fnameInput" type="text" style="display:none;" />
           </div>
 
           <div class="field">
             <label>Last Name</label>
-            <div class="value" id="lnameValue">—</div>
+            <div class="value" id="lnameValue">Loading...</div>
             <input class="input" id="lnameInput" type="text" style="display:none;" />
           </div>
 
           <div class="field">
             <label>Email</label>
-            <div class="value" id="emailValue">—</div>
+            <div class="value" id="emailValue">Loading...</div>
           </div>
 
           <div class="field">
             <label>Phone</label>
-            <div class="value" id="phoneValue">—</div>
+            <div class="value" id="phoneValue">Loading...</div>
             <input class="input" id="phoneInput" type="tel" style="display:none;" />
           </div>
         </div>
 
-        <button class="btn primary" id="saveBtn" style="display:none;">
+        <button class="btn primary" id="saveBtn" style="display:none; margin-top: 14px;">
           <i class="fa-solid fa-floppy-disk"></i> Save Changes
         </button>
       </section>
+    </section>
+
+    <section class="glass-card my-coach-card">
+      <div class="card-header">
+        <h2>My Coach</h2>
+      </div>
+
+      <div id="myCoachContent">
+        <div class="coach-empty">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <h3>Loading coach information...</h3>
+        </div>
+      </div>
     </section>
 
     <footer class="page-footer">
@@ -736,47 +812,350 @@
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const menuBtn = document.getElementById('menuBtn');
-      const sidebar = document.getElementById('sidebar');
-      const mainContent = document.getElementById('mainContent');
+    const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
+    const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      menuBtn.addEventListener('click', function () {
-        sidebar.classList.toggle('active');
-        mainContent.classList.toggle('shifted');
-        menuBtn.classList.toggle('active');
-      });
+    let currentUser = null;
+    let currentClient = null;
+    let isEditing = false;
 
-      document.addEventListener('click', function (e) {
-        if (!sidebar.contains(e.target) && !menuBtn.contains(e.target) && sidebar.classList.contains('active')) {
-          sidebar.classList.remove('active');
-          mainContent.classList.remove('shifted');
-          menuBtn.classList.remove('active');
-        }
-      });
+    document.addEventListener("DOMContentLoaded", async function () {
+      setupSidebar();
+      setupModals();
+      setupProfileButtons();
 
-      const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
-      if (cancelLogoutBtn) {
-        cancelLogoutBtn.addEventListener('click', function () {
-          document.getElementById('logoutModal')?.classList.remove('show');
-        });
-      }
-
-      const saveOkBtn = document.getElementById('saveOkBtn');
-      if (saveOkBtn) {
-        saveOkBtn.addEventListener('click', function () {
-          document.getElementById('saveModal')?.classList.remove('show');
-        });
-      }
-
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', function (e) {
-          if (e.target === modal) modal.classList.remove('show');
-        });
-      });
+      await loadProfile();
+      await loadMyCoach();
     });
-  </script>
 
-  <script src="profileawtad.js"></script>
+    function setupSidebar() {
+      const menuBtn = document.getElementById("menuBtn");
+      const sidebar = document.getElementById("sidebar");
+      const mainContent = document.getElementById("mainContent");
+
+      menuBtn.addEventListener("click", function () {
+        sidebar.classList.toggle("hidden");
+        mainContent.classList.toggle("expanded");
+        menuBtn.classList.toggle("active");
+      });
+    }
+
+    function setupModals() {
+      document.getElementById("cancelLogoutBtn").addEventListener("click", function () {
+        document.getElementById("logoutModal").classList.remove("show");
+      });
+
+      document.getElementById("saveOkBtn").addEventListener("click", function () {
+        document.getElementById("saveModal").classList.remove("show");
+      });
+
+      document.querySelectorAll(".modal").forEach(modal => {
+        modal.addEventListener("click", function (e) {
+          if (e.target === modal) modal.classList.remove("show");
+        });
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", function (e) {
+        e.preventDefault();
+        document.getElementById("logoutModal").classList.add("show");
+      });
+
+document.getElementById("confirmLogoutBtn").addEventListener("click", async function () {
+  const confirmBtn = document.getElementById("confirmLogoutBtn");
+
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = "Logging out...";
+
+  const { error } = await supa.auth.signOut();
+
+  if (error) {
+    alert("Logout failed: " + error.message);
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = "Logout";
+    return;
+  }
+
+  window.location.href = "loginawtad.html";
+});
+    }
+
+    function setupProfileButtons() {
+      document.getElementById("editToggleBtn").addEventListener("click", toggleEditMode);
+      document.getElementById("saveBtn").addEventListener("click", saveProfile);
+
+      document.getElementById("profilePicBtn").addEventListener("click", function () {
+        document.getElementById("profilePicInput").click();
+      });
+
+      document.getElementById("profilePicInput").addEventListener("change", uploadProfilePicture);
+    }
+
+    async function loadProfile() {
+      const { data: { user }, error: userError } = await supa.auth.getUser();
+
+      if (userError || !user) {
+        window.location.href = "loginawtad.html";
+        return;
+      }
+
+      currentUser = user;
+
+      const { data: client, error: clientError } = await supa
+        .from("Client")
+        .select("*")
+        .eq("client_id", user.id)
+        .single();
+
+      if (clientError || !client) {
+        console.error("Could not load client profile:", clientError);
+        setEmptyProfile(user.email);
+        return;
+      }
+
+      currentClient = client;
+      renderProfile(client);
+    }
+
+    function setEmptyProfile(email) {
+      document.getElementById("nameDisplay").textContent = "Client";
+      document.getElementById("sidebarUserName").textContent = "Client";
+      document.getElementById("fnameValue").textContent = "—";
+      document.getElementById("lnameValue").textContent = "—";
+      document.getElementById("emailValue").textContent = email || "—";
+      document.getElementById("phoneValue").textContent = "—";
+      document.getElementById("avatarInitials").textContent = "U";
+    }
+
+    function renderProfile(client) {
+      const first = client.Fname || "";
+      const last = client.Lname || "";
+      const fullName = `${first} ${last}`.trim() || "Client";
+      const initials = `${first.charAt(0)}${last.charAt(0)}` || "U";
+
+      document.getElementById("nameDisplay").textContent = fullName;
+      document.getElementById("sidebarUserName").textContent = fullName;
+      document.getElementById("titleDisplay").textContent = "AWTAD Client";
+
+      document.getElementById("fnameValue").textContent = first || "—";
+      document.getElementById("lnameValue").textContent = last || "—";
+      document.getElementById("emailValue").textContent = client.email || currentUser?.email || "—";
+      document.getElementById("phoneValue").textContent = client.Phone_Number || "—";
+
+      document.getElementById("fnameInput").value = first;
+      document.getElementById("lnameInput").value = last;
+      document.getElementById("phoneInput").value = client.Phone_Number || "";
+
+      document.getElementById("avatarInitials").textContent = initials;
+
+      const avatarImg = document.getElementById("avatarImg");
+      const avatarInitials = document.getElementById("avatarInitials");
+
+      if (client.profile_pic_url) {
+        avatarImg.src = client.profile_pic_url;
+        avatarImg.style.display = "block";
+        avatarInitials.style.display = "none";
+      } else {
+        avatarImg.style.display = "none";
+        avatarInitials.style.display = "block";
+      }
+    }
+
+    function toggleEditMode() {
+      isEditing = !isEditing;
+
+      const editBtn = document.getElementById("editToggleBtn");
+      const saveBtn = document.getElementById("saveBtn");
+
+      ["fname", "lname", "phone"].forEach(field => {
+        document.getElementById(`${field}Value`).style.display = isEditing ? "none" : "flex";
+        document.getElementById(`${field}Input`).style.display = isEditing ? "block" : "none";
+      });
+
+      saveBtn.style.display = isEditing ? "inline-flex" : "none";
+
+      editBtn.innerHTML = isEditing
+        ? '<i class="fa-solid fa-xmark"></i> Cancel'
+        : '<i class="fa-solid fa-pen-to-square"></i> Edit Profile';
+
+      if (!isEditing && currentClient) {
+        renderProfile(currentClient);
+      }
+    }
+
+    async function saveProfile() {
+      if (!currentUser) return;
+
+      const updates = {
+        Fname: document.getElementById("fnameInput").value.trim(),
+        Lname: document.getElementById("lnameInput").value.trim(),
+        Phone_Number: document.getElementById("phoneInput").value.trim()
+      };
+
+      const { data, error } = await supa
+        .from("Client")
+        .update(updates)
+        .eq("client_id", currentUser.id)
+        .select()
+        .single();
+
+      if (error) {
+        alert("Failed to save profile: " + error.message);
+        return;
+      }
+
+      currentClient = data;
+      isEditing = false;
+      renderProfile(data);
+
+      ["fname", "lname", "phone"].forEach(field => {
+        document.getElementById(`${field}Value`).style.display = "flex";
+        document.getElementById(`${field}Input`).style.display = "none";
+      });
+
+      document.getElementById("saveBtn").style.display = "none";
+      document.getElementById("editToggleBtn").innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Edit Profile';
+      document.getElementById("saveModal").classList.add("show");
+    }
+
+    async function uploadProfilePicture(event) {
+      const file = event.target.files[0];
+
+      if (!file || !currentUser) return;
+
+      if (!file.type.startsWith("image/")) {
+        alert("Please choose an image file.");
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Profile picture must be less than 2 MB.");
+        return;
+      }
+
+      const fileExt = file.name.split(".").pop();
+      const filePath = `client/${currentUser.id}-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supa.storage
+        .from("profile-pics")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: true
+        });
+
+      if (uploadError) {
+        alert("Image upload failed: " + uploadError.message);
+        return;
+      }
+
+      const { data: publicUrlData } = supa.storage
+        .from("profile-pics")
+        .getPublicUrl(filePath);
+
+      const profilePicUrl = publicUrlData.publicUrl;
+
+      const { data, error } = await supa
+        .from("Client")
+        .update({ profile_pic_url: profilePicUrl })
+        .eq("client_id", currentUser.id)
+        .select()
+        .single();
+
+      if (error) {
+        alert("Failed to save profile picture: " + error.message);
+        return;
+      }
+
+      currentClient = data;
+      renderProfile(data);
+    }
+
+    async function loadMyCoach() {
+      const container = document.getElementById("myCoachContent");
+
+      try {
+        if (!currentUser) return;
+
+        const { data: relationship, error: relError } = await supa
+          .from("Client_Coach_Relationship")
+          .select("coach_id, status")
+          .eq("client_id", currentUser.id)
+          .eq("status", "accepted")
+          .maybeSingle();
+
+        if (relError) {
+          console.error("Relationship error:", relError.message);
+        }
+
+        if (!relationship || !relationship.coach_id) {
+          renderNoCoach(container);
+          return;
+        }
+
+        const { data: coach, error: coachError } = await supa
+          .from("Coach")
+          .select("coach_id, Fname, Lname, email, Phone_Number, Specialty, profile_pic_url")
+          .eq("coach_id", relationship.coach_id)
+          .single();
+
+        if (coachError || !coach) {
+          console.error("Coach error:", coachError);
+          renderNoCoach(container);
+          return;
+        }
+
+        renderCoach(container, coach);
+
+      } catch (err) {
+        console.error("Unexpected My Coach error:", err);
+        renderNoCoach(container);
+      }
+    }
+
+    function renderNoCoach(container) {
+      container.innerHTML = `
+        <div class="coach-empty">
+          <i class="fa-solid fa-user-tie"></i>
+          <h3>No Coach Connected Yet</h3>
+          <p>You are not currently connected to a coach. Find a coach to let them review your sessions and provide feedback.</p>
+          <a href="FindCoach.html" class="btn primary">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Find a Coach
+          </a>
+        </div>
+      `;
+    }
+
+    function renderCoach(container, coach) {
+      const first = coach.Fname || "";
+      const last = coach.Lname || "";
+      const fullName = `${first} ${last}`.trim() || "Coach";
+      const initials = `${first.charAt(0)}${last.charAt(0)}` || "C";
+
+      const avatar = coach.profile_pic_url
+        ? `<img src="${coach.profile_pic_url}" alt="Coach Profile Picture">`
+        : initials;
+
+      container.innerHTML = `
+        <div class="coach-connected">
+          <div class="coach-avatar">
+            ${avatar}
+          </div>
+
+          <div class="coach-info">
+            <h3>${fullName}</h3>
+            <p><i class="fa-solid fa-dumbbell"></i>${coach.Specialty || "Specialty not provided"}</p>
+            <p><i class="fa-solid fa-envelope"></i>${coach.email || "Email not available"}</p>
+            <p><i class="fa-solid fa-phone"></i>${coach.Phone_Number || "Phone not provided"}</p>
+          </div>
+
+          <div class="coach-status">
+            <i class="fa-solid fa-circle-check"></i>
+            Connected
+          </div>
+        </div>
+      `;
+    }
+  </script>
 </body>
 </html>

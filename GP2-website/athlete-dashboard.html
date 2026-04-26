@@ -1,258 +1,1350 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWTAD | Athlete Analysis</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --sidebar-width: 220px;
-            --primary-accent: #ffd2c2;
-            --bg-dark: #4B3A57;
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.14);
-            --transition: all 0.3s ease;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWTAD | Athlete Sessions</title>
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            min-height: 100vh;
-            background: var(--bg-dark);
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            color: white;
-            display: flex;
-        }
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        body::before {
-            content: ""; position: fixed; inset: 0;
-            background: radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.2), transparent 45%);
-            z-index: -1;
-        }
+  <style>
+    :root {
+      --sidebar-width: 220px;
+      --primary-accent: #ffd2c2;
+      --primary-strong: #ffb59c;
+      --bg-dark: #4B3A57;
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass-strong: rgba(255, 255, 255, 0.12);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --success: #8dd3a1;
+      --danger: #ff6b6b;
+      --warning: #ffd166;
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.22);
+      --shadow-glow: 0 0 30px rgba(255, 181, 156, 0.12);
+    }
 
-        /* --- SIDEBAR (Consistent) --- */
-        .sidebar {
-            width: var(--sidebar-width); height: calc(100vh - 24px); margin: 12px;
-            position: fixed; background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-            border: 1px solid var(--glass-border); border-radius: 26px; backdrop-filter: blur(20px);
-            padding: 20px; display: flex; flex-direction: column; z-index: 1000;
-        }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; text-decoration: none; color: rgba(255,255,255,0.7); border-radius: 12px; margin-bottom: 8px; transition: 0.3s; }
-        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: var(--primary-accent); }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      min-width: 0;
+    }
 
-        /* --- MAIN CONTENT --- */
-        .main-wrapper { flex: 1; margin-left: calc(var(--sidebar-width) + 36px); padding: 40px; }
+    body {
+      min-height: 100vh;
+      background: var(--bg-dark);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: white;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        /* --- ATHLETE HEADER CARD --- */
-        .athlete-header-card {
-            background: var(--glass); border: 1px solid var(--glass-border); border-radius: 30px;
-            padding: 30px; display: flex; align-items: center; gap: 30px; margin-bottom: 40px;
-        }
-        .profile-pic { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary-accent); object-fit: cover; }
-        .header-info h1 { font-size: 2rem; color: var(--primary-accent); margin-bottom: 5px; }
-        .header-info p { opacity: 0.7; font-size: 0.9rem; margin-bottom: 5px; }
-        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; background: rgba(141, 211, 161, 0.2); color: #8dd3a1; font-size: 0.75rem; }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 25%, rgba(255, 182, 163, 0.25), transparent 42%),
+        radial-gradient(circle at 85% 75%, rgba(255, 209, 179, 0.18), transparent 48%);
+      z-index: -2;
+    }
 
-        /* --- DATA SECTIONS --- */
-        .section-title { font-size: 1.4rem; color: var(--primary-accent); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        
-        .data-card {
-            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 20px; transition: 0.3s;
-        }
-        .data-card:hover { border-color: var(--primary-accent); background: rgba(255,255,255,0.08); }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: -1;
+    }
 
-        .btn-small {
-            width: 100%; padding: 10px; margin-top: 15px; border-radius: 10px;
-            border: none; background: var(--primary-accent); color: #4B3A57;
-            font-weight: bold; cursor: pointer; transition: 0.3s;
-        }
-        .btn-small:hover { transform: translateY(-2px); opacity: 0.9; }
+    /* MENU BUTTON */
+    .menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1001;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: 0.3s ease;
+    }
 
-        /* --- MODAL / DETAIL VIEW --- */
-        .modal {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(10px);
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: #4B3A57; border: 1px solid var(--glass-border);
-            padding: 35px; border-radius: 25px; width: 90%; max-width: 500px;
-        }
+    .menu-btn:hover {
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+      transform: scale(1.05);
+      border-color: rgba(255,210,194,0.3);
+    }
 
-        textarea {
-            width: 100%; height: 100px; background: rgba(0,0,0,0.2);
-            border: 1px solid var(--glass-border); border-radius: 12px;
-            color: white; padding: 15px; margin: 15px 0; outline: none; resize: none;
-        }
-        textarea:focus { border-color: var(--primary-accent); }
+    .menu-btn i {
+      font-size: 1.5rem;
+      color: var(--primary-accent);
+      transition: 0.3s ease;
+    }
 
-        .loading-spinner { text-align: center; padding: 50px; opacity: 0.5; }
-    </style>
+    .menu-btn.active i {
+      transform: rotate(90deg);
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: calc(100vh - 24px);
+      margin: 12px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 16px;
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.08) 0%,
+        rgba(255,255,255,0.04) 100%
+      );
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft), var(--shadow-glow);
+      border-radius: 26px;
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      z-index: 1000;
+      overflow: hidden;
+      transition: left 0.3s ease;
+    }
+
+    .sidebar.hidden {
+      left: -270px;
+    }
+
+    .sidebar::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.12) 0%,
+        rgba(255,255,255,0.02) 35%,
+        rgba(255,255,255,0.01) 100%
+      );
+      pointer-events: none;
+    }
+
+    .sidebar-brand {
+      text-align: center;
+      padding-bottom: 26px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sidebar-brand img {
+      width: 105px;
+      filter: drop-shadow(0 0 14px rgba(255,204,187,0.2));
+    }
+
+    .coach-mini {
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.09);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      padding: 14px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+    }
+
+    .coach-mini h4 {
+      color: var(--primary-accent);
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .coach-mini p {
+      font-size: 0.76rem;
+      opacity: 0.72;
+      word-break: break-word;
+    }
+
+    .sidebar-nav {
+      flex-grow: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.72);
+      border-radius: 14px;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-item i {
+      width: 18px;
+      text-align: center;
+      color: var(--primary-accent);
+      font-size: 0.95rem;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(
+        135deg,
+        rgba(255,204,187,0.18),
+        rgba(255,255,255,0.06)
+      );
+      border: 1px solid rgba(255,210,194,0.16);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        0 0 18px rgba(255,181,156,0.10);
+    }
+
+    .nav-item:hover {
+      transform: translateX(2px);
+    }
+
+    /* MAIN */
+    .main-wrapper {
+      margin-left: calc(var(--sidebar-width) + 32px);
+      padding: 70px 34px 42px 34px;
+      width: calc(100% - var(--sidebar-width) - 32px);
+      transition: margin-left 0.3s ease, width 0.3s ease, padding 0.3s ease;
+    }
+
+    .main-wrapper.expanded {
+      margin-left: 0;
+      width: 100%;
+      padding: 70px 34px 42px 80px;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .back-link {
+      color: var(--primary-accent);
+      text-decoration: none;
+      opacity: 0.9;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .back-link:hover {
+      opacity: 1;
+      transform: translateX(-2px);
+    }
+
+    .athlete-header-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 28px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 34px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .profile-pic {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      border: 3px solid var(--primary-accent);
+      object-fit: cover;
+      background: rgba(255,210,194,0.1);
+      flex-shrink: 0;
+    }
+
+    .header-info h1 {
+      font-size: 2rem;
+      color: var(--primary-accent);
+      margin-bottom: 8px;
+      font-weight: 400;
+    }
+
+    .header-info p {
+      opacity: 0.75;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: rgba(141,211,161,0.15);
+      color: var(--success);
+      border: 1px solid rgba(141,211,161,0.25);
+      font-size: 0.75rem;
+      margin-top: 6px;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      color: var(--primary-accent);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 400;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 20px;
+    }
+
+    .data-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 22px;
+      padding: 22px;
+      transition: 0.25s;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .data-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary-accent);
+      background: var(--glass-strong);
+    }
+
+    .session-title {
+      color: var(--primary-accent);
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+      text-transform: capitalize;
+    }
+
+    .muted {
+      opacity: 0.72;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .feedback-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 10px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(141,211,161,0.13);
+      border: 1px solid rgba(141,211,161,0.22);
+      color: var(--success);
+      font-size: 0.78rem;
+    }
+
+    .feedback-chip.empty {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.65);
+    }
+
+    .feedback-preview {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.84rem;
+      line-height: 1.55;
+      opacity: 0.9;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .metric-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 15px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .metric-value {
+      color: var(--primary-accent);
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      opacity: 0.72;
+    }
+
+    .btn-small {
+      width: 100%;
+      padding: 11px 14px;
+      margin-top: 16px;
+      border-radius: 12px;
+      border: none;
+      background: var(--primary-accent);
+      color: #4B3A57;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.25s;
+      font-family: inherit;
+    }
+
+    .btn-small:hover {
+      transform: translateY(-2px);
+      opacity: 0.92;
+    }
+
+    .details-section {
+      margin-top: 42px;
+      display: none;
+    }
+
+    .details-section.active {
+      display: block;
+    }
+
+    .details-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 22px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .signal-box {
+      min-height: 180px;
+      background: rgba(0,0,0,0.18);
+      border: 1px dashed rgba(255,255,255,0.18);
+      border-radius: 18px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      opacity: 0.85;
+      margin-top: 14px;
+    }
+
+    .feedback-box {
+      margin-top: 22px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      background: rgba(0,0,0,0.20);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      color: white;
+      padding: 15px;
+      margin-top: 12px;
+      outline: none;
+      resize: vertical;
+      font-family: inherit;
+      line-height: 1.5;
+    }
+
+    textarea:focus {
+      border-color: var(--primary-accent);
+      box-shadow: 0 0 0 3px rgba(255,210,194,0.08);
+    }
+
+    .message {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    .success {
+      color: var(--success);
+    }
+
+    .error {
+      color: var(--danger);
+    }
+
+    .empty-state {
+      background: var(--glass);
+      border: 1px dashed var(--glass-border);
+      border-radius: 22px;
+      padding: 38px;
+      text-align: center;
+      opacity: 0.75;
+    }
+
+    .label-balanced {
+      color: var(--success);
+    }
+
+    .label-imbalanced {
+      color: var(--danger);
+    }
+
+    .saved-feedback-card {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(141,211,161,0.10);
+      border: 1px solid rgba(141,211,161,0.18);
+    }
+
+    .saved-feedback-card h4 {
+      color: var(--success);
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .saved-feedback-card p {
+      opacity: 0.9;
+      line-height: 1.6;
+      font-size: 0.88rem;
+    }
+
+    /* LOGOUT MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(20,14,24,0.58);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      width: min(560px, 92vw);
+      padding: 34px;
+      border-radius: 26px;
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.08) 0%,
+        rgba(255,255,255,0.05) 100%
+      );
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        var(--shadow-soft),
+        inset 0 1px 0 rgba(255,255,255,0.07);
+      backdrop-filter: blur(16px) saturate(135%);
+      -webkit-backdrop-filter: blur(16px) saturate(135%);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .modal-content::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.07) 0%,
+        transparent 42%
+      );
+      pointer-events: none;
+    }
+
+    .modal-content > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .modal-title {
+      color: var(--primary-accent);
+      margin-bottom: 16px;
+      font-size: 1.45rem;
+      font-weight: 600;
+    }
+
+    .modal-text {
+      opacity: 0.9;
+      line-height: 1.7;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .modal-btn {
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: inherit;
+      min-width: 130px;
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
+      color: #4B3A57;
+      box-shadow: 0 8px 18px rgba(255,181,156,0.20);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.16);
+    }
+
+    @media (max-width: 900px) {
+      .main-wrapper,
+      .main-wrapper.expanded {
+        width: 100%;
+        margin-left: 0;
+        padding: 80px 18px 32px;
+      }
+
+      .sidebar {
+        left: 0;
+      }
+
+      .sidebar.hidden {
+        left: -270px;
+      }
+
+      .athlete-header-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .metric-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .modal-actions {
+        flex-direction: column;
+      }
+
+      .modal-btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
+
 <body>
+  <div class="menu-btn active" id="menuBtn">
+    <i class="fas fa-bars"></i>
+  </div>
 
-    <aside class="sidebar">
-        <div style="text-align:center; margin-bottom: 30px;">
-            <img src="awtadlogo1.png" style="width: 90px;">
-        </div>
-        <nav>
-            <a href="coachawtad.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="MyAthletes.html" class="nav-item active"><i class="fas fa-users"></i> My Athletes</a>
-            <a href="coachschedule.html" class="nav-item"><i class="fas fa-calendar"></i> Schedule</a>
-        </nav>
-    </aside>
-
-    <main class="main-wrapper">
-        <div id="athleteHeader" class="athlete-header-card">
-            <p>Loading Athlete Profile...</p>
-        </div>
-
-        <div id="sessionsSection">
-            <h2 class="section-title"><i class="fas fa-history"></i> Training Sessions</h2>
-            <div id="sessionsGrid" class="grid-container">
-                </div>
-        </div>
-
-        <div id="repsSection" style="display:none; margin-top: 50px;">
-            <h2 class="section-title"><i class="fas fa-dumbbell"></i> Session Reps - <span id="activeSessionName"></span></h2>
-            <div id="repsGrid" class="grid-container">
-                </div>
-        </div>
-    </main>
-
-    <div id="repModal" class="modal">
-        <div class="modal-content">
-            <h3 id="modalRepLabel" style="color: var(--primary-accent); margin-bottom: 15px;">Rep Details</h3>
-            <div id="modalRepData" style="line-height: 1.8; opacity: 0.9;">
-                </div>
-            
-            <label style="display:block; margin-top:20px; font-size: 0.9rem; opacity: 0.7;">Coach Feedback</label>
-            <textarea id="coachFeedback" placeholder="Write your analysis here (e.g., 'Right side stronger')"></textarea>
-            
-            <div style="display:flex; gap:10px;">
-                <button class="btn-small" onclick="closeModal()" style="background: rgba(255,255,255,0.1); color: white;">Cancel</button>
-                <button class="btn-small" id="saveFeedbackBtn">Save Feedback</button>
-            </div>
-        </div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <img src="awtadlogo1.png" alt="AWTAD">
     </div>
 
-    <script>
-        const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
-        const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <div class="coach-mini">
+      <h4 id="coachNameSide">Coach</h4>
+      <p id="coachEmailSide">Loading...</p>
+    </div>
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const clientId = urlParams.get('id');
+    <nav class="sidebar-nav">
+      <a href="coachawtad.html" class="nav-item">
+        <i class="fas fa-th-large"></i>
+        <span class="nav-text">Dashboard</span>
+      </a>
 
-        async function init() {
-            if (!clientId) return alert("No athlete selected!");
-            
-            // # Load Athlete Info
-            const { data: athlete } = await supa.from('Client').select('*').eq('client_id', clientId).single();
-            if (athlete) renderAthleteHeader(athlete);
+      <a href="MyAthletes.html" class="nav-item active">
+        <i class="fas fa-users"></i>
+        <span class="nav-text">My Athletes</span>
+      </a>
 
-            // # Load Sessions
-            fetchSessions();
+      <a href="coachschedule.html" class="nav-item">
+        <i class="fas fa-calendar"></i>
+        <span class="nav-text">Schedule</span>
+      </a>
+
+      <a href="coach-profile.html" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span class="nav-text">Profile</span>
+      </a>
+    </nav>
+
+    <a href="#" id="logoutBtn" class="nav-item" style="margin-top:auto;">
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="nav-text">Logout</span>
+    </a>
+  </aside>
+
+  <main class="main-wrapper" id="mainWrapper">
+    <div class="top-actions">
+      <a href="MyAthletes.html" class="back-link">
+        <i class="fas fa-arrow-left"></i>
+        Back to My Athletes
+      </a>
+    </div>
+
+    <div id="athleteHeader" class="athlete-header-card">
+      <p>Loading athlete profile...</p>
+    </div>
+
+    <section id="sessionsSection">
+      <h2 class="section-title">
+        <i class="fas fa-history"></i>
+        Training Sessions
+      </h2>
+
+      <div id="sessionsGrid" class="grid-container">
+        <div class="empty-state">Loading sessions...</div>
+      </div>
+    </section>
+
+    <section id="sessionDetailsSection" class="details-section">
+      <h2 class="section-title">
+        <i class="fas fa-chart-line"></i>
+        Session Details
+      </h2>
+
+      <div class="details-card">
+        <h3 id="detailsTitle" class="session-title">Session</h3>
+        <p id="detailsSubtitle" class="muted"></p>
+
+        <div class="details-grid">
+          <div class="metric-box">
+            <div class="metric-value" id="detailsExercise">N/A</div>
+            <div class="metric-label">Exercise Type</div>
+          </div>
+
+          <div class="metric-box">
+            <div class="metric-value" id="detailsDuration">N/A</div>
+            <div class="metric-label">Duration</div>
+          </div>
+
+          <div class="metric-box">
+            <div class="metric-value" id="detailsSI">N/A</div>
+            <div class="metric-label">Symmetry Index</div>
+          </div>
+
+          <div class="metric-box">
+            <div class="metric-value" id="detailsDominant">N/A</div>
+            <div class="metric-label">Dominant Side</div>
+          </div>
+
+          <div class="metric-box">
+            <div class="metric-value" id="detailsLabel">N/A</div>
+            <div class="metric-label">Result Label</div>
+          </div>
+
+          <div class="metric-box">
+            <div class="metric-value" id="detailsFeedbackTime">N/A</div>
+            <div class="metric-label">Feedback Time</div>
+          </div>
+        </div>
+
+        <div id="savedFeedbackCard" class="saved-feedback-card" style="display:none;"></div>
+      </div>
+
+      <div class="details-card">
+        <h3 class="session-title">
+          <i class="fas fa-wave-square"></i>
+          Signal
+        </h3>
+
+        <div id="signalContainer" class="signal-box">
+          Signal preview will appear here if stored in Session.signal_preview.
+        </div>
+      </div>
+
+      <div class="details-card feedback-box">
+        <h3 class="session-title">
+          <i class="fas fa-comment-medical"></i>
+          Coach Feedback
+        </h3>
+
+        <p class="muted">
+          Write feedback for this session. The client will see it in My Coach with the session date, feedback time, exercise type, SI, dominant side, and result label.
+        </p>
+
+        <textarea id="coachFeedback" placeholder="Write your feedback here..."></textarea>
+
+        <button class="btn-small" id="saveFeedbackBtn">
+          Save Feedback
+        </button>
+
+        <p id="feedbackMessage" class="message"></p>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="logoutModal">
+    <div class="modal-content">
+      <h3 class="modal-title">Confirm Logout</h3>
+      <p class="modal-text">
+        Are you sure you want to log out? You'll need to log in again to access your account.
+      </p>
+
+      <div class="modal-actions">
+        <button class="modal-btn btn-secondary" id="cancelLogoutBtn">Cancel</button>
+        <button class="modal-btn btn-primary" id="confirmLogoutBtn">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
+    const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const clientId = urlParams.get("id");
+
+    let currentCoach = null;
+    let selectedSessionId = null;
+    let sessionsCache = [];
+
+    document.addEventListener("DOMContentLoaded", init);
+
+    async function init() {
+      setupSidebar();
+      setupLogoutModal();
+
+      if (!clientId) {
+        alert("No athlete selected.");
+        window.location.href = "MyAthletes.html";
+        return;
+      }
+
+      const { data: { user }, error: userError } = await supa.auth.getUser();
+
+      if (userError || !user) {
+        alert("Please login first.");
+        window.location.href = "loginawtad.html";
+        return;
+      }
+
+      await loadCoach(user.email);
+      await verifyCoachCanViewAthlete();
+      await loadAthleteInfo();
+      await fetchSessions();
+
+      document.getElementById("saveFeedbackBtn").addEventListener("click", saveFeedback);
+    }
+
+    function setupSidebar() {
+      const menuBtn = document.getElementById("menuBtn");
+      const sidebar = document.getElementById("sidebar");
+      const mainWrapper = document.getElementById("mainWrapper");
+
+      menuBtn.addEventListener("click", function () {
+        sidebar.classList.toggle("hidden");
+        mainWrapper.classList.toggle("expanded");
+        menuBtn.classList.toggle("active");
+      });
+    }
+
+    function setupLogoutModal() {
+      const logoutBtn = document.getElementById("logoutBtn");
+      const logoutModal = document.getElementById("logoutModal");
+      const cancelLogoutBtn = document.getElementById("cancelLogoutBtn");
+      const confirmLogoutBtn = document.getElementById("confirmLogoutBtn");
+
+      logoutBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        logoutModal.classList.add("active");
+      });
+
+      cancelLogoutBtn.addEventListener("click", function () {
+        logoutModal.classList.remove("active");
+      });
+
+      logoutModal.addEventListener("click", function (e) {
+        if (e.target === logoutModal) {
+          logoutModal.classList.remove("active");
+        }
+      });
+
+      confirmLogoutBtn.addEventListener("click", async function () {
+        confirmLogoutBtn.disabled = true;
+        confirmLogoutBtn.textContent = "Logging out...";
+
+        const { error } = await supa.auth.signOut();
+
+        if (error) {
+          alert("Logout failed: " + error.message);
+          confirmLogoutBtn.disabled = false;
+          confirmLogoutBtn.textContent = "Logout";
+          return;
         }
 
-        function renderAthleteHeader(ath) {
-            const initials = `${ath.Fname[0]}${ath.Lname[0]}`;
-            const profilePic = ath.profile_pic_url || `https://ui-avatars.com/api/?name=${initials}&background=ffd2c2&color=4B3A57`;
-            
-            document.getElementById('athleteHeader').innerHTML = `
-                <img src="${profilePic}" class="profile-pic">
-                <div class="header-info">
-                    <h1>${ath.Fname} ${ath.Lname}</h1>
-                    <p><i class="fas fa-envelope"></i> ${ath.email}</p>
-                    <p><i class="fas fa-phone"></i> ${ath.Phone_Number || 'N/A'}</p>
-                    <span class="status-badge">Connected</span>
+        window.location.href = "loginawtad.html";
+      });
+    }
+
+    async function loadCoach(email) {
+      const { data: coach, error } = await supa
+        .from("Coach")
+        .select("*")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (error || !coach) {
+        alert("Coach profile was not found.");
+        window.location.href = "loginawtad.html";
+        return;
+      }
+
+      currentCoach = coach;
+
+      document.getElementById("coachNameSide").textContent =
+        `${coach.Fname || ""} ${coach.Lname || ""}`.trim() || "Coach";
+
+      document.getElementById("coachEmailSide").textContent = coach.email || "";
+    }
+
+    async function verifyCoachCanViewAthlete() {
+      const { data: relationship, error } = await supa
+        .from("Client_Coach_Relationship")
+        .select("request_id")
+        .eq("client_id", clientId)
+        .eq("coach_id", currentCoach.coach_id)
+        .eq("status", "accepted")
+        .maybeSingle();
+
+      if (error || !relationship) {
+        alert("You are not allowed to view this athlete.");
+        window.location.href = "MyAthletes.html";
+      }
+    }
+
+    async function loadAthleteInfo() {
+      const { data: athlete, error } = await supa
+        .from("Client")
+        .select("*")
+        .eq("client_id", clientId)
+        .single();
+
+      if (error || !athlete) {
+        document.getElementById("athleteHeader").innerHTML =
+          "<p>Failed to load athlete profile.</p>";
+        return;
+      }
+
+      renderAthleteHeader(athlete);
+    }
+
+    function renderAthleteHeader(ath) {
+      const first = ath.Fname || "";
+      const last = ath.Lname || "";
+      const fullName = `${first} ${last}`.trim() || "Athlete";
+      const initials = `${first.charAt(0)}${last.charAt(0)}` || "A";
+
+      const profilePic = ath.profile_pic_url
+        ? ath.profile_pic_url
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=ffd2c2&color=4B3A57`;
+
+      document.getElementById("athleteHeader").innerHTML = `
+        <img src="${profilePic}" class="profile-pic" alt="Athlete profile picture">
+
+        <div class="header-info">
+          <h1>${fullName}</h1>
+          <p><i class="fas fa-envelope"></i> ${ath.email || "N/A"}</p>
+          <p><i class="fas fa-phone"></i> ${ath.Phone_Number || "N/A"}</p>
+          <span class="status-badge">Connected Athlete</span>
+        </div>
+      `;
+    }
+
+    async function fetchSessions() {
+      const grid = document.getElementById("sessionsGrid");
+
+      const { data: sessions, error } = await supa
+        .from("Session")
+        .select(`
+          session_id,
+          exercise_type,
+          session_date,
+          duration_sec,
+          client_id,
+          coach_feedback,
+          coach_feedback_at,
+          signal_preview,
+          Reps (
+            reps_id,
+            label,
+            symmetry_index,
+            dominant_side,
+            session_id
+          )
+        `)
+        .eq("client_id", clientId)
+        .order("session_date", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        grid.innerHTML = `
+          <div class="empty-state">
+            Failed to load sessions. If the error mentions coach_feedback_at, add the column to the Session table.
+          </div>
+        `;
+        return;
+      }
+
+      sessionsCache = sessions || [];
+
+      if (!sessionsCache.length) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            No sessions recorded yet.
+          </div>
+        `;
+        return;
+      }
+
+      renderSessions(sessionsCache);
+    }
+
+    function renderSessions(sessions) {
+      const grid = document.getElementById("sessionsGrid");
+
+      grid.innerHTML = sessions.map(session => {
+        const rep = session.Reps && session.Reps.length > 0 ? session.Reps[0] : null;
+
+        const si = rep && rep.symmetry_index !== null && rep.symmetry_index !== undefined
+          ? Number(rep.symmetry_index).toFixed(2) + "%"
+          : "N/A";
+
+        const dominantSide = rep?.dominant_side || "N/A";
+        const label = rep?.label || "N/A";
+        const labelClass = label.toLowerCase() === "balanced" ? "label-balanced" : "label-imbalanced";
+
+        const hasFeedback = session.coach_feedback && session.coach_feedback.trim() !== "";
+
+        const feedbackPreview = hasFeedback
+          ? session.coach_feedback.length > 90
+            ? session.coach_feedback.substring(0, 90) + "..."
+            : session.coach_feedback
+          : "";
+
+        const feedbackTime = session.coach_feedback_at
+          ? formatDateTime(session.coach_feedback_at)
+          : "No feedback time";
+
+        return `
+          <div class="data-card">
+            <h3 class="session-title">
+              ${session.exercise_type || "Session Analysis"}
+            </h3>
+
+            <p class="muted">
+              <i class="fas fa-calendar"></i>
+              Session: ${formatDateTime(session.session_date)}
+            </p>
+
+            <p class="muted">
+              <i class="fas fa-fingerprint"></i>
+              Session ID: ${shortId(session.session_id)}
+            </p>
+
+            <p class="muted">
+              <i class="fas fa-clock"></i>
+              Duration: ${formatDuration(session.duration_sec)}
+            </p>
+
+            <div class="metric-row">
+              <div class="metric-box">
+                <div class="metric-value">${si}</div>
+                <div class="metric-label">Symmetry Index</div>
+              </div>
+
+              <div class="metric-box">
+                <div class="metric-value">${dominantSide}</div>
+                <div class="metric-label">Dominant Side</div>
+              </div>
+            </div>
+
+            <div class="metric-row">
+              <div class="metric-box">
+                <div class="metric-value ${labelClass}">${label}</div>
+                <div class="metric-label">Label</div>
+              </div>
+
+              <div class="metric-box">
+                <div class="metric-value">
+                  ${hasFeedback ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-minus-circle"></i>'}
                 </div>
-            `;
-        }
-
-        async function fetchSessions() {
-            const { data: sessions, error } = await supa.from('Session').select('*').eq('client_id', clientId).order('session_date', {ascending: false});
-            const grid = document.getElementById('sessionsGrid');
-            
-            if (sessions.length === 0) {
-                grid.innerHTML = "<p style='opacity:0.5;'>No sessions recorded yet.</p>";
-                return;
-            }
-
-            grid.innerHTML = sessions.map(s => `
-                <div class="data-card">
-                    <h3 style="color:var(--primary-accent);">${s.exercise_type}</h3>
-                    <p style="font-size:0.85rem; opacity:0.7; margin-top:5px;">${new Date(s.session_date).toLocaleDateString()}</p>
-                    <p style="font-size:0.85rem; opacity:0.7;">Duration: ${s.duration_sec}s</p>
-                    <button class="btn-small" onclick="viewReps('${s.session_id}', '${s.exercise_type}')">View Reps</button>
+                <div class="metric-label">
+                  ${hasFeedback ? "Feedback Saved" : "No Feedback"}
                 </div>
-            `).join('');
+              </div>
+            </div>
+
+            <div class="feedback-chip ${hasFeedback ? "" : "empty"}">
+              <i class="fas ${hasFeedback ? "fa-comment" : "fa-comment-slash"}"></i>
+              ${hasFeedback ? `Saved: ${feedbackTime}` : "No feedback saved yet"}
+            </div>
+
+            ${hasFeedback ? `<div class="feedback-preview">${feedbackPreview}</div>` : ""}
+
+            <button class="btn-small" onclick="openSessionDetails('${session.session_id}')">
+              ${hasFeedback ? "View / Edit Feedback" : "View Session Details"}
+            </button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function openSessionDetails(sessionId) {
+      selectedSessionId = sessionId;
+
+      const session = sessionsCache.find(s => s.session_id === sessionId);
+
+      if (!session) {
+        alert("Session not found.");
+        return;
+      }
+
+      const rep = session.Reps && session.Reps.length > 0 ? session.Reps[0] : null;
+
+      document.getElementById("detailsTitle").textContent =
+        `${session.exercise_type || "Session"} Details`;
+
+      document.getElementById("detailsSubtitle").textContent =
+        `Session Date: ${formatDateTime(session.session_date)} | Session ID: ${shortId(session.session_id)}`;
+
+      document.getElementById("detailsExercise").textContent =
+        session.exercise_type || "N/A";
+
+      document.getElementById("detailsDuration").textContent =
+        formatDuration(session.duration_sec);
+
+      document.getElementById("detailsSI").textContent =
+        rep && rep.symmetry_index !== null && rep.symmetry_index !== undefined
+          ? Number(rep.symmetry_index).toFixed(2) + "%"
+          : "N/A";
+
+      document.getElementById("detailsDominant").textContent =
+        rep?.dominant_side || "N/A";
+
+      document.getElementById("detailsLabel").textContent =
+        rep?.label || "N/A";
+
+      document.getElementById("detailsFeedbackTime").textContent =
+        session.coach_feedback_at ? formatDateTime(session.coach_feedback_at) : "Not saved yet";
+
+      document.getElementById("coachFeedback").value =
+        session.coach_feedback || "";
+
+      renderSavedFeedbackCard(session);
+      renderSignalPreview(session.signal_preview);
+
+      document.getElementById("feedbackMessage").textContent = "";
+      document.getElementById("feedbackMessage").className = "message";
+
+      const detailsSection = document.getElementById("sessionDetailsSection");
+      detailsSection.classList.add("active");
+      detailsSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function renderSavedFeedbackCard(session) {
+      const card = document.getElementById("savedFeedbackCard");
+
+      if (!session.coach_feedback || session.coach_feedback.trim() === "") {
+        card.style.display = "none";
+        card.innerHTML = "";
+        return;
+      }
+
+      card.style.display = "block";
+      card.innerHTML = `
+        <h4><i class="fas fa-check-circle"></i> Feedback already saved for this session</h4>
+        <p><strong>Saved at:</strong> ${session.coach_feedback_at ? formatDateTime(session.coach_feedback_at) : "Time not saved"}</p>
+        <p><strong>Session ID:</strong> ${shortId(session.session_id)}</p>
+        <p><strong>Feedback:</strong> ${session.coach_feedback}</p>
+      `;
+    }
+
+    function renderSignalPreview(signalPreview) {
+      const signalContainer = document.getElementById("signalContainer");
+
+      if (!signalPreview) {
+        signalContainer.innerHTML = `
+          <div>
+            <i class="fas fa-wave-square" style="font-size:2rem; color:var(--primary-accent); margin-bottom:12px;"></i>
+            <p>No signal preview is saved for this session.</p>
+          </div>
+        `;
+        return;
+      }
+
+      let previewText = "";
+
+      try {
+        if (Array.isArray(signalPreview)) {
+          previewText = `${signalPreview.length} signal preview points saved.`;
+        } else if (typeof signalPreview === "object") {
+          const keys = Object.keys(signalPreview);
+          previewText = `Signal preview saved as JSON. Keys: ${keys.join(", ")}`;
+        } else {
+          previewText = "Signal preview is saved.";
         }
+      } catch {
+        previewText = "Signal preview is saved.";
+      }
 
-        async function viewReps(sessionId, type) {
-            document.getElementById('repsSection').style.display = 'block';
-            document.getElementById('activeSessionName').innerText = type;
-            
-            const { data: reps } = await supa.from('Reps').select('*').eq('session_id', sessionId);
-            const grid = document.getElementById('repsGrid');
+      signalContainer.innerHTML = `
+        <div>
+          <i class="fas fa-wave-square" style="font-size:2rem; color:var(--primary-accent); margin-bottom:12px;"></i>
+          <p>${previewText}</p>
+          <p style="font-size:0.85rem; opacity:0.7; margin-top:8px;">
+            The detailed signal preview can be displayed as a chart later if needed.
+          </p>
+        </div>
+      `;
+    }
 
-            grid.innerHTML = reps.map(r => `
-                <div class="data-card">
-                    <h4 style="color:var(--primary-accent);">${r.label}</h4>
-                    <p>Symmetry: ${(r.symmetry_index * 100).toFixed(1)}%</p>
-                    <p>Dominant: ${r.dominant_side}</p>
-                    <button class="btn-small" onclick="openRepDetail('${r.reps_id}')">View Result</button>
-                </div>
-            `).join('');
+    async function saveFeedback() {
+      const feedbackText = document.getElementById("coachFeedback").value.trim();
+      const message = document.getElementById("feedbackMessage");
 
-            // Scroll down to reps
-            document.getElementById('repsSection').scrollIntoView({ behavior: 'smooth' });
-        }
+      if (!selectedSessionId) {
+        message.textContent = "Please select a session first.";
+        message.className = "message error";
+        return;
+      }
 
-        async function openRepDetail(repId) {
-            const { data: rep } = await supa.from('Reps').select('*').eq('reps_id', repId).single();
-            const modal = document.getElementById('repModal');
-            
-            document.getElementById('modalRepLabel').innerText = `Analysis: ${rep.label}`;
-            document.getElementById('modalRepData').innerHTML = `
-                <p><strong>Symmetry Index:</strong> ${(rep.symmetry_index * 100).toFixed(2)}%</p>
-                <p><strong>Dominant Side:</strong> ${rep.dominant_side}</p>
-                <p><strong>Performance:</strong> ${rep.symmetry_index > 0.9 ? 'Excellent Balance' : 'Imbalance Detected'}</p>
-            `;
-            
-            // Load existing feedback if any
-            document.getElementById('coachFeedback').value = rep.feedback || "";
-            
-            // Setup save button
-            document.getElementById('saveFeedbackBtn').onclick = () => saveFeedback(repId);
-            
-            modal.classList.add('active');
-        }
+      if (!feedbackText) {
+        message.textContent = "Please write feedback before saving.";
+        message.className = "message error";
+        return;
+      }
 
-        async function saveFeedback(repId) {
-            const feedbackText = document.getElementById('coachFeedback').value;
-            const { error } = await supa.from('Reps').update({ feedback: feedbackText }).eq('reps_id', repId);
+      const feedbackTime = new Date().toISOString();
 
-            if (!error) {
-                alert("Feedback saved!");
-                closeModal();
-                // Refresh list to show data is updated
-                const activeSession = document.getElementById('activeSessionName').innerText;
-                // find current session id from any visible rep card or just re-run last viewReps (simplified here)
-            } else {
-                alert("Error saving feedback");
-            }
-        }
+      const { data, error } = await supa
+        .from("Session")
+        .update({
+          coach_feedback: feedbackText,
+          coach_feedback_at: feedbackTime
+        })
+        .eq("session_id", selectedSessionId)
+        .eq("client_id", clientId)
+        .select(`
+          session_id,
+          exercise_type,
+          session_date,
+          duration_sec,
+          client_id,
+          coach_feedback,
+          coach_feedback_at,
+          signal_preview,
+          Reps (
+            reps_id,
+            label,
+            symmetry_index,
+            dominant_side,
+            session_id
+          )
+        `)
+        .single();
 
-        function closeModal() {
-            document.getElementById('repModal').classList.remove('active');
-        }
+      if (error) {
+        console.error(error);
+        message.textContent = "Failed to save feedback: " + error.message;
+        message.className = "message error";
+        return;
+      }
 
-        window.onload = init;
-    </script>
+      const index = sessionsCache.findIndex(s => s.session_id === selectedSessionId);
+
+      if (index !== -1) {
+        sessionsCache[index] = data;
+      }
+
+      renderSessions(sessionsCache);
+      openSessionDetails(selectedSessionId);
+
+      const refreshedMessage = document.getElementById("feedbackMessage");
+      refreshedMessage.textContent = "Feedback saved successfully. The client can now see it in My Coach with the timestamp and session details.";
+      refreshedMessage.className = "message success";
+    }
+
+    function formatDateTime(dateString) {
+      if (!dateString) return "N/A";
+
+      const date = new Date(dateString);
+
+      if (isNaN(date.getTime())) return "N/A";
+
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+
+    function formatDuration(seconds) {
+      if (seconds === null || seconds === undefined || isNaN(seconds)) {
+        return "N/A";
+      }
+
+      return `${seconds} sec`;
+    }
+
+    function shortId(id) {
+      if (!id) return "N/A";
+      return id.slice(0, 8);
+    }
+  </script>
 </body>
 </html>
