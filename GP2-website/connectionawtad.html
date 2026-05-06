@@ -897,6 +897,44 @@
   font-weight: 500;
 }
 }
+.feedback-box {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 24px;
+  padding: 28px;
+  margin-top: 24px;
+  backdrop-filter: blur(16px);
+}
+
+.feedback-box textarea {
+  width: 100%;
+  min-height: 140px;
+  background: rgba(0, 0, 0, 0.20);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  color: white;
+  padding: 16px;
+  margin-top: 14px;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.feedback-box textarea::placeholder {
+  color: rgba(255,255,255,0.45);
+}
+
+.feedback-box textarea:focus {
+  border-color: #ffd2c2;
+  box-shadow: 0 0 0 3px rgba(255, 210, 194, 0.10);
+}
+
+.feedback-box .message {
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
   </style>
 </head>
 <body>
@@ -909,39 +947,39 @@
     <i class="fas fa-bars"></i>
   </div>
 
-  <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <img src="awtadlogo1.png" alt="AWTAD">
     </div>
 
-    <div class="user-mini-card">
-      <h4 id="sidebarUserName">....</h4>
-      <p>Performance Dashboard</p>
+    <div class="coach-profile-mini">
+      <h4 id="coachNameSide">Loading...</h4>
+      <p id="coachEmailSide">—</p>
     </div>
 
     <nav class="sidebar-nav">
-      <a href="userawtad.html" class="nav-item">
+      <a href="coachawtad.html" class="nav-item">
         <i class="fas fa-th-large"></i>
         <span class="nav-text">Dashboard</span>
       </a>
 
-      <a href="FindCoach.html" class="nav-item">
-        <i class="fas fa-user-tie"></i>
-        <span class="nav-text">Find a Coach</span>
+      <a href="MyAthletes.html" class="nav-item active">
+        <i class="fas fa-users"></i>
+        <span class="nav-text">My Athletes</span>
       </a>
 
-      <a href="sessionsawtad.html" class="nav-item active">
+      <a href="coachschedule.html" class="nav-item">
         <i class="fas fa-calendar"></i>
-        <span class="nav-text">Sessions</span>
+        <span class="nav-text">Schedule</span>
       </a>
 
-      <a href="profileawtad.html" class="nav-item">
-        <i class="fas fa-user"></i>
-        <span class="nav-text">Profile</span>
-      </a>
+ <a href="coach-profile.html" class="nav-item">
+  <i class="fas fa-user"></i>
+  <span class="nav-text">Profile</span>
+</a>
     </nav>
 
-    <a href="#" class="nav-item">
+    <a href="loginawtad.html" id="logoutBtn" class="nav-item" style="margin-top: auto;">
       <i class="fas fa-sign-out-alt"></i>
       <span class="nav-text">Logout</span>
     </a>
@@ -955,7 +993,7 @@
       </p>
 
       <div class="action-buttons">
-        <button class="action-btn" id="backBtn" onclick="window.location.href='startsesstionawtad.html'">
+        <button class="action-btn" id="backBtn" onclick="window.location.href='startsesstionawtad.html?client_id=' + new URLSearchParams(window.location.search).get('client_id')">
           <i class="fas fa-arrow-left"></i>
           Back to Selection
         </button>
@@ -1124,6 +1162,24 @@
     </div>
   </div>
 </div>
+<div id="feedbackBox" class="feedback-box" style="display:none; margin-top:24px;">
+  <h3 class="session-title">
+    <i class="fas fa-comment-medical"></i>
+    Coach Feedback
+  </h3>
+
+  <p class="muted">
+    Write feedback for this session. The athlete will see it later.
+  </p>
+
+  <textarea id="coachFeedback" placeholder="Write your feedback here..."></textarea>
+
+  <button class="action-btn primary" id="saveFeedbackBtn" style="width:100%; margin-top:14px;">
+    Save Feedback
+  </button>
+
+  <p id="feedbackMessage" class="message"></p>
+</div>
     </section>
 
     <footer>
@@ -1133,7 +1189,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const API_BASE = "http://127.0.0.1:8000";
+    const API_BASE = "https://boondocks-arise-greedy.ngrok-free.dev";
 
     async function apiPost(endpoint, body = null) {
       const options = {
@@ -1210,10 +1266,12 @@ async function saveSignalPreviewToSession(clientId, rawPlot) {
     let isConnected = false;
     let isSessionActive = false;
     let animationId;
+    let latestSessionId = null;
 
     const urlParams = new URLSearchParams(window.location.search);
     const exercise = urlParams.get('exercise') || 'squat';
-
+    const selectedClientId = urlParams.get('client_id');
+    console.log("Selected athlete client_id:", selectedClientId);
     const exerciseData = {
       squat: {
         name: 'Squat Analysis',
@@ -1379,18 +1437,32 @@ async function saveSignalPreviewToSession(clientId, rawPlot) {
         try {
           const { data: { user } } = await window.supabase.auth.getUser();
 
-          if (!user) {
-            throw new Error("No logged-in user found.");
-          }
+if (!user) {
+  throw new Error("No logged-in user found.");
+}
 
-          const result = await apiPost("/stop-session-and-analyze", {
-            client_id: user.id,
-            exercise_type: "Squat"
-          });
+
+
+const clientIdToSave = new URLSearchParams(window.location.search).get("client_id");
+const result = await apiPost("/stop-session-and-analyze", {
+    client_id: selectedClientId,
+    exercise_type: "Squat"
+});
+const { data: latestSession, error: latestSessionError } = await window.supabase
+  .from("Session")
+  .select("session_id")
+  .eq("client_id", clientIdToSave)
+  .order("session_date", { ascending: false })
+  .limit(1)
+  .single();
+
+if (!latestSessionError && latestSession) {
+  latestSessionId = latestSession.session_id;
+}
           console.log("Analysis result from backend:", result);
 
           if (result.raw_plot) {
-            const signalSaved = await saveSignalPreviewToSession(user.id, result.raw_plot);
+            const signalSaved = await saveSignalPreviewToSession(clientIdToSave, result.raw_plot);
 
             if (!signalSaved) {
               showMessage("Session analyzed, but signal preview was not saved.");
@@ -1409,6 +1481,7 @@ async function saveSignalPreviewToSession(clientId, rawPlot) {
           statusText.textContent = 'Session Stopped - Analysis complete';
 
           resultCard.style.display = 'block';
+          document.getElementById("feedbackBox").style.display = "block";
 
           const leftValueEl = document.getElementById('leftValue');
           const rightValueEl = document.getElementById('rightValue');
@@ -1628,8 +1701,55 @@ async function saveSignalPreviewToSession(clientId, rawPlot) {
       }
       ctx.stroke();
     }
+    
   });
+document.getElementById("saveFeedbackBtn").addEventListener("click", async function () {
 
+  const clientId = new URLSearchParams(window.location.search).get("client_id");
+
+  const feedbackText = document.getElementById("coachFeedback").value.trim();
+  const message = document.getElementById("feedbackMessage");
+
+  if (!feedbackText) {
+    message.textContent = "Please write feedback before saving.";
+    message.className = "message error";
+    return;
+  }
+
+  const { data: latestSession, error: latestSessionError } = await window.supabase
+    .from("Session")
+    .select("session_id")
+    .eq("client_id", clientId)
+    .order("session_date", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (latestSessionError || !latestSession) {
+    console.error(latestSessionError);
+    message.textContent = "No session found to save feedback.";
+    message.className = "message error";
+    return;
+  }
+
+  const { error } = await window.supabase
+    .from("Session")
+    .update({
+      coach_feedback: feedbackText,
+      coach_feedback_at: new Date().toISOString()
+    })
+    .eq("session_id", latestSession.session_id)
+    .eq("client_id", clientId);
+
+  if (error) {
+    console.error(error);
+    message.textContent = "Failed to save feedback: " + error.message;
+    message.className = "message error";
+    return;
+  }
+
+  message.textContent = "Feedback saved successfully.";
+  message.className = "message success";
+});
   document.addEventListener("DOMContentLoaded", async function() {
     try {
       const supa = window.supabase;
@@ -1644,7 +1764,7 @@ async function saveSignalPreviewToSession(clientId, rawPlot) {
       const { data: client, error: clientError } = await supa
         .from("Client")
         .select("Fname")
-        .eq("client_id", user.id)
+        .eq("client_id", new URLSearchParams(window.location.search).get('client_id') || user.id)
         .single();
 
       if (clientError) {

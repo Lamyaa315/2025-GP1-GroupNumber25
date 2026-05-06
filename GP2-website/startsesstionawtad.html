@@ -622,44 +622,43 @@
     <i class="fas fa-bars"></i>
   </div>
 
-  <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <img src="awtadlogo1.png" alt="AWTAD">
     </div>
 
-    <div class="user-mini-card">
-      <h4 id="sidebarUserName">....</h4>
-      <p>Performance Dashboard</p>
+    <div class="coach-profile-mini">
+      <h4 id="sidebarUserName">Loading...</h4>
+      <p id="coachEmailSide"></p>
     </div>
 
     <nav class="sidebar-nav">
-      <a href="userawtad.html" class="nav-item">
+      <a href="coachawtad.html" class="nav-item">
         <i class="fas fa-th-large"></i>
         <span class="nav-text">Dashboard</span>
       </a>
 
-      <a href="FindCoach.html" class="nav-item">
-        <i class="fas fa-user-tie"></i>
-        <span class="nav-text">My Coach</span>
+      <a href="MyAthletes.html" class="nav-item active">
+        <i class="fas fa-users"></i>
+        <span class="nav-text">My Athletes</span>
       </a>
 
-      <a href="sesstionsawtad.html" class="nav-item active">
+      <a href="coachschedule.html" class="nav-item">
         <i class="fas fa-calendar"></i>
-        <span class="nav-text">Sessions</span>
+        <span class="nav-text">Schedule</span>
       </a>
 
-      <a href="profileawtad.html" class="nav-item">
-        <i class="fas fa-user"></i>
-        <span class="nav-text">Profile</span>
-      </a>
+ <a href="coach-profile.html" class="nav-item">
+  <i class="fas fa-user"></i>
+  <span class="nav-text">Profile</span>
+</a>
     </nav>
 
-    <a href="#" id="logoutBtn" class="nav-item">
+    <a href="loginawtad.html" id="logoutBtn" class="nav-item" style="margin-top: auto;">
       <i class="fas fa-sign-out-alt"></i>
       <span class="nav-text">Logout</span>
     </a>
   </aside>
-
   <main class="main-content" id="mainContent">
     <section class="dashboard-header">
       <h1 class="dashboard-title">Start New Session</h1>
@@ -768,6 +767,8 @@
   </main>
 
   <script>
+    const pageParams = new URLSearchParams(window.location.search);
+    const selectedClientId = pageParams.get("client_id");
     document.addEventListener('DOMContentLoaded', function () {
       const menuBtn = document.getElementById('menuBtn');
       const sidebar = document.getElementById('sidebar');
@@ -781,6 +782,8 @@
       const proceedSessionBtn = document.getElementById('proceedSessionBtn');
 
       let selectedExercise = null;
+      const params = new URLSearchParams(window.location.search);
+      //const selectedClientId = params.get("client_id");
 
       const exerciseData = {
         squat: {
@@ -851,48 +854,66 @@
 
       proceedSessionBtn.addEventListener('click', function () {
         if (!selectedExercise) return;
-        window.location.href = `connectionawtad.html?exercise=${selectedExercise}`;
+        window.location.href = `connectionawtad.html?exercise=${selectedExercise}&client_id=${selectedClientId}`;
       });
     });
     document.addEventListener("DOMContentLoaded", async function () {
   try {
     const supa = window.supabase;
 
-    // جيب المستخدم الحالي
-    const { data: { user }, error: userError } = await supa.auth.getUser();
+    const {
+      data: { user },
+      error: userError
+    } = await supa.auth.getUser();
 
     if (userError || !user) {
-      console.error("No logged-in user found");
+      console.error("No logged-in coach found");
       return;
     }
 
-    // جيب الاسم الأول من جدول Client
-    const { data: client, error: clientError } = await supa
-      .from("Client")
-      .select("Fname")
-      .eq("client_id", user.id)
+    const { data: coach, error: coachError } = await supa
+      .from("Coach")
+      .select("Fname, email")
+      .eq("email", user.email)
       .single();
 
-    if (clientError) {
-      console.error("Error fetching client name:", clientError.message);
+    if (coachError || !coach) {
+      console.error("Error fetching coach:", coachError?.message);
       return;
     }
 
-    // حط الاسم في الـ Welcome
-    const welcomeName = document.getElementById("welcomeName");
-    if (welcomeName) {
-      welcomeName.textContent = client.Fname || "User";
-    }
+    document.getElementById("sidebarUserName").textContent =
+      coach.Fname || "Coach";
 
-    // حط الاسم في الـ Sidebar
-    const sidebarUserName = document.getElementById("sidebarUserName");
-    if (sidebarUserName) {
-      sidebarUserName.textContent = client.Fname || "User";
-    }
+    document.getElementById("sidebarCoachEmail").textContent =
+      coach.email || "";
 
   } catch (err) {
-    console.error("Unexpected error:", err);
+    console.error(err);
   }
+});
+document.addEventListener("DOMContentLoaded", async function () {
+  const { data: { user }, error: userError } = await window.supabase.auth.getUser();
+
+  console.log("Logged user:", user?.email);
+
+  if (userError || !user) return;
+
+  const { data: coach, error: coachError } = await window.supabase
+    .from("Coach")
+    .select("Fname,Lname,email")
+    .eq("email", user.email)
+    .maybeSingle();
+
+  console.log("Coach data:", coach, coachError);
+
+  if (!coach) return;
+
+  document.getElementById("sidebarUserName").textContent =
+    `${coach.Fname || ""} ${coach.Lname || ""}`.trim() || "Coach";
+
+  document.getElementById("sidebarCoachEmail").textContent =
+    coach.email || "";
 });
   </script>
 </body>

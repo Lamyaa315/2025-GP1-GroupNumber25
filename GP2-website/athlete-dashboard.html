@@ -845,7 +845,7 @@
     const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const urlParams = new URLSearchParams(window.location.search);
-    const clientId = urlParams.get("id");
+    const clientId = urlParams.get("client_id");
 
     let currentCoach = null;
     let selectedSessionId = null;

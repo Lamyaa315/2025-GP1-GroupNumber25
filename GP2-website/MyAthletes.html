@@ -583,7 +583,14 @@
               <div><i class="fas fa-phone"></i> ${ath.Phone_Number || 'Not provided'}</div>
             </div>
 
-            <a href="athlete-dashboard.html?id=${ath.client_id}" class="btn-action">View Profile</a>
+            <a href="athlete-dashboard.html?client_id=${ath.client_id}" class="btn-action">
+              View Athlete Dashboard</a>
+
+          <a href="startsesstionawtad.html?client_id=${ath.client_id}" class="btn-action" style="margin-top:10px;">
+
+            Start Session
+
+          </a>
           </div>
         `;
       });
