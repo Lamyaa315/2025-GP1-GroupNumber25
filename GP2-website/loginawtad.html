@@ -572,7 +572,7 @@
       forgotPasswordBtn.textContent = "Sending...";
 
       try {
-        const redirectUrl = window.location.origin + "/GP2-website/reset-password.html";
+       const redirectUrl = "https://awtad.netlify.app/reset-password.html";
 
         const { error } = await window.supabase.auth.resetPasswordForEmail(email, {
           redirectTo: redirectUrl
