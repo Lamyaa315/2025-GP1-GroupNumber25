@@ -1411,7 +1411,15 @@ async function saveSignalPreviewToSession(clientId, rawPlot) {
 
       if (!isSessionActive) {
         try {
-          const res = await apiPost("/start-session");
+         const res = await apiPost("/start-session", {
+  client_id: selectedClientId,
+  exercise_type: "Squat"
+});
+
+if (res.error_type) {
+  showMessage(res.error_message || "Could not start session.");
+  return;
+}
 
           if (res.error_type) {
             throw new Error(res.error_message || "Start failed");
