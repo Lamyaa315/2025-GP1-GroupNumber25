@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWTAD - Upload Signal</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <link rel="stylesheet" href="modes.css">
+
+  <style>
+    :root {
+      --sidebar-width: 220px;
+      --primary-accent: #ffd2c2;
+      --primary-strong: #ffb59c;
+      --bg-dark: #4B3A57;
+      --card-bg: rgba(255,255,255,0.07);
+      --glass-border: rgba(255,255,255,0.14);
+      --shadow-soft: 0 10px 30px rgba(0,0,0,0.22);
+      --success: #8dd3a1;
+      --danger: #ff6b6b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: white;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 25%, rgba(255,182,163,0.30), transparent 42%),
+        radial-gradient(circle at 85% 75%, rgba(255,209,179,0.22), transparent 48%),
+        radial-gradient(circle at 55% 45%, rgba(255,160,140,0.10), transparent 50%);
+      z-index: -2;
+    }
+
+    .menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 15px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .menu-btn i {
+      color: var(--primary-accent);
+      font-size: 1.5rem;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      height: calc(100vh - 24px);
+      margin: 12px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding: 22px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid var(--glass-border);
+      border-radius: 26px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(22px);
+      transition: left 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar.hidden { left: -270px; }
+
+    .sidebar-brand {
+      text-align: center;
+      padding-bottom: 26px;
+    }
+
+    .sidebar-brand img {
+      width: 105px;
+    }
+
+    .user-mini-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.09);
+      padding: 14px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+    }
+
+    .user-mini-card h4 {
+      color: var(--primary-accent);
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+    }
+
+    .user-mini-card p {
+      font-size: 0.76rem;
+      opacity: 0.72;
+    }
+
+    .sidebar-nav {
+      flex-grow: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      color: rgba(255,255,255,0.72);
+      text-decoration: none;
+      border-radius: 14px;
+      transition: 0.25s;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: white;
+      background: rgba(255,204,187,0.15);
+    }
+
+    .nav-item i {
+      color: var(--primary-accent);
+      width: 18px;
+      text-align: center;
+    }
+
+    .main-content {
+      margin-left: calc(var(--sidebar-width) + 32px);
+      padding: 70px 34px 42px;
+      transition: 0.3s;
+    }
+
+    .main-content.expanded {
+      margin-left: 0;
+      padding-left: 80px;
+    }
+
+    .welcome-title {
+      font-size: 2.35rem;
+      font-weight: 300;
+      margin-bottom: 8px;
+    }
+
+    .welcome-subtitle {
+      opacity: 0.76;
+      line-height: 1.7;
+      max-width: 850px;
+    }
+
+    .card {
+      margin-top: 28px;
+      padding: 28px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.05));
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(16px);
+    }
+
+    .section-title {
+      color: var(--primary-accent);
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin-bottom: 18px;
+    }
+
+    .upload-box {
+      border: 2px dashed rgba(255,210,194,0.35);
+      border-radius: 22px;
+      padding: 34px;
+      text-align: center;
+      background: rgba(255,255,255,0.04);
+      margin-top: 20px;
+    }
+
+    .upload-box i {
+      font-size: 3rem;
+      color: var(--primary-accent);
+      margin-bottom: 14px;
+    }
+
+    .file-input {
+      margin-top: 18px;
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.18);
+      color: white;
+    }
+
+    .form-select {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.18);
+      color: white;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: white;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 18px;
+      text-decoration: none;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
+      color: #4B3A57;
+      font-weight: 700;
+      border: none;
+      box-shadow: 0 8px 18px rgba(255,181,156,0.20);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .signal-canvas-container {
+      height: 320px;
+      background: rgba(0,0,0,0.18);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+      margin-top: 18px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .balance-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .side-comparison {
+      text-align: center;
+      padding: 24px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .side-title {
+      color: var(--primary-accent);
+      margin-bottom: 12px;
+    }
+
+    .side-value {
+      font-size: 3rem;
+      font-weight: 300;
+      color: var(--primary-accent);
+    }
+
+    .balance-visual {
+      height: 20px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      margin: 20px 0;
+    }
+
+    .balance-left {
+      background: linear-gradient(90deg, #ffb6a3, #ffd1b3);
+    }
+
+    .balance-right {
+      background: linear-gradient(90deg, #ffd1b3, #ffe8d6);
+    }
+
+    .imbalance-indicator {
+      text-align: center;
+      padding: 20px;
+      border-radius: 16px;
+      margin-top: 20px;
+      border: 1px solid;
+    }
+
+    .imbalance-indicator.balanced {
+      background: rgba(141,211,161,0.2);
+      border-color: rgba(141,211,161,0.4);
+    }
+
+    .imbalance-indicator.imbalanced {
+      background: rgba(255,182,163,0.2);
+      border-color: rgba(255,182,163,0.4);
+    }
+
+    .imbalance-value {
+      font-size: 1.5rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .balanced-text { color: var(--success); }
+    .imbalanced-text { color: var(--primary-accent); }
+
+    .message {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      display: none;
+      font-weight: 600;
+    }
+
+    .message.success {
+      display: block;
+      background: rgba(141,211,161,0.2);
+      color: var(--success);
+    }
+
+    .message.error {
+      display: block;
+      background: rgba(255,107,107,0.2);
+      color: var(--danger);
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      opacity: 0.75;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 768px) {
+      .main-content,
+      .main-content.expanded {
+        margin-left: 0;
+        padding: 80px 18px 32px;
+      }
+
+      .sidebar.hidden {
+        left: -270px;
+      }
+
+      .balance-comparison {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <label class="switch">
+    <input type="checkbox" id="themeSwitch">
+    <span class="slider"></span>
+  </label>
+
+  <div class="menu-btn active" id="menuBtn">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <img src="awtadlogo1.png" alt="AWTAD">
+    </div>
+
+    <div class="user-mini-card">
+      <h4 id="sidebarUserName">...</h4>
+      <p>Upload Analysis</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="userawtad.html" class="nav-item">
+        <i class="fas fa-th-large"></i>
+        <span class="nav-text">Dashboard</span>
+      </a>
+
+      <a href="FindCoach.html" class="nav-item">
+        <i class="fas fa-user-tie"></i>
+        <span class="nav-text">Find a Coach</span>
+      </a>
+
+      <a href="my-coach.html" class="nav-item">
+        <i class="fas fa-id-card"></i>
+        <span class="nav-text">My Coach</span>
+      </a>
+
+      <a href="sesstionsawtad.html" class="nav-item">
+        <i class="fas fa-calendar"></i>
+        <span class="nav-text">Sessions</span>
+      </a>
+
+      <a href="profileawtad.html" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span class="nav-text">Profile</span>
+      </a>
+    </nav>
+
+    <a href="#" id="logoutBtn" class="nav-item">
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="nav-text">Logout</span>
+    </a>
+  </aside>
+
+  <main class="main-content" id="mainContent">
+    <section>
+      <h1 class="welcome-title">Upload EMG Signal</h1>
+      <p class="welcome-subtitle">
+        Upload a recorded EMG signal file and receive the same muscle balance analysis generated from a live sensor session.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2 class="section-title">Signal File Upload</h2>
+
+      <div class="upload-box">
+        <i class="fas fa-file-upload"></i>
+        <h3>Upload Trigno CSV File</h3>
+        <p style="opacity:0.75; margin-top:8px;">
+          Please upload a CSV file exported from Trigno Discover.
+        </p>
+
+        <select id="exerciseType" class="form-select">
+          <option value="Squat">Squat Analysis</option>
+        </select>
+
+        <input type="file" id="signalFile" class="file-input" accept=".csv" />
+
+        <button class="action-btn primary" id="analyzeBtn">
+          <i class="fas fa-microscope"></i>
+          Analyze Uploaded Signal
+        </button>
+
+        <div id="uploadMessage" class="message"></div>
+      </div>
+    </section>
+
+    <section class="card" id="signalSection" style="display:none;">
+      <h2 class="section-title">Uploaded Signal Preview</h2>
+      <div class="signal-canvas-container">
+        <canvas id="signalCanvas"></canvas>
+      </div>
+    </section>
+
+    <section class="card" id="resultCard" style="display:none;">
+      <h2 class="section-title">VL Muscle Balance Summary</h2>
+
+      <div class="balance-comparison">
+        <div class="side-comparison">
+          <h3 class="side-title">
+            <i class="fas fa-arrow-left"></i>
+            Left VL
+          </h3>
+          <div class="side-value" id="leftValue">--%</div>
+          <div id="leftStrength">--</div>
+        </div>
+
+        <div class="side-comparison">
+          <h3 class="side-title">
+            <i class="fas fa-arrow-right"></i>
+            Right VL
+          </h3>
+          <div class="side-value" id="rightValue">--%</div>
+          <div id="rightStrength">--</div>
+        </div>
+      </div>
+
+      <div class="balance-visual">
+        <div class="balance-left" id="balanceLeftBar" style="width:50%"></div>
+        <div class="balance-right" id="balanceRightBar" style="width:50%"></div>
+      </div>
+
+      <div class="imbalance-indicator balanced" id="imbalanceIndicator">
+        <div class="imbalance-value balanced-text" id="imbalanceValue">--%</div>
+        <div id="imbalanceStatus">Status: --</div>
+        <div id="dominantSide" style="margin-top:8px;">Dominant Side: --</div>
+      </div>
+
+      <button class="action-btn primary" onclick="window.location.href='userawtad.html'">
+        <i class="fas fa-arrow-left"></i>
+        Back to Dashboard
+      </button>
+
+      <button class="action-btn" onclick="window.location.href='sesstionsawtad.html'">
+        <i class="fas fa-calendar"></i>
+        View Sessions
+      </button>
+    </section>
+
+    <footer>
+      <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
+    </footer>
+  </main>
+
+  <script>
+    const API_BASE = "https://wafer-slab-cuddly.ngrok-free.dev"; // غيريه حسب رابط ngrok الحالي
+
+    const supa = window.supabase;
+    let currentUser = null;
+
+    document.addEventListener("DOMContentLoaded", async function () {
+      const menuBtn = document.getElementById("menuBtn");
+      const sidebar = document.getElementById("sidebar");
+      const mainContent = document.getElementById("mainContent");
+
+      menuBtn.addEventListener("click", function () {
+        sidebar.classList.toggle("hidden");
+        mainContent.classList.toggle("expanded");
+        menuBtn.classList.toggle("active");
+      });
+
+      await loadUser();
+
+      document.getElementById("analyzeBtn").addEventListener("click", analyzeUploadedSignal);
+
+      const logoutBtn = document.getElementById("logoutBtn");
+      logoutBtn.addEventListener("click", async function (e) {
+        e.preventDefault();
+        await supa.auth.signOut();
+        window.location.href = "loginawtad.html";
+      });
+    });
+
+    async function loadUser() {
+      const { data: { user }, error } = await supa.auth.getUser();
+
+      if (error || !user) {
+        window.location.href = "loginawtad.html";
+        return;
+      }
+
+      currentUser = user;
+
+      const { data: client } = await supa
+        .from("Client")
+        .select("Fname, Lname")
+        .eq("client_id", user.id)
+        .single();
+
+      const fullName = `${client?.Fname || ""} ${client?.Lname || ""}`.trim() || "User";
+      document.getElementById("sidebarUserName").textContent = fullName;
+    }
+
+    async function analyzeUploadedSignal() {
+      const fileInput = document.getElementById("signalFile");
+      const exerciseType = document.getElementById("exerciseType").value;
+      const analyzeBtn = document.getElementById("analyzeBtn");
+
+      if (!currentUser) {
+        showMessage("User not found. Please login again.", "error");
+        return;
+      }
+
+      if (!fileInput.files.length) {
+        showMessage("Please select a CSV file first.", "error");
+        return;
+      }
+
+      const file = fileInput.files[0];
+
+      if (!file.name.toLowerCase().endsWith(".csv")) {
+        showMessage("Only CSV files are supported.", "error");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("client_id", currentUser.id);
+      formData.append("exercise_type", exerciseType);
+
+      try {
+        analyzeBtn.disabled = true;
+        analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        showMessage("Uploading and analyzing signal...", "success");
+
+        const res = await fetch(`${API_BASE}/upload-signal-and-analyze`, {
+          method: "POST",
+          body: formData
+        });
+
+        const result = await res.json();
+        console.log("Upload analysis result:", result);
+
+        if (!res.ok || result.error) {
+          throw new Error(result.error || "Analysis failed.");
+        }
+
+        displayResult(result);
+
+        if (result.raw_plot) {
+          document.getElementById("signalSection").style.display = "block";
+          drawRawSignal(result.raw_plot);
+        }
+
+        showMessage("Signal analyzed and saved successfully.", "success");
+
+      } catch (err) {
+        console.error(err);
+        showMessage(err.message || "Failed to analyze uploaded signal.", "error");
+      } finally {
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerHTML = '<i class="fas fa-microscope"></i> Analyze Uploaded Signal';
+      }
+    }
+
+    function displayResult(result) {
+      document.getElementById("resultCard").style.display = "block";
+
+      const si = Number(result.si || 0);
+      const imbalancePercentage = Math.round(si * 100);
+
+      const leftRms = Number(result.left_rms || 0.5);
+      const rightRms = Number(result.right_rms || 0.5);
+
+      const total = leftRms + rightRms;
+      const leftPercent = total > 0 ? Math.round((leftRms / total) * 100) : 50;
+      const rightPercent = total > 0 ? Math.round((rightRms / total) * 100) : 50;
+
+      document.getElementById("leftValue").textContent = `${leftPercent}%`;
+      document.getElementById("rightValue").textContent = `${rightPercent}%`;
+
+      document.getElementById("balanceLeftBar").style.width = `${leftPercent}%`;
+      document.getElementById("balanceRightBar").style.width = `${rightPercent}%`;
+
+      document.getElementById("leftStrength").textContent = getStrengthText(leftPercent);
+      document.getElementById("rightStrength").textContent = getStrengthText(rightPercent);
+
+      const imbalanceIndicator = document.getElementById("imbalanceIndicator");
+      const imbalanceValue = document.getElementById("imbalanceValue");
+      const imbalanceStatus = document.getElementById("imbalanceStatus");
+
+      if (imbalancePercentage >= 15) {
+        imbalanceIndicator.className = "imbalance-indicator imbalanced";
+        imbalanceValue.className = "imbalance-value imbalanced-text";
+        imbalanceValue.textContent = `${imbalancePercentage}% Imbalance`;
+        imbalanceStatus.textContent = "Status: Imbalanced (Above 15% threshold)";
+      } else {
+        imbalanceIndicator.className = "imbalance-indicator balanced";
+        imbalanceValue.className = "imbalance-value balanced-text";
+        imbalanceValue.textContent = `${imbalancePercentage}% Overall Imbalance`;
+        imbalanceStatus.textContent = "Status: Balanced (Below 15% threshold)";
+      }
+
+      document.getElementById("dominantSide").textContent = `Dominant Side: ${result.dominant}`;
+
+      document.getElementById("resultCard").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function getStrengthText(value) {
+      if (value >= 80) return "Strong Activation";
+      if (value >= 60) return "Moderate Activation";
+      return "Low Activation";
+    }
+
+    function showMessage(text, type) {
+      const msg = document.getElementById("uploadMessage");
+      msg.textContent = text;
+      msg.className = `message ${type}`;
+    }
+
+    function drawRawSignal(rawPlot) {
+      const canvas = document.getElementById("signalCanvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      const width = canvas.width;
+      const height = canvas.height;
+
+      ctx.clearRect(0, 0, width, height);
+
+      ctx.strokeStyle = "rgba(255,255,255,0.12)";
+      ctx.lineWidth = 1;
+
+      for (let y = 0; y < height; y += height / 10) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      for (let x = 0; x < width; x += width / 20) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+
+      const left = rawPlot.emg_left || [];
+      const right = rawPlot.emg_right || [];
+
+      if (!left.length || !right.length) return;
+
+      const allValues = [...left, ...right];
+      const minVal = Math.min(...allValues);
+      const maxVal = Math.max(...allValues);
+      const range = (maxVal - minVal) || 1;
+
+      function normalize(val, top, sectionHeight) {
+        return top + sectionHeight - ((val - minVal) / range) * sectionHeight;
+      }
+
+      const topSection = height * 0.05;
+      const sectionHeight = height * 0.35;
+      const bottomSection = height * 0.55;
+
+      ctx.strokeStyle = "rgba(255,182,163,0.9)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      for (let i = 0; i < left.length; i++) {
+        const x = (i / (left.length - 1)) * width;
+        const y = normalize(left[i], topSection, sectionHeight);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(141,211,161,0.9)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      for (let i = 0; i < right.length; i++) {
+        const x = (i / (right.length - 1)) * width;
+        const y = normalize(right[i], bottomSection, sectionHeight);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.stroke();
+    }
+  </script>
+
+  <script src="modes.js"></script>
+</body>
+</html>
