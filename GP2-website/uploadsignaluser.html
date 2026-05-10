@@ -233,7 +233,45 @@
       margin-top: 18px;
       text-decoration: none;
     }
+.analyze-btn {
+  width: 100%;
+  max-width: 420px;
+  margin: 24px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 
+  padding: 14px 22px;
+  border: none;
+  border-radius: 16px;
+
+  background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
+  color: #4B3A57;
+
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+
+  box-shadow: 0 8px 18px rgba(255, 181, 156, 0.20);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.analyze-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(255, 181, 156, 0.28);
+}
+
+.analyze-btn:active {
+  transform: scale(0.98);
+}
+
+.analyze-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
     .action-btn.primary {
       background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
       color: #4B3A57;
@@ -453,7 +491,7 @@
 
         <input type="file" id="signalFile" class="file-input" accept=".csv" />
 
-        <button class="action-btn primary" id="analyzeBtn">
+        <button class="action-btn primary" id="analyze-btn" ondblclick="analyzeUploadedSignal()">
           <i class="fas fa-microscope"></i>
           Analyze Uploaded Signal
         </button>
