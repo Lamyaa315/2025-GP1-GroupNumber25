@@ -218,44 +218,79 @@
       color: white;
     }
 
-    .analyze-btn {
-  width: 100%;
-  max-width: 420px;
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: white;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 18px;
+      text-decoration: none;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
+      color: #4B3A57;
+      font-weight: 700;
+      border: none;
+      box-shadow: 0 8px 18px rgba(255,181,156,0.20);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    #analyze-btn {
+  min-width: 260px;
+  height: 52px;
   margin: 24px auto 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
 
-  padding: 14px 22px;
+  padding: 0 26px;
   border: none;
-  border-radius: 16px;
+  border-radius: 14px;
 
   background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
   color: #4B3A57;
 
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   font-family: inherit;
 
   box-shadow: 0 8px 18px rgba(255, 181, 156, 0.20);
-  cursor: pointer;
   transition: all 0.25s ease;
+  cursor: pointer;
 }
 
-.analyze-btn:hover {
+#analyze-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 24px rgba(255, 181, 156, 0.28);
 }
 
-.analyze-btn:active {
+#analyze-btn:active {
   transform: scale(0.98);
 }
 
-.analyze-btn:disabled {
-  opacity: 0.5;
+#analyze-btn:disabled {
+  opacity: 0.55;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
+}
+
+#analyze-btn i {
+  font-size: 1rem;
+  color: #4B3A57;
 }
 
     .signal-canvas-container {
@@ -465,7 +500,7 @@
         <input type="file" id="signalFile" class="file-input" accept=".csv" />
 
         <button class="action-btn primary" id="analyze-btn" ondblclick="analyzeUploadedSignal()">
-          <i class="fas fa-microscope"></i>
+          <i class="fas fa-chart-line"></i>
           Analyze Uploaded Signal
         </button>
 
