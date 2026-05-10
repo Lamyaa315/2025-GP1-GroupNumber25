@@ -1275,9 +1275,7 @@
       renderSessions(filteredSessions);
     }
 
-    function viewSession(sessionId) {
-      window.location.href = `lastsessionawtad.html?id=${sessionId}`;
-    }
+    
 
     async function logout() {
       const { error } = await supa.auth.signOut();
