@@ -1,0 +1,48 @@
+/* Light Mode */
+:root {
+  --bg-color: #ffffff;  /* خلفية فاتحة */
+  --text-color: #000000;  /* نص أسود */
+  --primary-color: #ffb59c;  /* اللون الأساسي */
+  --secondary-color: #ffd2c2;  /* اللون الثانوي */
+  --sidebar-bg: rgba(255, 255, 255, 0.07);  /* خلفية الشريط الجانبي */
+  --sidebar-text: rgba(0, 0, 0, 0.72);  /* نص الشريط الجانبي */
+  --link-color: #ff6b6b;  /* لون الروابط */
+}
+
+/* Dark Mode */
+[data-theme="dark"] {
+  --bg-color: #2c2c2c;  /* خلفية داكنة */
+  --text-color: #ffffff;  /* نص أبيض */
+  --primary-color: #ff8c00;  /* اللون الأساسي في الوضع الداكن */
+  --secondary-color: #ff7f50;  /* اللون الثانوي في الوضع الداكن */
+  --sidebar-bg: rgba(255, 255, 255, 0.1);  /* خلفية الشريط الجانبي الداكن */
+  --sidebar-text: rgba(255, 255, 255, 0.72);  /* نص الشريط الجانبي الداكن */
+  --link-color: #ff8c00;  /* لون الروابط في الوضع الداكن */
+}
+
+/* تخصيص الألوان في الـ body */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* تخصيص الشريط الجانبي */
+.sidebar {
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text);
+}
+
+/* تخصيص الأزرار */
+button {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+/* تخصيص الروابط */
+a {
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--danger);
+}

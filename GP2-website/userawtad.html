@@ -8,7 +8,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <link rel="stylesheet" href="modes.css">
+   
   <style>
     :root {
       --sidebar-width: 220px;
@@ -819,7 +820,10 @@
   </style>
 </head>
 <body>
-
+<label class="switch">
+        <input type="checkbox" id="themeSwitch">
+        <span class="slider"></span>
+    </label>
   <div class="menu-btn active" id="menuBtn">
     <i class="fas fa-bars"></i>
   </div>
@@ -1145,7 +1149,7 @@ menuBtn.addEventListener('click', function () {
       document.getElementById('imbalanceModal').classList.add('active');
     }
 
-    async function loadDashboardData() {
+   async function loadDashboardData() {
       try {
         const { data: { user }, error: userError } = await supa.auth.getUser();
 
@@ -1155,25 +1159,20 @@ menuBtn.addEventListener('click', function () {
           return;
         }
 
+        // 1. جلب بيانات العميل
         const { data: client, error: clientError } = await supa
           .from("Client")
           .select("Fname, Lname")
           .eq("client_id", user.id)
           .single();
 
-        if (clientError) {
-          console.error("Error fetching client:", clientError.message);
-        }
-
         const firstName = client?.Fname || "User";
         const fullName = `${client?.Fname || ""} ${client?.Lname || ""}`.trim() || "User";
+        
+        if (document.getElementById("sidebarUserName")) document.getElementById("sidebarUserName").textContent = fullName;
+        if (document.getElementById("welcomeName")) document.getElementById("welcomeName").textContent = firstName;
 
-        const sidebarUserName = document.getElementById("sidebarUserName");
-        const welcomeName = document.getElementById("welcomeName");
-
-        if (sidebarUserName) sidebarUserName.textContent = fullName;
-        if (welcomeName) welcomeName.textContent = firstName;
-
+        // 2. جلب الجلسات مع الـ Reps
         const { data: sessions, error: sessionError } = await supa
           .from("Session")
           .select(`
@@ -1197,29 +1196,56 @@ menuBtn.addEventListener('click', function () {
           return;
         }
 
+        // 3. معالجة البيانات (Mapping)
         const mappedSessions = (sessions || []).map(session => {
           const rep = session.Reps && session.Reps.length > 0 ? session.Reps[0] : null;
-
           return {
             session_id: session.session_id,
             exercise_type: session.exercise_type || "Exercise",
             session_date: session.session_date,
             duration_sec: session.duration_sec,
-            coach_feedback: session.coach_feedback || "No feedback yet.",
             label: rep?.label || "Unknown",
-            symmetry_index: rep?.symmetry_index != null ? Number(rep.symmetry_index) : null,
+            symmetry_index: rep?.symmetry_index != null ? parseFloat(rep.symmetry_index) : null,
             dominant_side: rep?.dominant_side || "N/A"
           };
         });
 
+        console.log("Verified Sessions for Chart:", mappedSessions);
+
+        // 4. استدعاء دوال التحديث
         fillLastSessionSection(mappedSessions);
         fillStatsSection(mappedSessions);
         fillImbalanceSection(mappedSessions);
+        
+        // تعديل مهم هنا: نرسل البيانات مباشرة للتشارت
         fillChartSection(mappedSessions);
 
       } catch (err) {
         console.error("Unexpected dashboard error:", err);
       }
+    }
+
+    // تأكدي أيضاً من تحديث هذه الدالة لضمان الفلترة الصحيحة
+    function fillChartSection(sessions) {
+      // نفلتر الجلسات اللي فيها قيمة symmetry_index فقط
+      const sorted = [...sessions]
+        .filter(s => s.session_date && s.symmetry_index !== null)
+        .sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
+
+      if (sorted.length === 0) {
+        console.warn("No valid data for chart");
+        return;
+      }
+
+      allProgressLabels = sorted.map(s => {
+        const d = new Date(s.session_date);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      });
+
+      allProgressValues = sorted.map(s => s.symmetry_index);
+
+      // تشغيل الرسم البياني
+      initializeProgressChart("month"); 
     }
 
     function fillLastSessionSection(sessions) {
@@ -1403,144 +1429,92 @@ menuBtn.addEventListener('click', function () {
     }
 
     function fillChartSection(sessions) {
-      const sorted = [...sessions]
-        .filter(s => s.session_date && typeof s.symmetry_index === "number" && !isNaN(s.symmetry_index))
+    // 1. اطبعي أول جلسة عشان نشوف أسماء الحقول الفعلية
+    if (sessions.length > 0) {
+        console.log("Check first session structure:", sessions[0]);
+    }
+
+    // 2. محاولة استخراج البيانات حتى لو كانت القيم نصية أو الأسماء مختلفة قليلاً
+    const sorted = [...sessions]
+        .filter(s => s.session_date && s.symmetry_index !== null && s.symmetry_index !== undefined)
         .sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
 
-      allProgressLabels = sorted.map(s => {
+    if (sorted.length === 0) {
+        console.error("Chart Error: Still no valid data. Current sessions keys:", 
+                      sessions.length > 0 ? Object.keys(sessions[0]) : "Empty");
+        return;
+    }
+
+    allProgressLabels = sorted.map(s => {
         const d = new Date(s.session_date);
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      });
+    });
 
-      allProgressValues = sorted.map(s => s.symmetry_index);
+    allProgressValues = sorted.map(s => s.symmetry_index);
 
-      initializeProgressChart("month");
-    }
-
-    function getChartDataByPeriod(period) {
-      if (!allProgressLabels.length || !allProgressValues.length) {
-        return {
-          labels: ['No Data'],
-          values: [0]
-        };
-      }
-
-      let count = 4;
-      if (period === '3months') count = 8;
-      if (period === '6months') count = 12;
-
-      return {
-        labels: allProgressLabels.slice(-count),
-        values: allProgressValues.slice(-count)
-      };
-    }
+    console.log("Success! Data to be plotted:", allProgressValues);
+    initializeProgressChart("month"); 
+}
 
     function initializeProgressChart(period = "month") {
-      const canvas = document.getElementById('progressChart');
-      if (!canvas) return;
-
-      const progressCtx = canvas.getContext('2d');
-      const sliced = getChartDataByPeriod(period);
-
-      if (progressChart) {
-        progressChart.destroy();
-      }
-
-      progressChart = new Chart(progressCtx, {
-        type: 'line',
-        data: {
-          labels: sliced.labels,
-          datasets: [
-            {
-              label: 'Symmetry Index %',
-              data: sliced.values,
-              borderColor: peachColors.primary,
-              backgroundColor: 'rgba(255, 182, 163, 0.15)',
-              tension: 0.3,
-              fill: true,
-              borderWidth: 3,
-              pointBackgroundColor: peachColors.primary,
-              pointBorderColor: '#fff',
-              pointBorderWidth: 2,
-              pointRadius: 6,
-              pointHoverRadius: 8
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'top',
-              labels: {
-                color: 'white',
-                font: {
-                  size: 14,
-                  family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
-                }
-              }
-            },
-            tooltip: {
-              backgroundColor: 'rgba(75, 58, 87, 0.95)',
-              titleColor: peachColors.light,
-              bodyColor: 'white',
-              borderColor: peachColors.primary,
-              borderWidth: 1,
-              cornerRadius: 8,
-              callbacks: {
-                label: function(context) {
-                  return `Symmetry Index: ${context.raw}%`;
-                }
-              }
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: {
-                color: 'rgba(255, 255, 255, 0.1)'
-              },
-              ticks: {
-                color: 'white',
-                callback: function(value) {
-                  return value + '%';
-                },
-                font: { size: 12 }
-              },
-              title: {
-                display: true,
-                text: 'Symmetry Index',
-                color: 'white',
-                font: {
-                  size: 13,
-                  weight: 'normal'
-                }
-              }
-            },
-            x: {
-              grid: {
-                color: 'rgba(255, 255, 255, 0.1)'
-              },
-              ticks: {
-                color: 'white',
-                font: { size: 12 }
-              }
-            }
-          },
-          interaction: {
-            intersect: false,
-            mode: 'index'
-          }
+        const canvas = document.getElementById('progressChart');
+        if (!canvas) {
+            console.error("Canvas element not found!");
+            return;
         }
-      });
-    }
 
+        const progressCtx = canvas.getContext('2d');
+        const sliced = getChartDataByPeriod(period);
+
+        // إذا كان هناك رسم قديم، نحذفه لإنشاء الجديد
+        if (progressChart) {
+            progressChart.destroy();
+        }
+
+        progressChart = new Chart(progressCtx, {
+            type: 'line',
+            data: {
+                labels: sliced.labels,
+                datasets: [{
+                    label: 'Symmetry Index %',
+                    data: sliced.values,
+                    borderColor: '#ffb6a3', // اللون الخوخي
+                    backgroundColor: 'rgba(255, 182, 163, 0.2)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#ffb6a3'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100, // تأكدي أن المقياس يصل لـ 100%
+                        ticks: { color: 'white' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    },
+                    x: {
+                        ticks: { color: 'white' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    }
+                },
+                plugins: {
+                    legend: { labels: { color: 'white' } }
+                }
+            }
+        });
+    }
     function changeChartPeriod(event, period) {
       document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
       initializeProgressChart(period);
     }
+
   </script>
+  <script src="modes.js"></script>
 </body>
 </html>
