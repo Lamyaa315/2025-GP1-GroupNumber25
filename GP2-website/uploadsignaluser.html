@@ -589,7 +589,7 @@
 
       await loadUser();
 
-      document.getElementById("analyzeBtn").addEventListener("click", analyzeUploadedSignal);
+      document.getElementById("analyze-btn").addEventListener("click", analyzeUploadedSignal);
 
       const logoutBtn = document.getElementById("logoutBtn");
       logoutBtn.addEventListener("click", async function (e) {
@@ -622,7 +622,7 @@
     async function analyzeUploadedSignal() {
       const fileInput = document.getElementById("signalFile");
       const exerciseType = document.getElementById("exerciseType").value;
-      const analyzeBtn = document.getElementById("analyzeBtn");
+      const analyzeBtn = document.getElementById("analyze-btn");
 
       if (!currentUser) {
         showMessage("User not found. Please login again.", "error");
