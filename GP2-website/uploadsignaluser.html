@@ -401,7 +401,51 @@
       background: rgba(255,107,107,0.2);
       color: var(--danger);
     }
+    .reps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
 
+.rep-card {
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.rep-title {
+  color: var(--primary-accent);
+  margin-bottom: 12px;
+  font-size: 1.15rem;
+}
+
+.rep-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 9px 0;
+  font-size: 0.95rem;
+}
+
+.rep-status {
+  margin-top: 14px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  display: inline-block;
+  font-weight: 700;
+}
+
+.rep-status.balanced {
+  background: rgba(141,211,161,0.18);
+  color: var(--success);
+}
+
+.rep-status.imbalanced {
+  background: rgba(255,107,107,0.18);
+  color: var(--danger);
+}
     footer {
       margin-top: 40px;
       text-align: center;
@@ -504,7 +548,7 @@
 
         <input type="file" id="signalFile" class="file-input" accept=".csv" />
 
-        <button class="action-btn primary" id="analyze-btn" ondblclick="analyzeUploadedSignal()">
+        <button class="action-btn primary" id="analyze-btn">
           <i class="fas fa-chart-line"></i>
           Analyze Uploaded Signal
         </button>
@@ -553,7 +597,7 @@
         <div id="imbalanceStatus">Status: --</div>
         <div id="dominantSide" style="margin-top:8px;">Dominant Side: --</div>
       </div>
-
+        <div id="repsResultContainer" class="reps-grid"></div>
       <button class="action-btn primary" onclick="window.location.href='userawtad.html'">
         <i class="fas fa-arrow-left"></i>
         Back to Dashboard
@@ -681,48 +725,104 @@
       }
     }
 
-    function displayResult(result) {
-      document.getElementById("resultCard").style.display = "block";
+  function displayResult(result) {
+  document.getElementById("resultCard").style.display = "block";
 
-      const si = Number(result.si || 0);
-      const imbalancePercentage = Math.round(si * 100);
+  const reps = result.reps || [];
 
-      const leftRms = Number(result.left_rms || 0.5);
-      const rightRms = Number(result.right_rms || 0.5);
+  if (!reps.length) {
+    showMessage("No reps data returned from analysis.", "error");
+    return;
+  }
 
-      const total = leftRms + rightRms;
-      const leftPercent = total > 0 ? Math.round((leftRms / total) * 100) : 50;
-      const rightPercent = total > 0 ? Math.round((rightRms / total) * 100) : 50;
+  const firstRep = reps[0];
 
-      document.getElementById("leftValue").textContent = `${leftPercent}%`;
-      document.getElementById("rightValue").textContent = `${rightPercent}%`;
+  const si = Number(firstRep.si || 0);
+  const imbalancePercentage = Math.round(si * 100);
 
-      document.getElementById("balanceLeftBar").style.width = `${leftPercent}%`;
-      document.getElementById("balanceRightBar").style.width = `${rightPercent}%`;
+  const leftRms = Number(firstRep.left_rms || 0.5);
+  const rightRms = Number(firstRep.right_rms || 0.5);
 
-      document.getElementById("leftStrength").textContent = getStrengthText(leftPercent);
-      document.getElementById("rightStrength").textContent = getStrengthText(rightPercent);
+  const total = leftRms + rightRms;
+  const leftPercent = total > 0 ? Math.round((leftRms / total) * 100) : 50;
+  const rightPercent = total > 0 ? Math.round((rightRms / total) * 100) : 50;
 
-      const imbalanceIndicator = document.getElementById("imbalanceIndicator");
-      const imbalanceValue = document.getElementById("imbalanceValue");
-      const imbalanceStatus = document.getElementById("imbalanceStatus");
+  document.getElementById("leftValue").textContent = `${leftPercent}%`;
+  document.getElementById("rightValue").textContent = `${rightPercent}%`;
 
-      if (imbalancePercentage >= 15) {
-        imbalanceIndicator.className = "imbalance-indicator imbalanced";
-        imbalanceValue.className = "imbalance-value imbalanced-text";
-        imbalanceValue.textContent = `${imbalancePercentage}% Imbalance`;
-        imbalanceStatus.textContent = "Status: Imbalanced (Above 15% threshold)";
-      } else {
-        imbalanceIndicator.className = "imbalance-indicator balanced";
-        imbalanceValue.className = "imbalance-value balanced-text";
-        imbalanceValue.textContent = `${imbalancePercentage}% Symmetry Difference`;
-        imbalanceStatus.textContent = "Status: Balanced (Below 15% threshold)";
-      }
+  document.getElementById("balanceLeftBar").style.width = `${leftPercent}%`;
+  document.getElementById("balanceRightBar").style.width = `${rightPercent}%`;
 
-      document.getElementById("dominantSide").textContent = `Dominant Side: ${result.dominant}`;
+  document.getElementById("leftStrength").textContent = getStrengthText(leftPercent);
+  document.getElementById("rightStrength").textContent = getStrengthText(rightPercent);
 
-      document.getElementById("resultCard").scrollIntoView({ behavior: "smooth" });
-    }
+  const imbalanceIndicator = document.getElementById("imbalanceIndicator");
+  const imbalanceValue = document.getElementById("imbalanceValue");
+  const imbalanceStatus = document.getElementById("imbalanceStatus");
+
+  if (imbalancePercentage >= 15) {
+    imbalanceIndicator.className = "imbalance-indicator imbalanced";
+    imbalanceValue.className = "imbalance-value imbalanced-text";
+    imbalanceValue.textContent = `${imbalancePercentage}% Imbalance`;
+    imbalanceStatus.textContent = "First Rep Status: Imbalanced";
+  } else {
+    imbalanceIndicator.className = "imbalance-indicator balanced";
+    imbalanceValue.className = "imbalance-value balanced-text";
+    imbalanceValue.textContent = `${imbalancePercentage}% Symmetry Difference`;
+    imbalanceStatus.textContent = "First Rep Status: Balanced";
+  }
+
+  document.getElementById("dominantSide").textContent =
+    `First Rep Dominant Side: ${firstRep.dominant}`;
+
+  renderRepsResults(reps);
+
+  document.getElementById("resultCard").scrollIntoView({ behavior: "smooth" });
+}
+
+function renderRepsResults(reps) {
+  const container = document.getElementById("repsResultContainer");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  reps.forEach(rep => {
+    const siPercent = Math.round(Number(rep.si || 0) * 100);
+    const statusClass = siPercent >= 15 ? "imbalanced" : "balanced";
+    const statusText = siPercent >= 15 ? "Imbalanced" : "Balanced";
+
+    const card = document.createElement("div");
+    card.className = "rep-card";
+
+    card.innerHTML = `
+      <h3 class="rep-title">Rep ${rep.rep_number}</h3>
+
+      <div class="rep-row">
+        <span>Symmetry Index</span>
+        <strong>${siPercent}%</strong>
+      </div>
+
+      <div class="rep-row">
+        <span>Dominant Side</span>
+        <strong>${rep.dominant}</strong>
+      </div>
+
+      <div class="rep-row">
+        <span>Left RMS</span>
+        <strong>${Number(rep.left_rms || 0).toFixed(4)}</strong>
+      </div>
+
+      <div class="rep-row">
+        <span>Right RMS</span>
+        <strong>${Number(rep.right_rms || 0).toFixed(4)}</strong>
+      </div>
+
+      <span class="rep-status ${statusClass}">${statusText}</span>
+    `;
+
+    container.appendChild(card);
+  });
+}
 
     function getStrengthText(value) {
       if (value >= 80) return "Strong Activation";

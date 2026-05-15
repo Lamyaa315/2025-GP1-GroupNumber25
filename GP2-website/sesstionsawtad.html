@@ -965,7 +965,6 @@
             <select class="filter-select" id="sortFilter">
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
-              <option value="score">Highest Symmetry Index</option>
             </select>
           </div>
         </div>
@@ -978,22 +977,6 @@
           </div>
           <div class="stat-value" id="totalSessionsValue">0</div>
           <div class="stat-label">Total Sessions</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-balance-scale"></i>
-          </div>
-          <div class="stat-value" id="currentImbalanceValue">N/A</div>
-          <div class="stat-label">Current Symmetry Index</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-chart-line"></i>
-          </div>
-          <div class="stat-value" id="improvementValue">N/A</div>
-          <div class="stat-label">Improvement</div>
         </div>
 
         <div class="stat-card">
@@ -1079,10 +1062,13 @@
             coach_feedback,
             Reps (
               reps_id,
+              rep_number,
               label,
               symmetry_index,
-              dominant_side
-            )
+              dominant_side,
+              rms_left,
+              rms_right
+                      )
           `)
           .eq("client_id", user.id)
           .order("session_date", { ascending: false });
@@ -1090,25 +1076,19 @@
         if (error) throw error;
 
         sessionData = (data || []).map(session => {
-          const rep = session.Reps && session.Reps.length > 0 ? session.Reps[0] : null;
+  const reps = session.Reps || [];
 
-          const symmetryValue = rep?.symmetry_index != null && !isNaN(rep.symmetry_index)
-            ? Number(rep.symmetry_index)
-            : null;
-
-          return {
-            id: session.session_id,
-            title: session.exercise_type ? `${session.exercise_type} Analysis` : "Session Analysis",
-            date: session.session_date,
-            exerciseName: session.exercise_type || "Unknown Exercise",
-            overallImbalance: symmetryValue,
-            durationSec: session.duration_sec,
-            duration: formatDuration(session.duration_sec),
-            status: rep?.label ? rep.label.toLowerCase() : "imbalanced",
-            dominantSide: rep?.dominant_side || "N/A",
-            coachFeedback: session.coach_feedback || "No feedback yet"
-          };
-        });
+  return {
+    id: session.session_id,
+    title: session.exercise_type ? `${session.exercise_type} Session` : "Session",
+    date: session.session_date,
+    exerciseName: session.exercise_type || "Unknown Exercise",
+    durationSec: session.duration_sec,
+    duration: formatDuration(session.duration_sec),
+    repsCount: reps.length,
+    coachFeedback: session.coach_feedback || "No feedback yet"
+  };
+});
 
         updateStats(sessionData);
         filterSessions();
@@ -1121,34 +1101,15 @@
 
     function updateStats(sessions) {
       const totalSessionsEl = document.getElementById("totalSessionsValue");
-      const currentImbalanceEl = document.getElementById("currentImbalanceValue");
-      const improvementEl = document.getElementById("improvementValue");
       const avgDurationEl = document.getElementById("avgDurationValue");
 
       if (!sessions.length) {
         totalSessionsEl.textContent = "0";
-        currentImbalanceEl.textContent = "N/A";
-        improvementEl.textContent = "N/A";
         avgDurationEl.textContent = "N/A";
         return;
       }
 
       totalSessionsEl.textContent = sessions.length;
-
-      const validSI = sessions
-        .map(s => s.overallImbalance)
-        .filter(v => typeof v === "number" && !isNaN(v));
-
-      currentImbalanceEl.textContent = validSI.length ? `${validSI[0].toFixed(2)}%` : "N/A";
-
-      if (validSI.length >= 2 && validSI[validSI.length - 1] !== 0) {
-        const oldest = validSI[validSI.length - 1];
-        const latest = validSI[0];
-        const diff = ((oldest - latest) / oldest) * 100;
-        improvementEl.textContent = `${diff.toFixed(0)}%`;
-      } else {
-        improvementEl.textContent = "N/A";
-      }
 
       const validDurations = sessions
         .map(s => s.durationSec)
@@ -1163,71 +1124,75 @@
     }
 
     function renderSessions(sessions) {
-      const grid = document.getElementById('sessionsGrid');
-      const emptyState = document.getElementById('emptyState');
+  const grid = document.getElementById('sessionsGrid');
+  const emptyState = document.getElementById('emptyState');
 
-      if (sessions.length === 0) {
-        grid.style.display = 'none';
-        emptyState.style.display = 'block';
-        return;
-      }
+  if (sessions.length === 0) {
+    grid.style.display = 'none';
+    emptyState.style.display = 'block';
+    return;
+  }
 
-      grid.style.display = 'grid';
-      emptyState.style.display = 'none';
+  grid.style.display = 'grid';
+  emptyState.style.display = 'none';
 
-      grid.innerHTML = sessions.map(session => `
-        <div class="session-card" onclick="viewSession('${session.id}')">
-          <div class="session-header">
-            <div>
-              <h3 class="session-title">${session.title}</h3>
-              <div class="session-date">${formatDate(session.date)}</div>
-            </div>
-            <div class="session-badge">${session.status}</div>
+  grid.innerHTML = sessions.map(session => `
+    <div class="session-card">
+      <div class="session-header">
+        <div>
+          <h3 class="session-title">${session.title}</h3>
+          <div class="session-date">${formatDate(session.date)}</div>
+        </div>
+        <div class="session-badge">${session.repsCount} Reps</div>
+      </div>
+
+      <div class="session-metrics-top">
+        <div class="metric-top">
+          <div class="metric-value-top">${session.exerciseName}</div>
+          <div class="metric-label-top">Exercise</div>
+        </div>
+      </div>
+
+      <div class="phase-squares">
+        <div class="phase-title">
+          <i class="fas fa-list phase-icon"></i>
+          Session Overview
+        </div>
+
+        <div class="phase-grid">
+          <div class="phase-square">
+            <div class="phase-number"><i class="fas fa-repeat"></i></div>
+            <div class="phase-name">Repetitions</div>
+            <div class="phase-percentage">${session.repsCount}</div>
+            <div class="phase-status">Recorded</div>
           </div>
 
-          <div class="session-metrics-top">
-            <div class="metric-top">
-              <div class="metric-value-top">${session.exerciseName}</div>
-              <div class="metric-label-top">Exercise</div>
-            </div>
-          </div>
-
-          <div class="phase-squares">
-            <div class="phase-title">
-              <i class="fas fa-chart-bar phase-icon"></i>
-              Session Details
-            </div>
-
-            <div class="phase-grid">
-              <div class="phase-square ${getStatusClass(session.status)}">
-                <div class="phase-number">1</div>
-                <div class="phase-name">Symmetry Index</div>
-                <div class="phase-percentage">
-                  ${session.overallImbalance == null ? "N/A" : session.overallImbalance.toFixed(2) + "%"}
-                </div>
-                <div class="phase-status ${getStatusClass(session.status)}">
-                  ${getStatusText(session.status)}
-                </div>
-              </div>
-
-              <div class="phase-square">
-                <div class="phase-number"><i class="fas fa-user"></i></div>
-                <div class="phase-name">Dominant Side</div>
-                <div class="phase-percentage">${session.dominantSide}</div>
-                <div class="phase-status">Recorded</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="session-footer">
-            <div class="session-duration">
-              <i class="fas fa-clock"></i>
-              ${session.duration}
-            </div>
+          <div class="phase-square">
+            <div class="phase-number"><i class="fas fa-clock"></i></div>
+            <div class="phase-name">Duration</div>
+            <div class="phase-percentage">${session.duration}</div>
+            <div class="phase-status">Completed</div>
           </div>
         </div>
-      `).join('');
-    }
+      </div>
+
+      <div class="session-footer">
+        <div class="session-duration">
+          <i class="fas fa-calendar"></i>
+          ${formatDate(session.date)}
+        </div>
+
+        <button class="action-btn primary" onclick="viewSessionDetails('${session.id}')">
+          <i class="fas fa-eye"></i>
+          More Details
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+function viewSessionDetails(sessionId) {
+  window.location.href = `session-details.html?session_id=${sessionId}`;
+}
 
     function filterSessions() {
       const timeFilter = document.getElementById('timeFilter').value;

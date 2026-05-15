@@ -519,7 +519,98 @@
       background: rgba(255, 182, 163, 0.9);
       box-shadow: 0 0 14px rgba(255, 182, 163, 0.5);
     }
+.form-check-wrapper {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+  align-items: stretch;
+  position: relative;
+  z-index: 1;
+}
 
+.form-camera-card {
+  position: relative;
+  min-height: 320px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#formVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  z-index: 1;
+}
+
+#formCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.form-check-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+}
+
+.form-result-card {
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.form-result-title {
+  color: var(--primary-accent);
+  font-size: 1rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.form-result-main {
+  font-size: 1.45rem;
+  margin-bottom: 10px;
+  color: white;
+}
+
+.form-result-detail {
+  opacity: 0.86;
+  line-height: 1.7;
+  font-size: 0.94rem;
+}
+
+.form-result-card.balanced {
+  border-color: rgba(141, 211, 161, 0.35);
+  background: rgba(141, 211, 161, 0.12);
+}
+
+.form-result-card.warning {
+  border-color: rgba(255, 182, 163, 0.40);
+  background: rgba(255, 182, 163, 0.14);
+}
+
+@media (max-width: 768px) {
+  .form-check-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .form-camera-card {
+    min-height: 260px;
+  }
+}
     .sensor-label {
       font-size: 0.92rem;
       opacity: 0.92;
@@ -1039,6 +1130,42 @@
         </div>
 
         <div class="sensor-positions"></div>
+      </div>
+    </section>
+    <!-- Quick Form Check (Camera-Based) -->
+    <section class="connection-section" id="quickFormCheckSection">
+      <div class="connection-header">
+        <h2 class="connection-title">Quick Form Check</h2>
+        <p class="sensor-description">
+          Perform one slow bodyweight squat to check visible movement symmetry before using EMG sensors.
+        </p>
+      </div>
+
+      <div class="form-check-wrapper">
+        <div class="form-camera-card">
+          <video id="formVideo" autoplay playsinline muted></video>
+          <canvas id="formCanvas"></canvas>
+        </div>
+
+        <div class="form-check-panel">
+          <button class="action-btn primary" id="startFormCheckBtn" type="button">
+            <i class="fas fa-camera"></i>
+            Start Form Check
+          </button>
+
+          <button class="action-btn" id="stopFormCheckBtn" type="button" style="display:none;">
+            <i class="fas fa-stop-circle"></i>
+            Stop Check
+          </button>
+
+          <div class="form-result-card" id="formResultCard">
+            <div class="form-result-title">Camera-Based Movement Insight</div>
+            <div class="form-result-main" id="formResultMain">Ready to start</div>
+            <div class="form-result-detail" id="formResultDetail">
+              This quick check estimates visible movement asymmetry from body angles. AWTAD uses EMG sensors to measure muscle activation imbalance.
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1793,6 +1920,217 @@ document.getElementById("saveFeedbackBtn").addEventListener("click", async funct
       console.error("Unexpected error:", err);
     }
   });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>`   
+
+<script>
+let awtadFormPose = null;
+let awtadFormCheckActive = false;
+let awtadStream = null;
+let awtadFrameId = null;
+
+function setFormResult(status, detail, state) {
+  const card = document.getElementById("formResultCard");
+  const main = document.getElementById("formResultMain");
+  const detailEl = document.getElementById("formResultDetail");
+
+  if (!card) return;
+
+  card.classList.remove("balanced", "warning");
+  if (state) card.classList.add(state);
+
+  main.textContent = status;
+  detailEl.textContent = detail;
+}
+
+function drawPoseOverlay(results) {
+  const video = document.getElementById("formVideo");
+  const canvas = document.getElementById("formCanvas");
+
+  if (!results.poseLandmarks) return;
+
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const landmarks = results.poseLandmarks;
+
+  const connections = [
+    [11,12],[11,23],[12,24],[23,24],
+    [23,25],[25,27],[24,26],[26,28]
+  ];
+
+  ctx.save();
+  ctx.scale(-1,1);
+  ctx.translate(-canvas.width,0);
+
+  ctx.strokeStyle = "#ffd2c2";
+  ctx.lineWidth = 4;
+
+  connections.forEach(([a,b]) => {
+    const p1 = landmarks[a];
+    const p2 = landmarks[b];
+
+    if (!p1 || !p2) return;
+
+    ctx.beginPath();
+    ctx.moveTo(p1.x * canvas.width, p1.y * canvas.height);
+    ctx.lineTo(p2.x * canvas.width, p2.y * canvas.height);
+    ctx.stroke();
+  });
+
+  landmarks.forEach((point, i) => {
+    if (![11,12,23,24,25,26,27,28].includes(i)) return;
+
+    ctx.beginPath();
+    ctx.arc(
+      point.x * canvas.width,
+      point.y * canvas.height,
+      6,
+      0,
+      Math.PI * 2
+    );
+    ctx.fillStyle = "#8dd3a1";
+    ctx.fill();
+  });
+
+  ctx.restore();
+}
+
+function analyzeFormFromLandmarks(landmarks) {
+  const leftShoulder = landmarks[11];
+  const rightShoulder = landmarks[12];
+  const leftHip = landmarks[23];
+  const rightHip = landmarks[24];
+
+  if (!leftShoulder || !rightShoulder || !leftHip || !rightHip) {
+    setFormResult(
+      "Body not detected",
+      "Stand farther so full body is visible.",
+      "warning"
+    );
+    return;
+  }
+
+  const shoulderTilt = Math.abs(leftShoulder.y - rightShoulder.y);
+  const hipTilt = Math.abs(leftHip.y - rightHip.y);
+
+  const score = Math.round((shoulderTilt + hipTilt) * 100);
+
+  if (score < 8) {
+    setFormResult(
+      "Balanced visible movement",
+      `Symmetry score: ${score}%`,
+      "balanced"
+    );
+  } else {
+    setFormResult(
+      "Visible asymmetry detected",
+      `Symmetry score: ${score}%`,
+      "warning"
+    );
+  }
+}
+
+async function startFormCheck() {
+  const video = document.getElementById("formVideo");
+  const startBtn = document.getElementById("startFormCheckBtn");
+  const stopBtn = document.getElementById("stopFormCheckBtn");
+
+  if (!awtadFormPose) {
+    awtadFormPose = new Pose({
+      locateFile: file =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+    });
+
+    awtadFormPose.setOptions({
+      modelComplexity: 0,
+      smoothLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+    });
+
+    awtadFormPose.onResults((results) => {
+      if (!awtadFormCheckActive) return;
+
+      drawPoseOverlay(results);
+
+      if (results.poseLandmarks) {
+        analyzeFormFromLandmarks(results.poseLandmarks);
+      }
+    });
+  }
+
+  try {
+    awtadStream = await navigator.mediaDevices.getUserMedia({
+      video: true
+    });
+
+    video.srcObject = awtadStream;
+    await video.play();
+
+    awtadFormCheckActive = true;
+
+    startBtn.style.display = "none";
+    stopBtn.style.display = "inline-flex";
+
+    async function detectLoop() {
+      if (!awtadFormCheckActive) return;
+
+      await awtadFormPose.send({ image: video });
+      awtadFrameId = requestAnimationFrame(detectLoop);
+    }
+
+    detectLoop();
+
+  } catch (err) {
+    console.error(err);
+
+    setFormResult(
+      "Camera failed",
+      "Allow camera access.",
+      "warning"
+    );
+  }
+}
+
+function stopFormCheck() {
+  awtadFormCheckActive = false;
+
+  if (awtadFrameId) {
+    cancelAnimationFrame(awtadFrameId);
+  }
+
+  if (awtadStream) {
+    awtadStream.getTracks().forEach(track => track.stop());
+  }
+
+  document.getElementById("formVideo").srcObject = null;
+  document.getElementById("formCanvas")
+    .getContext("2d")
+    .clearRect(
+      0,
+      0,
+      document.getElementById("formCanvas").width,
+      document.getElementById("formCanvas").height
+    );
+
+  document.getElementById("startFormCheckBtn").style.display = "inline-flex";
+  document.getElementById("stopFormCheckBtn").style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document
+    .getElementById("startFormCheckBtn")
+    .addEventListener("click", startFormCheck);
+
+  document
+    .getElementById("stopFormCheckBtn")
+    .addEventListener("click", stopFormCheck);
+});
 </script>
 </body>
 </html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWTAD - Session Details</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+
+  <style>
+    :root {
+      --sidebar-width: 220px;
+      --primary-accent: #ffd2c2;
+      --bg-dark: #4B3A57;
+      --glass-border: rgba(255,255,255,0.14);
+      --shadow-soft: 0 10px 30px rgba(0,0,0,0.22);
+      --success: #8dd3a1;
+      --danger: #ff6b6b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: white;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 25%, rgba(255,182,163,0.30), transparent 42%),
+        radial-gradient(circle at 85% 75%, rgba(255,209,179,0.22), transparent 48%),
+        radial-gradient(circle at 55% 45%, rgba(255,160,140,0.10), transparent 50%);
+      z-index: -2;
+    }
+
+    .menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 15px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+      cursor: pointer;
+    }
+
+    .menu-btn i {
+      color: var(--primary-accent);
+      font-size: 1.5rem;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      height: calc(100vh - 24px);
+      margin: 12px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding: 22px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid var(--glass-border);
+      border-radius: 26px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(22px);
+      transition: left 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar.hidden { left: -270px; }
+
+    .sidebar-brand {
+      text-align: center;
+      padding-bottom: 26px;
+    }
+
+    .sidebar-brand img { width: 105px; }
+
+    .user-mini-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.09);
+      padding: 14px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+    }
+
+    .user-mini-card h4 {
+      color: var(--primary-accent);
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+    }
+
+    .user-mini-card p {
+      font-size: 0.76rem;
+      opacity: 0.72;
+    }
+
+    .sidebar-nav { flex-grow: 1; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      color: rgba(255,255,255,0.72);
+      text-decoration: none;
+      border-radius: 14px;
+      transition: 0.25s;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: white;
+      background: rgba(255,204,187,0.15);
+    }
+
+    .nav-item i {
+      color: var(--primary-accent);
+      width: 18px;
+      text-align: center;
+    }
+
+    .main-content {
+      margin-left: calc(var(--sidebar-width) + 32px);
+      padding: 70px 34px 42px;
+      transition: 0.3s;
+    }
+
+    .main-content.expanded {
+      margin-left: 0;
+      padding-left: 80px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+
+    .page-title {
+      font-size: 2.25rem;
+      font-weight: 300;
+    }
+
+    .page-subtitle {
+      opacity: 0.75;
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: white;
+      text-decoration: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
+      color: #4B3A57;
+      font-weight: 700;
+      border: none;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.05));
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 28px;
+      margin-bottom: 26px;
+    }
+
+    .section-title {
+      color: var(--primary-accent);
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin-bottom: 18px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 18px;
+    }
+
+    .summary-item {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .summary-value {
+      color: var(--primary-accent);
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+
+    .summary-label {
+      opacity: 0.78;
+      font-size: 0.9rem;
+    }
+
+    .signal-canvas-container {
+      height: 340px;
+      background: rgba(0,0,0,0.18);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .reps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .rep-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 22px;
+      padding: 22px;
+    }
+
+    .rep-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .rep-title {
+      color: var(--primary-accent);
+      font-size: 1.25rem;
+    }
+
+    .status-pill {
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .status-pill.balanced {
+      background: rgba(141,211,161,0.18);
+      color: var(--success);
+    }
+
+    .status-pill.imbalanced {
+      background: rgba(255,107,107,0.18);
+      color: var(--danger);
+    }
+
+    .rep-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      font-size: 0.95rem;
+    }
+
+    .rep-row span { opacity: 0.78; }
+    .rep-row strong { color: var(--primary-accent); }
+
+    .balance-bar {
+      height: 16px;
+      border-radius: 999px;
+      overflow: hidden;
+      display: flex;
+      background: rgba(255,255,255,0.12);
+      margin-top: 16px;
+    }
+
+    .left-bar {
+      background: linear-gradient(90deg, #ffb6a3, #ffd1b3);
+      height: 100%;
+    }
+
+    .right-bar {
+      background: linear-gradient(90deg, #ffd1b3, #ffe8d6);
+      height: 100%;
+    }
+
+    .empty-state {
+      text-align: center;
+      opacity: 0.8;
+      padding: 40px;
+    }
+
+    footer {
+      text-align: center;
+      opacity: 0.72;
+      margin-top: 30px;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 1024px) {
+      :root { --sidebar-width: 82px; }
+      .sidebar-brand img, .nav-text, .user-mini-card { display: none; }
+      .nav-item { justify-content: center; }
+    }
+
+    @media (max-width: 768px) {
+      .main-content,
+      .main-content.expanded {
+        margin-left: 0;
+        padding: 80px 18px 32px;
+      }
+
+      .sidebar.hidden { left: -270px; }
+      .page-title { font-size: 1.9rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="menu-btn active" id="menuBtn">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <img src="awtadlogo1.png" alt="AWTAD">
+    </div>
+
+    <div class="user-mini-card">
+      <h4 id="sidebarUserName">...</h4>
+      <p>Session details</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="userawtad.html" class="nav-item">
+        <i class="fas fa-th-large"></i>
+        <span class="nav-text">Dashboard</span>
+      </a>
+
+      <a href="FindCoach.html" class="nav-item">
+        <i class="fas fa-user-tie"></i>
+        <span class="nav-text">Find a Coach</span>
+      </a>
+
+      <a href="my-coach.html" class="nav-item">
+        <i class="fas fa-id-card"></i>
+        <span class="nav-text">My Coach</span>
+      </a>
+
+      <a href="sesstionsawtad.html" class="nav-item active">
+        <i class="fas fa-calendar"></i>
+        <span class="nav-text">Sessions</span>
+      </a>
+
+      <a href="profileawtad.html" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span class="nav-text">Profile</span>
+      </a>
+    </nav>
+
+    <a href="#" id="logoutBtn" class="nav-item">
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="nav-text">Logout</span>
+    </a>
+  </aside>
+
+  <main class="main-content" id="mainContent">
+    <section class="page-header">
+      <div>
+        <h1 class="page-title">Session Details</h1>
+        <p class="page-subtitle">Detailed breakdown of each repetition in this EMG session.</p>
+      </div>
+
+      <button class="action-btn" onclick="window.location.href='sesstionsawtad.html'">
+        <i class="fas fa-arrow-left"></i>
+        Back to Sessions
+      </button>
+    </section>
+
+    <section class="card">
+      <h2 class="section-title">Session Summary</h2>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="summary-value" id="exerciseValue">--</div>
+          <div class="summary-label">Exercise</div>
+        </div>
+
+        <div class="summary-item">
+          <div class="summary-value" id="dateValue">--</div>
+          <div class="summary-label">Date</div>
+        </div>
+
+        <div class="summary-item">
+          <div class="summary-value" id="durationValue">--</div>
+          <div class="summary-label">Duration</div>
+        </div>
+
+        <div class="summary-item">
+          <div class="summary-value" id="repCountValue">--</div>
+          <div class="summary-label">Repetitions</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="signalCard" style="display:none;">
+      <h2 class="section-title">Signal Preview</h2>
+      <div class="signal-canvas-container">
+        <canvas id="signalCanvas"></canvas>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="section-title">Repetition Analysis</h2>
+      <div class="reps-grid" id="repsGrid"></div>
+
+      <div class="empty-state" id="emptyState" style="display:none;">
+        No repetition data found for this session.
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
+    </footer>
+  </main>
+
+  <script>
+    const supa = window.supabase;
+
+    function formatDate(dateString) {
+      if (!dateString) return "N/A";
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      });
+    }
+
+    function formatDuration(seconds) {
+      if (seconds == null || isNaN(seconds)) return "N/A";
+      return `${seconds} sec`;
+    }
+
+    function getSessionId() {
+      return new URLSearchParams(window.location.search).get("session_id");
+    }
+
+    document.addEventListener("DOMContentLoaded", async function () {
+      const menuBtn = document.getElementById("menuBtn");
+      const sidebar = document.getElementById("sidebar");
+      const mainContent = document.getElementById("mainContent");
+
+      menuBtn.addEventListener("click", function () {
+        sidebar.classList.toggle("hidden");
+        mainContent.classList.toggle("expanded");
+        menuBtn.classList.toggle("active");
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", async function (e) {
+        e.preventDefault();
+        await supa.auth.signOut();
+        window.location.href = "loginawtad.html";
+      });
+
+      await loadUser();
+      await loadSessionDetails();
+    });
+
+    async function loadUser() {
+      const { data: { user }, error } = await supa.auth.getUser();
+
+      if (error || !user) {
+        window.location.href = "loginawtad.html";
+        return;
+      }
+
+      const { data: client } = await supa
+        .from("Client")
+        .select("Fname, Lname")
+        .eq("client_id", user.id)
+        .single();
+
+      document.getElementById("sidebarUserName").textContent =
+        `${client?.Fname || ""} ${client?.Lname || ""}`.trim() || "User";
+    }
+
+    async function loadSessionDetails() {
+      const sessionId = getSessionId();
+
+      if (!sessionId) {
+        alert("Missing session_id.");
+        window.location.href = "sesstionsawtad.html";
+        return;
+      }
+
+      const { data: { user }, error: authError } = await supa.auth.getUser();
+
+      if (authError || !user) {
+        window.location.href = "loginawtad.html";
+        return;
+      }
+
+      const { data: session, error } = await supa
+        .from("Session")
+        .select(`
+          session_id,
+          exercise_type,
+          session_date,
+          duration_sec,
+          signal_preview,
+          client_id,
+          Reps (
+            reps_id,
+            rep_number,
+            label,
+            symmetry_index,
+            dominant_side,
+            rms_left,
+            rms_right
+          )
+        `)
+        .eq("session_id", sessionId)
+        .eq("client_id", user.id)
+        .single();
+
+      if (error || !session) {
+        console.error(error);
+        alert("Session not found.");
+        window.location.href = "sesstionsawtad.html";
+        return;
+      }
+
+      document.getElementById("exerciseValue").textContent = session.exercise_type || "Exercise";
+      document.getElementById("dateValue").textContent = formatDate(session.session_date);
+      document.getElementById("durationValue").textContent = formatDuration(session.duration_sec);
+
+      const reps = (session.Reps || []).sort((a, b) => {
+        return Number(a.rep_number || 0) - Number(b.rep_number || 0);
+      });
+
+      document.getElementById("repCountValue").textContent = reps.length;
+      renderReps(reps);
+
+      if (session.signal_preview) {
+        document.getElementById("signalCard").style.display = "block";
+        setTimeout(() => drawRawSignal(session.signal_preview), 100);
+      }
+    }
+
+    function renderReps(reps) {
+      const grid = document.getElementById("repsGrid");
+      const emptyState = document.getElementById("emptyState");
+
+      if (!reps.length) {
+        grid.style.display = "none";
+        emptyState.style.display = "block";
+        return;
+      }
+
+      grid.style.display = "grid";
+      emptyState.style.display = "none";
+
+      grid.innerHTML = reps.map(rep => {
+        const si = Number(rep.symmetry_index || 0);
+        const siPercent = Math.round(si * 100);
+
+        const label = rep.label || (si >= 0.15 ? "imbalance" : "balanced");
+        const statusClass = label.toLowerCase() === "balanced" ? "balanced" : "imbalanced";
+        const statusText = statusClass === "balanced" ? "Balanced" : "Imbalanced";
+
+        const leftRms = Number(rep.rms_left || 0);
+        const rightRms = Number(rep.rms_right || 0);
+        const total = leftRms + rightRms;
+
+        const leftPercent = total > 0 ? Math.round((leftRms / total) * 100) : 50;
+        const rightPercent = total > 0 ? Math.round((rightRms / total) * 100) : 50;
+
+        return `
+          <div class="rep-card">
+            <div class="rep-header">
+              <h3 class="rep-title">Rep ${rep.rep_number || "-"}</h3>
+              <span class="status-pill ${statusClass}">${statusText}</span>
+            </div>
+
+            <div class="rep-row">
+              <span>Symmetry Index</span>
+              <strong>${siPercent}%</strong>
+            </div>
+
+            <div class="rep-row">
+              <span>Dominant Side</span>
+              <strong>${rep.dominant_side || "N/A"}</strong>
+            </div>
+
+            <div class="rep-row">
+              <span>Left RMS</span>
+              <strong>${leftRms.toFixed(4)}</strong>
+            </div>
+
+            <div class="rep-row">
+              <span>Right RMS</span>
+              <strong>${rightRms.toFixed(4)}</strong>
+            </div>
+
+            <div class="rep-row">
+              <span>Left Activation</span>
+              <strong>${leftPercent}%</strong>
+            </div>
+
+            <div class="rep-row">
+              <span>Right Activation</span>
+              <strong>${rightPercent}%</strong>
+            </div>
+
+            <div class="balance-bar">
+              <div class="left-bar" style="width:${leftPercent}%"></div>
+              <div class="right-bar" style="width:${rightPercent}%"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function drawRawSignal(rawPlot) {
+      const canvas = document.getElementById("signalCanvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      const width = canvas.width;
+      const height = canvas.height;
+
+      ctx.clearRect(0, 0, width, height);
+
+      ctx.strokeStyle = "rgba(255,255,255,0.12)";
+      ctx.lineWidth = 1;
+
+      for (let y = 0; y < height; y += height / 10) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      for (let x = 0; x < width; x += width / 20) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+
+      const left = rawPlot.emg_left || [];
+      const right = rawPlot.emg_right || [];
+
+      if (!left.length || !right.length) return;
+
+      const allValues = [...left, ...right];
+      const minVal = Math.min(...allValues);
+      const maxVal = Math.max(...allValues);
+      const range = (maxVal - minVal) || 1;
+
+      function normalize(val, top, sectionHeight) {
+        return top + sectionHeight - ((val - minVal) / range) * sectionHeight;
+      }
+
+      const topSection = height * 0.05;
+      const sectionHeight = height * 0.35;
+      const bottomSection = height * 0.55;
+
+      ctx.strokeStyle = "rgba(255,182,163,0.9)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      for (let i = 0; i < left.length; i++) {
+        const x = (i / (left.length - 1)) * width;
+        const y = normalize(left[i], topSection, sectionHeight);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(141,211,161,0.9)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      for (let i = 0; i < right.length; i++) {
+        const x = (i / (right.length - 1)) * width;
+        const y = normalize(right[i], bottomSection, sectionHeight);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.stroke();
+    }
+  </script>
+</body>
+</html>
