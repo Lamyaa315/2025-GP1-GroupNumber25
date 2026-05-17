@@ -820,10 +820,7 @@
   </style>
 </head>
 <body>
-<label class="switch">
-        <input type="checkbox" id="themeSwitch">
-        <span class="slider"></span>
-    </label>
+
   <div class="menu-btn active" id="menuBtn">
     <i class="fas fa-bars"></i>
   </div>
@@ -974,20 +971,6 @@
 
         <div class="stat-card">
           <div class="stat-card-header">
-            <h3 class="stat-card-title">Balance Improvement</h3>
-            <div class="stat-card-icon">
-              <i class="fas fa-chart-line"></i>
-            </div>
-          </div>
-          <div class="stat-card-value" id="improvementValue">N/A</div>
-          <div class="stat-card-change">
-            <i class="fas fa-arrow-up"></i>
-            <span id="improvementText">Need more sessions</span>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-card-header">
             <h3 class="stat-card-title">Avg. Session Duration</h3>
             <div class="stat-card-icon">
               <i class="fas fa-clock"></i>
@@ -1069,7 +1052,7 @@
     let allProgressValues = [];
 
     document.addEventListener('DOMContentLoaded', async function () {
-      const menuBtn = document.getElementById('menuBtn');
+      
       const sidebar = document.getElementById('sidebar');
       const mainContent = document.getElementById('mainContent');
 
@@ -1197,17 +1180,48 @@ menuBtn.addEventListener('click', function () {
 
         // 3. معالجة البيانات (Mapping)
         const mappedSessions = (sessions || []).map(session => {
-          const rep = session.Reps && session.Reps.length > 0 ? session.Reps[0] : null;
-          return {
-            session_id: session.session_id,
-            exercise_type: session.exercise_type || "Exercise",
-            session_date: session.session_date,
-            duration_sec: session.duration_sec,
-            label: rep?.label || "Unknown",
-            symmetry_index: rep?.symmetry_index != null ? parseFloat(rep.symmetry_index) : null,
-            dominant_side: rep?.dominant_side || "N/A"
-          };
-        });
+  const reps = session.Reps || [];
+
+  const validSI = reps
+    .map(rep => Number(rep.symmetry_index))
+    .filter(value => !isNaN(value));
+
+  const rawAvgSI = validSI.length
+  ? validSI.reduce((sum, value) => sum + value, 0) / validSI.length
+  : null;
+
+const avgSI = rawAvgSI != null && rawAvgSI <= 1
+  ? rawAvgSI * 100
+  : rawAvgSI;
+
+  const labels = reps
+    .map(rep => rep.label)
+    .filter(Boolean);
+
+  const finalLabel = avgSI == null
+    ? "Unknown"
+    : avgSI >= 15
+      ? "Imbalanced"
+      : "Balanced";
+
+  const dominantSides = reps
+    .map(rep => rep.dominant_side)
+    .filter(Boolean);
+
+  const dominantSide = dominantSides.length
+    ? dominantSides[dominantSides.length - 1]
+    : "N/A";
+
+  return {
+    session_id: session.session_id,
+    exercise_type: session.exercise_type || "Exercise",
+    session_date: session.session_date,
+    duration_sec: session.duration_sec,
+    label: finalLabel,
+    symmetry_index: avgSI,
+    dominant_side: dominantSide
+  };
+});
 
         console.log("Verified Sessions for Chart:", mappedSessions);
 
@@ -1345,46 +1359,29 @@ menuBtn.addEventListener('click', function () {
     }
 
     function fillStatsSection(sessions) {
-      const totalSessionsValue = document.getElementById('totalSessionsValue');
-      const totalSessionsText = document.getElementById('totalSessionsText');
-      const improvementValue = document.getElementById('improvementValue');
-      const improvementText = document.getElementById('improvementText');
-      const avgDurationValue = document.getElementById('avgDurationValue');
-      const avgDurationText = document.getElementById('avgDurationText');
+  const totalSessionsValue = document.getElementById('totalSessionsValue');
+  const totalSessionsText = document.getElementById('totalSessionsText');
+  const avgDurationValue = document.getElementById('avgDurationValue');
+  const avgDurationText = document.getElementById('avgDurationText');
 
-      const totalSessions = sessions.length;
+  const totalSessions = sessions.length;
 
-      const validSI = sessions
-        .map(s => s.symmetry_index)
-        .filter(v => typeof v === "number" && !isNaN(v));
+  totalSessionsValue.textContent = totalSessions;
+  totalSessionsText.textContent = totalSessions > 0 ? "Recorded sessions" : "No sessions yet";
 
-      const validDurations = sessions
-        .map(s => s.duration_sec)
-        .filter(v => typeof v === "number" && !isNaN(v));
+  const validDurations = sessions
+    .map(s => Number(s.duration_sec))
+    .filter(v => !isNaN(v) && v > 0);
 
-      totalSessionsValue.textContent = totalSessions;
-      totalSessionsText.textContent = totalSessions > 0 ? "Recorded sessions" : "No sessions yet";
-
-      if (validSI.length >= 2 && validSI[validSI.length - 1] > 0) {
-        const oldest = validSI[validSI.length - 1];
-        const latest = validSI[0];
-        const improvement = ((oldest - latest) / oldest) * 100;
-        improvementValue.textContent = `${improvement.toFixed(0)}%`;
-        improvementText.textContent = `From ${oldest.toFixed(2)}% to ${latest.toFixed(2)}%`;
-      } else {
-        improvementValue.textContent = "N/A";
-        improvementText.textContent = "Need more sessions";
-      }
-
-      if (validDurations.length) {
-        const avg = validDurations.reduce((a, b) => a + b, 0) / validDurations.length;
-        avgDurationValue.textContent = `${avg.toFixed(0)} sec`;
-        avgDurationText.textContent = "Average across sessions";
-      } else {
-        avgDurationValue.textContent = "N/A";
-        avgDurationText.textContent = "No duration data";
-      }
-    }
+  if (validDurations.length) {
+    const avg = validDurations.reduce((a, b) => a + b, 0) / validDurations.length;
+    avgDurationValue.textContent = `${avg.toFixed(0)} sec`;
+    avgDurationText.textContent = "Average across sessions";
+  } else {
+    avgDurationValue.textContent = "N/A";
+    avgDurationText.textContent = "No duration data";
+  }
+}
 
     function fillImbalanceSection(sessions) {
       const analysisText = document.getElementById('analysisText');
@@ -1454,7 +1451,30 @@ menuBtn.addEventListener('click', function () {
     console.log("Success! Data to be plotted:", allProgressValues);
     initializeProgressChart("month"); 
 }
+function getChartDataByPeriod(period) {
+  const now = new Date();
 
+  let monthsBack = 1;
+
+  if (period === "3months") monthsBack = 3;
+  if (period === "6months") monthsBack = 6;
+
+  const cutoffDate = new Date();
+  cutoffDate.setMonth(now.getMonth() - monthsBack);
+
+  const filtered = allProgressLabels.map((label, index) => {
+    return {
+      label,
+      value: allProgressValues[index],
+      rawIndex: index
+    };
+  });
+
+  return {
+    labels: filtered.map(item => item.label),
+    values: filtered.map(item => item.value)
+  };
+}
     function initializeProgressChart(period = "month") {
         const canvas = document.getElementById('progressChart');
         if (!canvas) {

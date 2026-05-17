@@ -338,7 +338,33 @@
       overflow: hidden;
       margin-bottom: 24px;
     }
+    .youtube-card {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255, 210, 194, 0.16), rgba(255,255,255,0.06));
+  border: 1px solid rgba(255,255,255,0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
 
+.youtube-card i {
+  font-size: 4rem;
+  color: #ffd2c2;
+}
+
+.youtube-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 210, 194, 0.35);
+}
     .exercise-instructions::before,
     .sensor-placement::before,
     .connection-section::before,
@@ -367,14 +393,15 @@
     }
 
     .exercise-header,
-    .sensor-header,
     .connection-header,
     .signal-header {
       position: relative;
       z-index: 1;
       margin-bottom: 22px;
     }
-
+    .sensor-header{
+      display: none;
+    }
     .exercise-header {
       display: flex;
       justify-content: space-between;
@@ -392,57 +419,53 @@
       color: var(--primary-accent);
     }
 
-    .exercise-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 22px;
-      position: relative;
-      z-index: 1;
-    }
+   .exercise-details {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 28px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
 
-    .exercise-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
+.exercise-steps {
+  display: flex !important;
+  flex-direction: column;
+  gap: 18px;
+  position: relative;
+  z-index: 5;
+  max-width: 560px;
+}
 
-    .exercise-step,
-    .step {
-      display: flex;
-      align-items: flex-start;
-      gap: 15px;
-    }
+.exercise-step {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 15px;
+  color: white;
+}
 
-    .exercise-step-number,
-    .step-number {
-      background: rgba(255, 182, 163, 0.25);
-      border: 1px solid rgba(255, 182, 163, 0.45);
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      flex-shrink: 0;
-      color: white;
-    }
+.exercise-step-number {
+  background: rgba(255, 182, 163, 0.25);
+  border: 1px solid rgba(255, 182, 163, 0.45);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-    .exercise-step-content h4,
-    .step-content h4 {
-      font-size: 1.02rem;
-      margin-bottom: 6px;
-      color: var(--primary-accent);
-    }
+.exercise-step-content h4 {
+  color: var(--primary-accent);
+  margin-bottom: 6px;
+}
 
-    .exercise-step-content p,
-    .step-content p,
-    .sensor-description {
-      opacity: 0.9;
-      font-size: 0.95rem;
-      line-height: 1.7;
-    }
-
+.exercise-step-content p {
+  color: white;
+  opacity: 0.9;
+  line-height: 1.7;
+}
     .exercise-visual {
       display: flex;
       align-items: center;
@@ -462,56 +485,80 @@
     }
 
     .exercise-image {
-      max-width: 320px;
-      height: 220px;
-      color: rgba(255,255,255,0.25);
-      font-size: 3rem;
-    }
+  width: 100%;
+  max-width: 420px;
+  height: 500px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.exercise-image iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
 
     .sensor-visual {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 22px;
-      margin-top: 10px;
-      position: relative;
-      z-index: 1;
-    }
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 28px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
 
-    .sensor-image {
-      max-width: 700px;
-      min-height: 320px;
-      padding: 18px;
-    }
+.sensor-image {
+  width: 320px;
+  padding: 14px;
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.sensor-image::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.18),
+    rgba(255,255,255,0.03) 45%,
+    transparent
+  );
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.sensor-image img {
+  width: 100%;
+  display: block;
+  border-radius: 18px;
+  position: relative;
+  z-index: 1;
+}
+.sensor-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+}
 
-    .sensor-image img {
-      width: 100%;
-      max-width: 620px;
-      height: auto;
-      display: block;
-      object-fit: contain;
-      border-radius: 16px;
-    }
+.sensor-text .sensor-title {
+  margin-bottom: 0;
+}
 
-    .sensor-image-placeholder {
-      font-size: 3rem;
-      color: rgba(255,255,255,0.25);
-    }
-
-    .sensor-positions {
-      display: flex;
-      justify-content: center;
-      gap: 50px;
-      width: 100%;
-      flex-wrap: wrap;
-    }
-
-    .sensor-position {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
+.sensor-text .sensor-description {
+  font-size: 1rem;
+  line-height: 1.8;
+  opacity: 0.9;
+}
+.sensor-positions {
+  justify-content: flex-end;
+  gap: 18px;
+}
     .sensor-dot {
       width: 18px;
       height: 18px;
@@ -521,16 +568,17 @@
     }
 .form-check-wrapper {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 24px;
-  align-items: stretch;
+  grid-template-columns: 380px 1fr;
+  gap: 18px;
+  align-items: center;
   position: relative;
   z-index: 1;
 }
 
 .form-camera-card {
   position: relative;
-  min-height: 320px;
+  width: 380px;
+  height: 620px;
   background: rgba(0, 0, 0, 0.18);
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 20px;
@@ -605,10 +653,14 @@
 @media (max-width: 768px) {
   .form-check-wrapper {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .form-camera-card {
-    min-height: 260px;
+    width: 100%;
+    max-width: 360px;
+    height: 500px;
+    margin: 0 auto;
   }
 }
     .sensor-label {
@@ -648,13 +700,50 @@
     }
 
     .info-steps {
-      margin-top: 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      position: relative;
-      z-index: 1;
-    }
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.step-number {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 182, 163, 0.25);
+  border: 1px solid rgba(255, 182, 163, 0.45);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.step-content h4 {
+  color: var(--primary-accent);
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+.step-content p {
+  color: white;
+  opacity: 0.86;
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
 
     .signal-display {
       display: none;
@@ -1088,11 +1177,6 @@
           <i class="fas fa-arrow-left"></i>
           Back to Selection
         </button>
-
-        <button class="action-btn">
-          <i class="fas fa-question-circle"></i>
-          Help
-        </button>
       </div>
     </section>
 
@@ -1103,11 +1187,51 @@
       </div>
 
       <div class="exercise-details">
-        <div class="exercise-steps"></div>
+        <div class="exercise-steps">
+  <div class="exercise-step">
+    <div class="exercise-step-number">1</div>
+    <div class="exercise-step-content">
+      <h4>Starting Position</h4>
+      <p>Stand with feet shoulder-width apart, toes pointing slightly outward.</p>
+    </div>
+  </div>
+
+  <div class="exercise-step">
+    <div class="exercise-step-number">2</div>
+    <div class="exercise-step-content">
+      <h4>Movement Phase</h4>
+      <p>Lower your body by bending knees and hips while keeping the chest up.</p>
+    </div>
+  </div>
+
+  <div class="exercise-step">
+    <div class="exercise-step-number">3</div>
+    <div class="exercise-step-content">
+      <h4>Depth</h4>
+      <p>Descend until the thighs are parallel to the ground or as deep as comfortable.</p>
+    </div>
+  </div>
+
+  <div class="exercise-step">
+    <div class="exercise-step-number">4</div>
+    <div class="exercise-step-content">
+      <h4>Return</h4>
+      <p>Push through the heels and return to the standing position.</p>
+    </div>
+  </div>
+</div>
 
         <div class="exercise-visual">
           <div class="exercise-image">
-            <i class="fas fa-running"></i>
+            <a
+  class="youtube-card"
+  href="https://youtu.be/rrJIyZGlK8c?si=oXyk_e1FyaJB-x5i"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <i class="fab fa-youtube"></i>
+  <span>Watch Back Squat Tutorial</span>
+</a>
           </div>
         </div>
       </div>
@@ -1122,14 +1246,23 @@
       </div>
 
       <div class="sensor-visual">
-        <div class="sensor-image">
-          <img src="sensor-placement.jpeg" alt="EMG sensor placement guide" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="sensor-image-placeholder" style="display:none;">
-            <i class="fas fa-user"></i>
-          </div>
-        </div>
 
-        <div class="sensor-positions"></div>
+  <div class="sensor-image">
+    <img src="placement.jpeg" alt="EMG sensor placement guide">
+  </div>
+
+  <div class="sensor-text">
+    <h2 class="sensor-title">Sensor Placement Guide</h2>
+
+    <p class="sensor-description">
+      Place the EMG sensors on both legs as shown in the image.
+      Ensure the skin is clean and dry before application.
+    </p>
+  </div>
+
+</div>
+
+       
       </div>
     </section>
     <!-- Quick Form Check (Camera-Based) -->
@@ -1393,6 +1526,8 @@ async function saveSignalPreviewToSession(clientId, rawPlot) {
     let isSessionActive = false;
     let animationId;
     let latestSessionId = null;
+    let isSavingFeedback = false;
+    let feedbackAlreadySaved = false;
 
     const urlParams = new URLSearchParams(window.location.search);
     const exercise = urlParams.get('exercise') || 'squat';
@@ -1617,6 +1752,20 @@ if (!latestSessionError && latestSession) {
           resultCard.style.display = 'block';
           document.getElementById("feedbackBox").style.display = "block";
 
+          feedbackAlreadySaved = false;
+          isSavingFeedback = false;
+
+          document.getElementById("coachFeedback").disabled = false;
+          document.getElementById("coachFeedback").value = "";
+
+          const saveFeedbackBtn = document.getElementById("saveFeedbackBtn");
+          saveFeedbackBtn.disabled = false;
+          saveFeedbackBtn.innerHTML = "Save Feedback";
+
+          const feedbackMessage = document.getElementById("feedbackMessage");
+          feedbackMessage.textContent = "";
+          feedbackMessage.className = "message";
+
           const leftValueEl = document.getElementById('leftValue');
           const rightValueEl = document.getElementById('rightValue');
           const leftStrengthEl = document.getElementById('leftStrength');
@@ -1838,11 +1987,17 @@ if (!latestSessionError && latestSession) {
     
   });
 document.getElementById("saveFeedbackBtn").addEventListener("click", async function () {
-
-  const clientId = new URLSearchParams(window.location.search).get("client_id");
-
+  const saveBtn = document.getElementById("saveFeedbackBtn");
   const feedbackText = document.getElementById("coachFeedback").value.trim();
   const message = document.getElementById("feedbackMessage");
+
+  if (isSavingFeedback || feedbackAlreadySaved) return;
+
+  if (!latestSessionId) {
+    message.textContent = "No analyzed session found to save feedback.";
+    message.className = "message error";
+    return;
+  }
 
   if (!feedbackText) {
     message.textContent = "Please write feedback before saving.";
@@ -1850,39 +2005,42 @@ document.getElementById("saveFeedbackBtn").addEventListener("click", async funct
     return;
   }
 
-  const { data: latestSession, error: latestSessionError } = await window.supabase
-    .from("Session")
-    .select("session_id")
-    .eq("client_id", clientId)
-    .order("session_date", { ascending: false })
-    .limit(1)
-    .single();
+  isSavingFeedback = true;
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = "Saving...";
 
-  if (latestSessionError || !latestSession) {
-    console.error(latestSessionError);
-    message.textContent = "No session found to save feedback.";
+  try {
+    const { error } = await window.supabase
+      .from("Session")
+      .update({
+        coach_feedback: feedbackText,
+        coach_feedback_at: new Date().toISOString()
+      })
+      .eq("session_id", latestSessionId);
+
+    if (error) throw error;
+
+    feedbackAlreadySaved = true;
+
+    message.textContent = "Feedback saved successfully.";
+    message.className = "message success";
+
+    saveBtn.innerHTML = "Feedback Saved";
+    saveBtn.disabled = true;
+    document.getElementById("coachFeedback").disabled = true;
+
+  } catch (err) {
+    console.error(err);
+
+    isSavingFeedback = false;
+    feedbackAlreadySaved = false;
+
+    message.textContent = "Failed to save feedback: " + err.message;
     message.className = "message error";
-    return;
+
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = "Save Feedback";
   }
-
-  const { error } = await window.supabase
-    .from("Session")
-    .update({
-      coach_feedback: feedbackText,
-      coach_feedback_at: new Date().toISOString()
-    })
-    .eq("session_id", latestSession.session_id)
-    .eq("client_id", clientId);
-
-  if (error) {
-    console.error(error);
-    message.textContent = "Failed to save feedback: " + error.message;
-    message.className = "message error";
-    return;
-  }
-
-  message.textContent = "Feedback saved successfully.";
-  message.className = "message success";
 });
   document.addEventListener("DOMContentLoaded", async function() {
     try {

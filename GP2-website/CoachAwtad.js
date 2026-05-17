@@ -78,6 +78,9 @@ const { data: activeClients, error: aError } = await supa
     if (document.getElementById('statActiveClients')) {
         document.getElementById('statActiveClients').textContent = (activeClients || []).length;
     }
+    if (document.getElementById('statPendingCount')) {
+  document.getElementById('statPendingCount').textContent = (pendingRequests || []).length;
+}
 }
 
 function subscribeToCoachRequests() {
@@ -205,7 +208,7 @@ function renderAcceptedList(relationships) {
 
         card.onclick = () => {
     if (c && c.client_id) {
-        window.location.href = `athlete-dashboard.html?id=${c.client_id}`;
+        window.location.href = `athlete-dashboard.html?client_id=${c.client_id}`;
     } else {
         console.error("Client ID is missing in the data object", c);
     }

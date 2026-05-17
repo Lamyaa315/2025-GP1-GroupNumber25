@@ -534,7 +534,35 @@
     .modal-btn:hover {
       transform: translateY(-2px);
     }
+    /* REQUEST TOAST */
+.toast {
+  position: fixed;
+  top: 22px;
+  right: 28px;
+  z-index: 3000;
+  min-width: 280px;
+  max-width: 420px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(141, 211, 161, 0.22), rgba(255,255,255,0.08));
+  border: 1px solid rgba(141, 211, 161, 0.35);
+  color: white;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: none;
+  align-items: center;
+  gap: 12px;
+  animation: fadeIn 0.35s ease;
+}
 
+.toast.active {
+  display: flex;
+}
+
+.toast i {
+  color: var(--success);
+}
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -686,13 +714,31 @@
       <p class="modal-text">
         Are you sure you want to log out? You'll need to log in again to access your account.
       </p>
-
       <div class="modal-buttons">
         <button id="cancelLogout" class="modal-btn cancel">Cancel</button>
         <button id="confirmLogout" class="modal-btn confirm">Logout</button>
       </div>
     </div>
   </div>
+
+  <div id="requestModal" class="modal">
+  <div class="modal-content">
+    <h3 class="modal-title">Confirm Request</h3>
+    <p class="modal-text" id="requestModalText">
+      Are you sure you want to send a request to this coach?
+    </p>
+
+    <div class="modal-buttons">
+      <button id="cancelRequest" class="modal-btn cancel">Cancel</button>
+      <button id="confirmRequest" class="modal-btn confirm">Send Request</button>
+    </div>
+  </div>
+</div>
+
+<div id="requestToast" class="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="requestToastText">Request sent successfully!</span>
+</div>
 
   <script>
     const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
@@ -952,52 +998,104 @@
       }).join('');
     }
 
-    async function sendConnectRequest(coachId, coachName) {
-      if (!currentUser || !currentClient) {
-        alert("Your client profile was not found. Please log in again.");
-        return;
-      }
+    let selectedCoachId = null;
+let selectedCoachName = null;
 
-      const { data: activeRel } = await supa
-        .from('Client_Coach_Relationship')
-        .select('request_id, status')
-        .eq('client_id', currentClient.client_id)
-        .in('status', ['pending', 'accepted'])
-        .maybeSingle();
+function showToast(message) {
+  const toast = document.getElementById("requestToast");
+  const text = document.getElementById("requestToastText");
 
-      if (activeRel) {
-        window.location.href = "my-coach.html";
-        return;
-      }
+  text.innerText = message;
+  toast.classList.add("active");
 
-      if (!confirm(`Send a connection request to Coach ${coachName}?`)) return;
+  setTimeout(() => {
+    toast.classList.remove("active");
+  }, 2500);
+}
 
-      const { error: relError } = await supa
-        .from('Client_Coach_Relationship')
-        .insert([{
-          client_id: currentClient.client_id,
-          coach_id: coachId,
-          status: 'pending'
-        }]);
+function openRequestModal(coachId, coachName) {
+  selectedCoachId = coachId;
+  selectedCoachName = coachName;
 
-      if (relError) {
-        console.error("Insert error:", relError);
-        alert("Error: " + relError.message);
-        return;
-      }
+  document.getElementById("requestModalText").innerText =
+    `Are you sure you want to send a request to Coach ${coachName}?`;
 
-      await supa
-        .from('Client')
-        .update({
-          coach_id: coachId,
-          request_status: 'pending'
-        })
-        .eq('client_id', currentClient.client_id);
+  document.getElementById("requestModal").classList.add("active");
+}
 
-      alert("Request sent!");
-      window.location.href = "my-coach.html";
+async function sendConnectRequest(coachId, coachName) {
+  if (!currentUser || !currentClient) {
+    showToast("Your client profile was not found. Please log in again.");
+    return;
+  }
+
+  const { data: activeRel } = await supa
+    .from('Client_Coach_Relationship')
+    .select('request_id, status')
+    .eq('client_id', currentClient.client_id)
+    .in('status', ['pending', 'accepted'])
+    .maybeSingle();
+
+  if (activeRel) {
+    window.location.href = "my-coach.html";
+    return;
+  }
+
+  openRequestModal(coachId, coachName);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  const requestModal = document.getElementById("requestModal");
+  const cancelRequest = document.getElementById("cancelRequest");
+  const confirmRequest = document.getElementById("confirmRequest");
+
+  cancelRequest.addEventListener("click", function () {
+    requestModal.classList.remove("active");
+  });
+
+  requestModal.addEventListener("click", function (e) {
+    if (e.target === requestModal) {
+      requestModal.classList.remove("active");
+    }
+  });
+
+  confirmRequest.addEventListener("click", async function () {
+    confirmRequest.disabled = true;
+    confirmRequest.textContent = "Sending...";
+
+    const { error: relError } = await supa
+      .from('Client_Coach_Relationship')
+      .insert([{
+        client_id: currentClient.client_id,
+        coach_id: selectedCoachId,
+        status: 'pending'
+      }]);
+
+    if (relError) {
+      console.error("Insert error:", relError);
+      showToast("Error: " + relError.message);
+      confirmRequest.disabled = false;
+      confirmRequest.textContent = "Send Request";
+      requestModal.classList.remove("active");
+      return;
     }
 
+    await supa
+      .from('Client')
+      .update({
+        coach_id: selectedCoachId,
+        request_status: 'pending'
+      })
+      .eq('client_id', currentClient.client_id);
+
+    requestModal.classList.remove("active");
+    showToast("Request sent successfully!");
+
+    setTimeout(() => {
+      window.location.href = "my-coach.html";
+    }, 1200);
+  });
+});
     function goToDetails(coachId) {
       window.location.href = `coach-details.html?id=${coachId}`;
     }

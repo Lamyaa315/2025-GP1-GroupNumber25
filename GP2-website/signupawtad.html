@@ -65,93 +65,30 @@
       pointer-events: none;
     }
 
-    /* NAVBAR - SAME STYLE AS LANDING PAGE */
-    .navbar {
-      position: static;
-      z-index: 1000;
-      width: 100%;
-      margin: 0;
-      padding: 20px 6%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(255, 255, 255, 0.075);
-      border-bottom: 1px solid var(--glass-border);
-      border-radius: 0;
-      backdrop-filter: blur(22px) saturate(140%);
-      -webkit-backdrop-filter: blur(22px) saturate(140%);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
-    }
+    .auth-logo {
+  text-align: center;
+  margin-bottom: 22px;
+  position: relative;
+  z-index: 1;
+}
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: white;
-    }
+.auth-logo a {
+  display: inline-block;
+  cursor: pointer;
+}
 
-    .logo img {
-      width: 115px;
-      height: auto;
-      object-fit: contain;
-      filter: drop-shadow(0 0 14px rgba(255, 210, 194, 0.16));
-    }
+.auth-logo img {
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px rgba(255, 210, 194, 0.16));
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
 
-    .logo-text {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.1;
-    }
-
-    .logo-text strong {
-      color: var(--primary-accent);
-      font-size: 1.25rem;
-      letter-spacing: 0.08em;
-    }
-
-    .logo-text span {
-      font-size: 0.88rem;
-      color: var(--text-soft);
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .nav-links a {
-      color: rgba(255, 255, 255, 0.78);
-      text-decoration: none;
-      font-size: 1.05rem;
-      padding: 10px 14px;
-      border-radius: 999px;
-      transition: 0.25s ease;
-    }
-
-    .nav-links a:hover {
-      color: white;
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .nav-links .login-link {
-      color: var(--primary-accent);
-      border: 1px solid rgba(255, 210, 194, 0.16);
-    }
-
-    .nav-links .signup-link {
-      color: #4B3A57;
-      background: linear-gradient(135deg, #FFD7C8, #FFBFA9);
-      font-weight: 700;
-      box-shadow: 0 10px 22px rgba(255, 181, 156, 0.18);
-    }
-
-    .nav-links .signup-link:hover {
-      color: #4B3A57;
-      transform: translateY(-2px);
-      background: linear-gradient(135deg, #FFE0D3, #FFC6B2);
-    }
+.auth-logo a:hover img {
+  transform: scale(1.04);
+  opacity: 0.9;
+}
 
 .signup-page {
   width: min(100% - 40px, 560px);
@@ -532,26 +469,9 @@ select.form-input option {
     }
 
     @media (max-width: 760px) {
-      .navbar {
-        padding: 12px 16px;
-      }
-
-      .logo img {
-        width: 78px;
-      }
-
-      .logo-text {
-        display: none;
-      }
-
-      .nav-links {
-        gap: 4px;
-      }
-
-      .nav-links a {
-        font-size: 0.85rem;
-        padding: 9px 10px;
-      }
+      .auth-logo img {
+  width: 95px;
+}
 
       .signup-page {
         width: min(100% - 24px, 680px);
@@ -587,23 +507,15 @@ select.form-input option {
 </head>
 
 <body>
-  <nav class="navbar">
-    <a href="awtadhp.html" class="logo">
-      <img src="awtadlogo1.png" alt="AWTAD Logo">
-      <div class="logo-text">
-        <strong>AWTAD</strong>
-        <span>EMG-based movement insight</span>
-      </div>
-    </a>
-
-    <div class="nav-links">
-      <a href="awtadhp.html">Home</a>
-      <a href="loginawtad.html" class="login-link">Log In</a>
-    </div>
-  </nav>
+  
 
   <main class="signup-page">
     <section class="signup-card">
+      <div class="auth-logo">
+  <a href="index.html">
+    <img src="awtadlogo1.png" alt="AWTAD Logo">
+  </a>
+</div>
       <div class="signup-header">
         <h1 class="signup-title">Create Account</h1>
         <p class="signup-subtitle">Choose your role and set up your AWTAD profile.</p>

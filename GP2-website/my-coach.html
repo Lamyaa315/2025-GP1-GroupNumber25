@@ -752,7 +752,33 @@
       opacity: 0.75;
       font-size: 0.95rem;
     }
+    .toast {
+  position: fixed;
+  top: 22px;
+  right: 28px;
+  z-index: 3000;
+  min-width: 280px;
+  max-width: 420px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(141, 211, 161, 0.22), rgba(255,255,255,0.08));
+  border: 1px solid rgba(141, 211, 161, 0.35);
+  color: white;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
 
+.toast.active {
+  display: flex;
+}
+
+.toast i {
+  color: var(--success);
+}
     @media (max-width: 900px) {
       .coach-content {
         grid-template-columns: 1fr;
@@ -896,7 +922,10 @@
       </div>
     </div>
   </div>
-
+  <div id="toast" class="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastText">Done successfully.</span>
+</div>
   <script>
     const SUPABASE_URL = "https://mtxungnwzittdxnfdhvd.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_pPnHK3uF-_roE6wmByPKxw_-kt5gpgr";
@@ -906,7 +935,17 @@
     let currentClient = null;
     let activeRelationship = null;
     let modalAction = null;
+    function showToast(message) {
+  const toast = document.getElementById("toast");
+  const toastText = document.getElementById("toastText");
 
+  toastText.textContent = message;
+  toast.classList.add("active");
+
+  setTimeout(() => {
+    toast.classList.remove("active");
+  }, 2500);
+}
     document.addEventListener("DOMContentLoaded", async function () {
       setupSidebar();
       setupModal();
@@ -1564,30 +1603,32 @@
     }
 
     async function cancelPendingRequest() {
-      if (!activeRelationship || !currentClient) return;
+  if (!activeRelationship || !currentClient) return;
 
-      const { error: relError } = await supa
-        .from("Client_Coach_Relationship")
-        .update({ status: "cancelled" })
-        .eq("request_id", activeRelationship.request_id);
+  const { error: relError } = await supa
+    .from("Client_Coach_Relationship")
+    .update({ status: "cancelled" })
+    .eq("request_id", activeRelationship.request_id);
 
-      if (relError) {
-        alert("Could not cancel request: " + relError.message);
-        return;
-      }
+  if (relError) {
+    showToast("Could not cancel request: " + relError.message);
+    return;
+  }
 
-      await supa
-        .from("Client")
-        .update({
-          coach_id: null,
-          request_status: "none"
-        })
-        .eq("client_id", currentClient.client_id);
+  await supa
+    .from("Client")
+    .update({
+      coach_id: null,
+      request_status: "none"
+    })
+    .eq("client_id", currentClient.client_id);
 
-      alert("Request cancelled.");
-      window.location.href = "FindCoach.html";
-    }
+  showToast("Request cancelled successfully!");
 
+  setTimeout(() => {
+    window.location.href = "FindCoach.html";
+  }, 1200);
+}
     async function removeCoachConnection() {
       if (!activeRelationship || !currentClient) return;
 
@@ -1609,8 +1650,11 @@
         })
         .eq("client_id", currentClient.client_id);
 
-      alert("Coach removed.");
-      window.location.reload();
+      showToast("Coach removed successfully!");
+
+setTimeout(() => {
+  window.location.reload();
+}, 1200);
     }
   </script>
 </body>
