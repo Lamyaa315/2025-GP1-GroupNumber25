@@ -1449,7 +1449,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const API_BASE = "https://boondocks-arise-greedy.ngrok-free.dev";
+    const API_BASE = "https://wafer-slab-cuddly.ngrok-free.dev";
     async function apiPost(endpoint, body = null) {
       const options = {
         method: "POST",
@@ -1528,7 +1528,7 @@ async function saveSignalPreviewToSession(clientId, rawPlot) {
     let latestSessionId = null;
     let isSavingFeedback = false;
     let feedbackAlreadySaved = false;
-
+    
     const urlParams = new URLSearchParams(window.location.search);
     const exercise = urlParams.get('exercise') || 'squat';
     const selectedClientId = urlParams.get('client_id');
@@ -1581,17 +1581,6 @@ async function saveSignalPreviewToSession(clientId, rawPlot) {
     if (exerciseData[exercise]) {
       exerciseTitle.textContent = `Exercise: ${exerciseData[exercise].name}`;
       currentMuscle.textContent = exerciseData[exercise].muscle;
-
-      sensorPositions.innerHTML = '';
-      exerciseData[exercise].sensorPositions.forEach(position => {
-        const item = document.createElement('div');
-        item.className = 'sensor-position';
-        item.innerHTML = `
-          <div class="sensor-dot"></div>
-          <div class="sensor-label">${position}</div>
-        `;
-        sensorPositions.appendChild(item);
-      });
 
       exerciseSteps.innerHTML = '';
       exerciseData[exercise].steps.forEach((step, index) => {
@@ -1984,9 +1973,7 @@ if (!latestSessionError && latestSession) {
       }
       ctx.stroke();
     }
-    
-  });
-document.getElementById("saveFeedbackBtn").addEventListener("click", async function () {
+    document.getElementById("saveFeedbackBtn").addEventListener("click", async function () {
   const saveBtn = document.getElementById("saveFeedbackBtn");
   const feedbackText = document.getElementById("coachFeedback").value.trim();
   const message = document.getElementById("feedbackMessage");
@@ -2042,6 +2029,8 @@ document.getElementById("saveFeedbackBtn").addEventListener("click", async funct
     saveBtn.innerHTML = "Save Feedback";
   }
 });
+  });
+
   document.addEventListener("DOMContentLoaded", async function() {
     try {
       const supa = window.supabase;
