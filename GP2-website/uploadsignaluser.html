@@ -695,65 +695,127 @@
     }
 
 function displayResult(result) {
-  console.log("NEW DISPLAY RESULT RUNNING");
-  document.getElementById("resultCard").style.display = "block";
 
-  const reps = result.reps || [];
+  const resultCard = document.getElementById("resultCard");
 
-  if (!reps.length) {
-    showMessage("No reps data returned from analysis.", "error");
+  if (!resultCard) {
+
+    console.error("resultCard not found");
+
     return;
+
+  }
+
+  resultCard.style.display = "block";
+
+  let reps = [];
+
+  if (Array.isArray(result.reps) && result.reps.length > 0) {
+
+    reps = result.reps;
+
+  } else {
+
+    reps = [{
+
+      rep_number: result.rep_number || 1,
+
+      si: result.si,
+
+      dominant: result.dominant || result.dominant_side || "N/A",
+
+      left_rms: result.left_rms,
+
+      right_rms: result.right_rms,
+
+      label: result.label
+
+    }];
+
   }
 
   renderRepsResults(reps);
 
-  document.getElementById("resultCard").scrollIntoView({
-    behavior: "smooth"
-  });
+  resultCard.scrollIntoView({ behavior: "smooth" });
+
 }
 
 function renderRepsResults(reps) {
+
   const container = document.getElementById("repsResultContainer");
-  if (!container) return;
+
+  if (!container) {
+
+    console.error("repsResultContainer not found");
+
+    return;
+
+  }
 
   container.innerHTML = "";
 
-  reps.forEach(rep => {
-    const siPercent = Math.round(Number(rep.si || 0) * 100);
-    const statusClass = siPercent >= 15 ? "imbalanced" : "balanced";
-    const statusText = siPercent >= 15 ? "Imbalanced" : "Balanced";
+  reps.forEach((rep, index) => {
+
+    const siPercent = Number(rep.si || 0).toFixed(2);
+
+    const label = rep.label || "";
+
+    const statusClass = label.toLowerCase().includes("balance") && !label.toLowerCase().includes("imbalance")
+
+      ? "balanced"
+
+      : "imbalanced";
+
+    const statusText = label || statusClass;
 
     const card = document.createElement("div");
+
     card.className = "rep-card";
 
     card.innerHTML = `
-      <h3 class="rep-title">Rep ${rep.rep_number}</h3>
+
+      <h3 class="rep-title">Rep ${rep.rep_number || index + 1}</h3>
 
       <div class="rep-row">
+
         <span>Symmetry Index</span>
+
         <strong>${siPercent}%</strong>
+
       </div>
 
       <div class="rep-row">
+
         <span>Dominant Side</span>
-        <strong>${rep.dominant}</strong>
+
+        <strong>${rep.dominant || "N/A"}</strong>
+
       </div>
 
       <div class="rep-row">
+
         <span>Left RMS</span>
+
         <strong>${Number(rep.left_rms || 0).toFixed(4)}</strong>
+
       </div>
 
       <div class="rep-row">
+
         <span>Right RMS</span>
+
         <strong>${Number(rep.right_rms || 0).toFixed(4)}</strong>
+
       </div>
 
       <span class="rep-status ${statusClass}">${statusText}</span>
+
     `;
 
     container.appendChild(card);
+
   });
+
 }
 
     function getStrengthText(value) {
