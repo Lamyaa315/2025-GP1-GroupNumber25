@@ -7,6 +7,7 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="theme.css">
 
   <style>
     :root {
@@ -466,7 +467,11 @@
       opacity: 0.85;
       margin-top: 14px;
     }
-
+    .signal-canvas {
+  width: 100%;
+  height: 260px;
+  display: block;
+}
     .feedback-box {
       margin-top: 22px;
     }
@@ -683,6 +688,9 @@
 </head>
 
 <body>
+  <button id="themeToggle" class="theme-toggle" type="button">
+  <i class="fas fa-moon"></i>
+</button>
   <div class="menu-btn active" id="menuBtn">
     <i class="fas fa-bars"></i>
   </div>
@@ -706,11 +714,6 @@
       <a href="MyAthletes.html" class="nav-item active">
         <i class="fas fa-users"></i>
         <span class="nav-text">My Athletes</span>
-      </a>
-
-      <a href="coachschedule.html" class="nav-item">
-        <i class="fas fa-calendar"></i>
-        <span class="nav-text">Schedule</span>
       </a>
 
       <a href="coach-profile.html" class="nav-item">
@@ -1213,44 +1216,125 @@
     }
 
     function renderSignalPreview(signalPreview) {
-      const signalContainer = document.getElementById("signalContainer");
+  const signalContainer = document.getElementById("signalContainer");
 
-      if (!signalPreview) {
-        signalContainer.innerHTML = `
-          <div>
-            <i class="fas fa-wave-square" style="font-size:2rem; color:var(--primary-accent); margin-bottom:12px;"></i>
-            <p>No signal preview is saved for this session.</p>
-          </div>
-        `;
-        return;
-      }
+  if (!signalPreview) {
+    signalContainer.innerHTML = `
+      <div>
+        <i class="fas fa-wave-square" style="font-size:2rem; color:var(--primary-accent); margin-bottom:12px;"></i>
+        <p>No signal preview is saved for this session.</p>
+      </div>
+    `;
+    return;
+  }
 
-      let previewText = "";
+  let rawPlot = signalPreview;
 
-      try {
-        if (Array.isArray(signalPreview)) {
-          previewText = `${signalPreview.length} signal preview points saved.`;
-        } else if (typeof signalPreview === "object") {
-          const keys = Object.keys(signalPreview);
-          previewText = `Signal preview saved as JSON. Keys: ${keys.join(", ")}`;
-        } else {
-          previewText = "Signal preview is saved.";
-        }
-      } catch {
-        previewText = "Signal preview is saved.";
-      }
-
-      signalContainer.innerHTML = `
-        <div>
-          <i class="fas fa-wave-square" style="font-size:2rem; color:var(--primary-accent); margin-bottom:12px;"></i>
-          <p>${previewText}</p>
-          <p style="font-size:0.85rem; opacity:0.7; margin-top:8px;">
-            The detailed signal preview can be displayed as a chart later if needed.
-          </p>
-        </div>
-      `;
+  if (typeof rawPlot === "string") {
+    try {
+      rawPlot = JSON.parse(rawPlot);
+    } catch (e) {
+      signalContainer.innerHTML = `<p>Signal preview exists, but it is not valid JSON.</p>`;
+      return;
     }
+  }
 
+  const left = rawPlot.emg_left || [];
+  const right = rawPlot.emg_right || [];
+
+  if (!left.length || !right.length) {
+    signalContainer.innerHTML = `<p>Signal preview is saved, but left/right EMG arrays were not found.</p>`;
+    return;
+  }
+
+  signalContainer.innerHTML = `
+    <canvas id="detailsSignalCanvas" class="signal-canvas"></canvas>
+  `;
+
+  setTimeout(() => {
+    drawDetailsSignal(left, right);
+  }, 50);
+}
+function drawDetailsSignal(left, right) {
+  const canvas = document.getElementById("detailsSignalCanvas");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+
+  const width = canvas.width;
+  const height = canvas.height;
+
+  ctx.clearRect(0, 0, width, height);
+
+  ctx.strokeStyle = "rgba(255,255,255,0.12)";
+  ctx.lineWidth = 1;
+
+  for (let y = 0; y < height; y += height / 8) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+  }
+
+  for (let x = 0; x < width; x += width / 12) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, height);
+    ctx.stroke();
+  }
+
+  const maxPoints = 500;
+
+  const leftSampled = downsample(left, maxPoints);
+  const rightSampled = downsample(right, maxPoints);
+
+  const allValues = [...leftSampled, ...rightSampled].map(Number).filter(v => !isNaN(v));
+
+  if (!allValues.length) return;
+
+  const minVal = Math.min(...allValues);
+  const maxVal = Math.max(...allValues);
+  const range = maxVal - minVal || 1;
+
+  function normalize(value, top, sectionHeight) {
+    return top + sectionHeight - ((value - minVal) / range) * sectionHeight;
+  }
+
+  function drawLine(values, top, sectionHeight, color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    values.forEach((value, index) => {
+      const x = (index / (values.length - 1)) * width;
+      const y = normalize(Number(value), top, sectionHeight);
+
+      if (index === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+
+    ctx.stroke();
+  }
+
+  drawLine(leftSampled, height * 0.08, height * 0.36, "rgba(255, 182, 163, 0.95)");
+  drawLine(rightSampled, height * 0.56, height * 0.36, "rgba(141, 211, 161, 0.95)");
+
+  ctx.fillStyle = "rgba(255,255,255,0.75)";
+  ctx.font = "13px Segoe UI";
+  ctx.fillText("Left EMG", 12, 20);
+  ctx.fillText("Right EMG", 12, height * 0.52);
+}
+
+function downsample(values, maxPoints) {
+  if (!Array.isArray(values)) return [];
+  if (values.length <= maxPoints) return values;
+
+  const step = Math.ceil(values.length / maxPoints);
+  return values.filter((_, index) => index % step === 0);
+}
     async function saveFeedback() {
       const feedbackText = document.getElementById("coachFeedback").value.trim();
       const message = document.getElementById("feedbackMessage");
@@ -1346,5 +1430,6 @@
       return id.slice(0, 8);
     }
   </script>
+  <script src="theme.js"></script>
 </body>
 </html>

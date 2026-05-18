@@ -7,6 +7,7 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="theme.css">
 
   <style>
     * {
@@ -554,6 +555,9 @@
 </head>
 
 <body>
+  <button id="themeToggle" class="theme-toggle" type="button">
+  <i class="fas fa-moon"></i>
+</button>
   <div class="modal" id="saveModal" aria-hidden="true">
     <div class="modal-content">
       <h3>Changes Saved</h3>
@@ -973,5 +977,6 @@
       renderCoachProfile(data);
     }
   </script>
+  <script src="theme.js"></script>
 </body>
 </html>

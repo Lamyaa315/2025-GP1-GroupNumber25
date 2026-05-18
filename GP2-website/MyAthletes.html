@@ -7,7 +7,7 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+  <link rel="stylesheet" href="theme.css">
   <style>
     :root {
       --sidebar-width: 220px;
@@ -431,6 +431,9 @@
 </head>
 
 <body>
+  <button id="themeToggle" class="theme-toggle" type="button">
+  <i class="fas fa-moon"></i>
+</button>
   <div class="menu-btn active" id="menuBtn">
     <i class="fas fa-bars"></i>
   </div>
@@ -620,5 +623,6 @@
 
     window.onload = init;
   </script>
+  <script src="theme.js"></script>
 </body>
 </html>

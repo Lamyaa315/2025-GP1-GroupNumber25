@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
+  <link rel="stylesheet" href="theme.css">
 
   <style>
     :root {
@@ -873,7 +874,9 @@
   </style>
 </head>
 <body>
-
+  <button id="themeToggle" class="theme-toggle" type="button">
+  <i class="fas fa-moon"></i>
+</button>
   <div class="menu-btn active" id="menuBtn">
     <i class="fas fa-bars"></i>
   </div>
@@ -1291,5 +1294,6 @@ logoutModal.addEventListener('click', function (e) {
       await fetchSessionsFromDB();
     });
   </script>
+  <script src="theme.js"></script>
 </body>
 </html>

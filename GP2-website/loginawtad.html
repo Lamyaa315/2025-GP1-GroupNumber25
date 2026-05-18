@@ -7,7 +7,7 @@
   <title>AWTAD - Log In</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+  <link rel="stylesheet" href="theme.css">
   <style>
     :root {
       --bg-dark: #4B3A57;
@@ -375,6 +375,9 @@
 </head>
 
 <body>
+  <button id="themeToggle" class="theme-toggle" type="button">
+  <i class="fas fa-moon"></i>
+</button>
   <main class="login-page">
     <section class="login-card">
       <div class="auth-logo">
@@ -567,5 +570,6 @@
       }
     });
   </script>
+  <script src="theme.js"></script>
 </body>
 </html>

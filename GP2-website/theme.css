@@ -1,0 +1,424 @@
+/* =========================
+   AWTAD LIGHT MODE THEME
+========================= */
+
+/* THEME TOGGLE BUTTON */
+#themeToggle,
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  left: auto;
+
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: all 0.25s ease;
+  font-size: 1.2rem;
+}
+
+/* DARK MODE BUTTON */
+body:not(.light-mode) #themeToggle,
+body:not(.light-mode) .theme-toggle {
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.10),
+    rgba(255,255,255,0.04)
+  );
+
+  border: 1px solid rgba(255,255,255,0.14);
+  color: #ffd2c2;
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  box-shadow:
+    0 10px 24px rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* LIGHT MODE BUTTON */
+body.light-mode #themeToggle,
+body.light-mode .theme-toggle {
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.55),
+    rgba(236,228,240,0.38)
+  );
+
+  border: 1px solid rgba(75,58,87,0.14);
+  color: #4B3A57;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 10px 26px rgba(75,58,87,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.55);
+}
+
+#themeToggle:hover,
+.theme-toggle:hover {
+  transform: scale(1.08);
+}
+
+/* =========================
+   LIGHT MODE VARIABLES
+========================= */
+body.light-mode {
+  --bg-main: #f7efee;
+  --bg-secondary: #eee4ec;
+
+  --card-bg: rgba(245, 239, 246, 0.58);
+  --card-strong: rgba(237, 228, 240, 0.72);
+
+  --glass-border: rgba(75,58,87,0.18);
+
+  --text-primary: #2f2438;
+  --text-secondary: rgba(47,36,56,0.72);
+
+  --accent: #4B3A57;
+  --accent-soft: #8b6f98;
+  --peach: #d89c86;
+
+  --success: #63b27f;
+  --danger: #d96c76;
+
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255,214,201,0.55), transparent 38%),
+    radial-gradient(circle at 82% 72%, rgba(120,90,145,0.28), transparent 45%),
+    linear-gradient(135deg, #f8efee 0%, #efe5ec 45%, #e7ddea 100%);
+
+  color: var(--text-primary);
+}
+
+/* =========================
+   TEXT
+========================= */
+body.light-mode,
+body.light-mode p,
+body.light-mode span,
+body.light-mode label,
+body.light-mode small,
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode h3,
+body.light-mode h4,
+body.light-mode h5,
+body.light-mode h6 {
+  color: var(--text-primary) !important;
+}
+
+body.light-mode .muted,
+body.light-mode .subtitle,
+body.light-mode .description,
+body.light-mode .dashboard-subtitle {
+  color: var(--text-secondary) !important;
+}
+
+/* =========================
+   GLASS CARDS
+========================= */
+body.light-mode .data-card,
+body.light-mode .details-card,
+body.light-mode .feedback-box,
+body.light-mode .exercise-instructions,
+body.light-mode .sensor-placement,
+body.light-mode .connection-section,
+body.light-mode .signal-display,
+body.light-mode .athlete-header-card,
+body.light-mode .coach-mini,
+body.light-mode .sidebar,
+body.light-mode .modal-content,
+body.light-mode .metric-box,
+body.light-mode .step,
+body.light-mode .user-mini-card,
+body.light-mode .balance-analysis,
+body.light-mode .side-comparison,
+body.light-mode .saved-feedback-card,
+body.light-mode .stat-card,
+body.light-mode .exercise-card,
+body.light-mode .progress-section,
+body.light-mode .imbalance-section,
+body.light-mode .stage-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.54),
+    rgba(235,225,240,0.46)
+  ) !important;
+
+  border: 1px solid rgba(75,58,87,0.16) !important;
+
+  backdrop-filter: blur(22px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+
+  box-shadow:
+    0 14px 34px rgba(75,58,87,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.42) !important;
+}
+
+/* STRONG PANELS */
+body.light-mode .status-message,
+body.light-mode .form-result-card,
+body.light-mode .signal-box {
+  background: rgba(239,228,240,0.74) !important;
+  border: 1px solid rgba(75,58,87,0.12) !important;
+}
+
+/* =========================
+   TITLES / NUMBERS
+========================= */
+body.light-mode .metric-value,
+body.light-mode .stat-card-value,
+body.light-mode .stage-number,
+body.light-mode .stage-percentage {
+  color: #4B3A57 !important;
+  opacity: 1 !important;
+  font-weight: 600 !important;
+}
+
+body.light-mode .session-title,
+body.light-mode .section-title,
+body.light-mode .dashboard-title,
+body.light-mode .analysis-title,
+body.light-mode .exercise-title,
+body.light-mode .sensor-title,
+body.light-mode .connection-title,
+body.light-mode .signal-title,
+body.light-mode .progress-title,
+body.light-mode .imbalance-title {
+  color: #4B3A57 !important;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+body.light-mode .nav-item {
+  color: rgba(75,58,87,0.78) !important;
+}
+
+body.light-mode .nav-item i {
+  color: #8b6f98 !important;
+}
+
+body.light-mode .nav-item:hover,
+body.light-mode .nav-item.active {
+  background: rgba(139,111,152,0.12) !important;
+  border: 1px solid rgba(139,111,152,0.18) !important;
+  color: #4B3A57 !important;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+body.light-mode .action-btn,
+body.light-mode .btn-small,
+body.light-mode .modal-btn,
+body.light-mode .btn-secondary {
+  background: rgba(255,255,255,0.45) !important;
+  color: #4B3A57 !important;
+  border: 1px solid rgba(75,58,87,0.10) !important;
+}
+
+body.light-mode .action-btn.primary,
+body.light-mode .btn-primary,
+body.light-mode .exercise-btn,
+body.light-mode .learn-more-btn,
+body.light-mode .modal-btn.confirm {
+  background: linear-gradient(
+    135deg,
+    #4B3A57,
+    #7b5f88
+  ) !important;
+
+  color: white !important;
+  border: none !important;
+
+  box-shadow:
+    0 10px 24px rgba(75,58,87,0.20),
+    inset 0 1px 0 rgba(255,255,255,0.14);
+}
+
+/* =========================
+   INPUTS
+========================= */
+body.light-mode input,
+body.light-mode select,
+body.light-mode textarea {
+  background: rgba(255,255,255,0.62) !important;
+  color: #2f2438 !important;
+  border: 1px solid rgba(75,58,87,0.12) !important;
+}
+
+body.light-mode input::placeholder,
+body.light-mode textarea::placeholder {
+  color: rgba(75,58,87,0.45) !important;
+}
+
+/* =========================
+   BADGES
+========================= */
+body.light-mode .status-badge,
+body.light-mode .feedback-chip {
+  background: rgba(99,178,127,0.12) !important;
+  color: #4e8f66 !important;
+  border: 1px solid rgba(99,178,127,0.18) !important;
+}
+
+/* =========================
+   EMPTY
+========================= */
+body.light-mode .empty-state {
+  background: rgba(239,228,240,0.64) !important;
+  border: 1px dashed rgba(75,58,87,0.14) !important;
+}
+
+/* =========================
+   MODAL
+========================= */
+body.light-mode .modal {
+  background: rgba(75,58,87,0.18);
+}
+
+/* =========================
+   CLIENT / COACH SELECTOR
+========================= */
+.user-type-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.user-type-option input[type="radio"] {
+  display: none;
+}
+
+.user-type-option label {
+  width: 100%;
+  padding: 18px 22px;
+  border-radius: 20px;
+
+  border: 1px solid rgba(75,58,87,0.12);
+
+  background: rgba(255,255,255,0.52);
+
+  color: #2f2438;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  font-weight: 700;
+  cursor: pointer;
+
+  transition: 0.25s ease;
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.user-type-option label i {
+  color: #4B3A57;
+}
+
+.user-type-option input[type="radio"]:checked + label {
+  background: linear-gradient(
+    135deg,
+    rgba(139,111,152,0.24),
+    rgba(255,255,255,0.45)
+  );
+
+  border: 1px solid rgba(139,111,152,0.35);
+
+  color: #4B3A57;
+
+  box-shadow:
+    0 10px 22px rgba(139,111,152,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.55);
+}
+
+.user-type-option input[type="radio"]:checked + label i {
+  color: #7b5f88;
+}
+/* FIX: Light mode readability for numbers/cards */
+body.light-mode .stat-card,
+body.light-mode .session-card,
+body.light-mode .data-card,
+body.light-mode .metric-card,
+body.light-mode .summary-card {
+  background: rgba(255, 255, 255, 0.58) !important;
+  border: 1px solid rgba(75, 58, 87, 0.18) !important;
+  box-shadow: 0 12px 28px rgba(75, 58, 87, 0.12) !important;
+}
+
+/* Important numbers */
+body.light-mode .stat-card-value,
+body.light-mode .metric-value,
+body.light-mode .session-number,
+body.light-mode .duration-value,
+body.light-mode .reps-value,
+body.light-mode .total-value,
+body.light-mode [id*="Value"],
+body.light-mode [class*="value"] {
+  color: #4B3A57 !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+}
+
+/* Card titles and labels */
+body.light-mode .stat-card-title,
+body.light-mode .metric-label,
+body.light-mode .session-title,
+body.light-mode .section-title,
+body.light-mode .card-title,
+body.light-mode h2,
+body.light-mode h3,
+body.light-mode h4 {
+  color: #2F2438 !important;
+  opacity: 1 !important;
+}
+
+/* Small labels like Total Sessions / Avg Duration */
+body.light-mode .stat-card-change,
+body.light-mode .metric-label,
+body.light-mode .session-meta,
+body.light-mode .muted,
+body.light-mode small,
+body.light-mode p {
+  color: rgba(47, 36, 56, 0.78) !important;
+  opacity: 1 !important;
+}
+
+/* Icons */
+body.light-mode .stat-card-icon,
+body.light-mode .metric-icon,
+body.light-mode .card-icon,
+body.light-mode i {
+  color: #7A5C8A !important;
+  opacity: 1 !important;
+}
+
+/* Session cards inner boxes */
+body.light-mode .session-card .metric-box,
+body.light-mode .data-card .metric-box,
+body.light-mode .session-overview,
+body.light-mode .session-summary,
+body.light-mode .exercise-box {
+  background: rgba(255, 255, 255, 0.48) !important;
+  border: 1px solid rgba(75, 58, 87, 0.14) !important;
+}
+
+/* Peach numbers were disappearing, force them darker */
+body.light-mode .stat-card-value,
+body.light-mode .metric-value {
+  text-shadow: none !important;
+}

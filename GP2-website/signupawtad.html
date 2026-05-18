@@ -7,7 +7,7 @@
   <title>AWTAD - Sign Up</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+  <link rel="stylesheet" href="theme.css">
   <style>
     :root {
       --bg-dark: #4B3A57;
@@ -508,7 +508,9 @@ select.form-input option {
 
 <body>
   
-
+  <button id="themeToggle" class="theme-toggle" type="button">
+  <i class="fas fa-moon"></i>
+</button>
   <main class="signup-page">
     <section class="signup-card">
       <div class="auth-logo">
@@ -906,5 +908,6 @@ if (userType === "coach" && !specialty) {
       }
     });
   </script>
+  <script src="theme.js"></script>
 </body>
 </html>
