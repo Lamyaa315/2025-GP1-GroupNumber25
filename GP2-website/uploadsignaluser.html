@@ -694,7 +694,8 @@
       }
     }
 
-  function displayResult(result) {
+function displayResult(result) {
+  console.log("NEW DISPLAY RESULT RUNNING");
   document.getElementById("resultCard").style.display = "block";
 
   const reps = result.reps || [];
@@ -704,49 +705,11 @@
     return;
   }
 
-  const firstRep = reps[0];
-
-  const si = Number(firstRep.si || 0);
-  const imbalancePercentage = Math.round(si * 100);
-
-  const leftRms = Number(firstRep.left_rms || 0.5);
-  const rightRms = Number(firstRep.right_rms || 0.5);
-
-  const total = leftRms + rightRms;
-  const leftPercent = total > 0 ? Math.round((leftRms / total) * 100) : 50;
-  const rightPercent = total > 0 ? Math.round((rightRms / total) * 100) : 50;
-
-  document.getElementById("leftValue").textContent = `${leftPercent}%`;
-  document.getElementById("rightValue").textContent = `${rightPercent}%`;
-
-  document.getElementById("balanceLeftBar").style.width = `${leftPercent}%`;
-  document.getElementById("balanceRightBar").style.width = `${rightPercent}%`;
-
-  document.getElementById("leftStrength").textContent = getStrengthText(leftPercent);
-  document.getElementById("rightStrength").textContent = getStrengthText(rightPercent);
-
-  const imbalanceIndicator = document.getElementById("imbalanceIndicator");
-  const imbalanceValue = document.getElementById("imbalanceValue");
-  const imbalanceStatus = document.getElementById("imbalanceStatus");
-
-  if (imbalancePercentage >= 15) {
-    imbalanceIndicator.className = "imbalance-indicator imbalanced";
-    imbalanceValue.className = "imbalance-value imbalanced-text";
-    imbalanceValue.textContent = `${imbalancePercentage}% Imbalance`;
-    imbalanceStatus.textContent = "First Rep Status: Imbalanced";
-  } else {
-    imbalanceIndicator.className = "imbalance-indicator balanced";
-    imbalanceValue.className = "imbalance-value balanced-text";
-    imbalanceValue.textContent = `${imbalancePercentage}% Symmetry Difference`;
-    imbalanceStatus.textContent = "First Rep Status: Balanced";
-  }
-
-  document.getElementById("dominantSide").textContent =
-    `First Rep Dominant Side: ${firstRep.dominant}`;
-
   renderRepsResults(reps);
 
-  document.getElementById("resultCard").scrollIntoView({ behavior: "smooth" });
+  document.getElementById("resultCard").scrollIntoView({
+    behavior: "smooth"
+  });
 }
 
 function renderRepsResults(reps) {
