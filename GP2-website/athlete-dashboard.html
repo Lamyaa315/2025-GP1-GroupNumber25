@@ -683,7 +683,93 @@
       .modal-btn {
         width: 100%;
       }
+      
     }
+    .training-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-box {
+  min-width: 230px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.filter-box label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  opacity: 0.78;
+}
+
+.filter-box select {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.09);
+  color: white;
+  outline: none;
+  font-family: inherit;
+}
+
+.filter-box select option {
+  color: #2f2438;
+}
+
+/* Light mode */
+body.light-mode .filter-box {
+  background: rgba(255,255,255,0.55) !important;
+  border: 1px solid rgba(75,58,87,0.16) !important;
+}
+
+body.light-mode .filter-box label {
+  color: #4B3A57 !important;
+  opacity: 1 !important;
+}
+
+body.light-mode .filter-box select {
+  background: rgba(255,255,255,0.75) !important;
+  color: #2f2438 !important;
+  border: 1px solid rgba(75,58,87,0.16) !important;
+}
+.reps-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.rep-card {
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.rep-card h4 {
+  color: var(--primary-accent);
+  margin-bottom: 12px;
+}
+
+.rep-card p {
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.rep-card strong {
+  color: var(--primary-accent);
+}
   </style>
 </head>
 
@@ -741,10 +827,20 @@
     </div>
 
     <section id="sessionsSection">
-      <h2 class="section-title">
-        <i class="fas fa-history"></i>
-        Training Sessions
-      </h2>
+      <div class="training-header">
+  <h2 class="section-title">
+    <i class="fas fa-history"></i>
+    Training Sessions
+  </h2>
+
+  <div class="filter-box">
+    <label for="sessionSort">Sort By</label>
+    <select id="sessionSort">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+    </select>
+  </div>
+</div>
 
       <div id="sessionsGrid" class="grid-container">
         <div class="empty-state">Loading sessions...</div>
@@ -771,21 +867,11 @@
             <div class="metric-value" id="detailsDuration">N/A</div>
             <div class="metric-label">Duration</div>
           </div>
-
           <div class="metric-box">
-            <div class="metric-value" id="detailsSI">N/A</div>
-            <div class="metric-label">Symmetry Index</div>
+            <div class="metric-value" id="detailsReps">N/A</div>
+            <div class="metric-label">Reps</div>
           </div>
-
-          <div class="metric-box">
-            <div class="metric-value" id="detailsDominant">N/A</div>
-            <div class="metric-label">Dominant Side</div>
-          </div>
-
-          <div class="metric-box">
-            <div class="metric-value" id="detailsLabel">N/A</div>
-            <div class="metric-label">Result Label</div>
-          </div>
+         
 
           <div class="metric-box">
             <div class="metric-value" id="detailsFeedbackTime">N/A</div>
@@ -801,7 +887,16 @@
           <i class="fas fa-wave-square"></i>
           Signal
         </h3>
+        <div class="details-card">
+  <h3 class="session-title">
+    <i class="fas fa-list-ol"></i>
+    Repetition Details
+  </h3>
 
+  <div id="repsDetailsGrid" class="reps-details-grid">
+    <p class="muted">Select a session to view reps.</p>
+  </div>
+</div>
         <div id="signalContainer" class="signal-box">
           Signal preview will appear here if stored in Session.signal_preview.
         </div>
@@ -879,6 +974,9 @@
       await loadAthleteInfo();
       await fetchSessions();
 
+      document.getElementById("sessionSort").addEventListener("change", function () {
+        renderSessions(getSortedSessions());
+    });
       document.getElementById("saveFeedbackBtn").addEventListener("click", saveFeedback);
     }
 
@@ -1054,13 +1152,26 @@
 
       renderSessions(sessionsCache);
     }
+    function getSortedSessions() {
+  const sortValue = document.getElementById("sessionSort")?.value || "newest";
 
+  return [...sessionsCache].sort((a, b) => {
+    const dateA = new Date(a.session_date || 0);
+    const dateB = new Date(b.session_date || 0);
+
+    if (sortValue === "oldest") {
+      return dateA - dateB;
+    }
+
+    return dateB - dateA;
+  });
+}
     function renderSessions(sessions) {
       const grid = document.getElementById("sessionsGrid");
 
       grid.innerHTML = sessions.map(session => {
         const rep = session.Reps && session.Reps.length > 0 ? session.Reps[0] : null;
-
+        const repsCount = session.Reps ? session.Reps.length : 0;
         const si = rep && rep.symmetry_index !== null && rep.symmetry_index !== undefined
           ? Number(rep.symmetry_index).toFixed(2) + "%"
           : "N/A";
@@ -1101,7 +1212,10 @@
               <i class="fas fa-clock"></i>
               Duration: ${formatDuration(session.duration_sec)}
             </p>
-
+            <p class="muted">
+              <i class="fas fa-repeat"></i>
+              Reps: ${repsCount}
+            </p>
             <div class="metric-row">
               <div class="metric-box">
                 <div class="metric-value">${si}</div>
@@ -1156,7 +1270,9 @@
       }
 
       const rep = session.Reps && session.Reps.length > 0 ? session.Reps[0] : null;
-
+      renderRepsDetails(session.Reps || []);
+      const repsCount = session.Reps ? session.Reps.length : 0;
+      document.getElementById("detailsReps").textContent = repsCount;
       document.getElementById("detailsTitle").textContent =
         `${session.exercise_type || "Session"} Details`;
 
@@ -1169,16 +1285,7 @@
       document.getElementById("detailsDuration").textContent =
         formatDuration(session.duration_sec);
 
-      document.getElementById("detailsSI").textContent =
-        rep && rep.symmetry_index !== null && rep.symmetry_index !== undefined
-          ? Number(rep.symmetry_index).toFixed(2) + "%"
-          : "N/A";
-
-      document.getElementById("detailsDominant").textContent =
-        rep?.dominant_side || "N/A";
-
-      document.getElementById("detailsLabel").textContent =
-        rep?.label || "N/A";
+    
 
       document.getElementById("detailsFeedbackTime").textContent =
         session.coach_feedback_at ? formatDateTime(session.coach_feedback_at) : "Not saved yet";
@@ -1196,7 +1303,38 @@
       detailsSection.classList.add("active");
       detailsSection.scrollIntoView({ behavior: "smooth" });
     }
+    function renderRepsDetails(reps) {
+  const repsGrid = document.getElementById("repsDetailsGrid");
 
+  if (!repsGrid) return;
+
+  if (!reps.length) {
+    repsGrid.innerHTML = `
+      <div class="empty-state">
+        No repetition records were found for this session.
+      </div>
+    `;
+    return;
+  }
+
+  repsGrid.innerHTML = reps.map((rep, index) => {
+    const si = rep.symmetry_index !== null && rep.symmetry_index !== undefined
+      ? Number(rep.symmetry_index).toFixed(2) + "%"
+      : "N/A";
+
+    const dominantSide = rep.dominant_side || "N/A";
+    const label = rep.label || "N/A";
+
+    return `
+      <div class="rep-card">
+        <h4>Rep ${index + 1}</h4>
+        <p><strong>Symmetry Index:</strong> ${si}</p>
+        <p><strong>Dominant Side:</strong> ${dominantSide}</p>
+        <p><strong>Status:</strong> ${label}</p>
+      </div>
+    `;
+  }).join("");
+}
     function renderSavedFeedbackCard(session) {
       const card = document.getElementById("savedFeedbackCard");
 

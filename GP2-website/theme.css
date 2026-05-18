@@ -442,7 +442,14 @@ body.light-mode .stage-progress-fill.imbalanced {
    LIGHT MODAL
 ========================= */
 body.light-mode .modal {
-  background: rgba(75,58,87,0.20) !important;
+ background:
+  radial-gradient(circle at 18% 18%, rgba(255, 214, 201, 0.55), transparent 36%),
+  radial-gradient(circle at 88% 18%, rgba(235, 220, 245, 0.42), transparent 38%),
+  linear-gradient(135deg, #f8efee 0%, #f1e8ee 50%, #ebe3ef 100%) !important;
+
+background-attachment: fixed !important;
+background-repeat: no-repeat !important;
+background-size: cover !important;
 }
 
 /* =========================
@@ -522,4 +529,49 @@ body.light-mode footer,
 body.light-mode footer p {
   color: rgba(47,36,56,0.68) !important;
   opacity: 1 !important;
+}
+/* FIX START SESSION STEP BOX ISSUE */
+body.light-mode .step,
+body.light-mode .instruction-step,
+body.light-mode .analysis-step,
+body.light-mode .session-step {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+/* Start Session steps readability fix */
+body.light-mode .exercise-step,
+body.light-mode .exercise-step-content,
+body.light-mode .exercise-step-content h4,
+body.light-mode .exercise-step-content p {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body.light-mode .exercise-step-content h4 {
+  color: #2f2438 !important;
+  font-weight: 800 !important;
+}
+
+body.light-mode .exercise-step-content p {
+  color: rgba(47, 36, 56, 0.82) !important;
+  font-weight: 500 !important;
+}
+
+body.light-mode .exercise-step-number {
+  background: rgba(75, 58, 87, 0.16) !important;
+  border: 1px solid rgba(75, 58, 87, 0.28) !important;
+  color: #4B3A57 !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+}
+body.light-mode .rep-card {
+  background: rgba(255,255,255,0.45) !important;
+  border: 1px solid rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 10px 25px rgba(75,58,87,0.08);
 }
