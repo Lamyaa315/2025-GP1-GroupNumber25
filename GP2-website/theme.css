@@ -1,19 +1,22 @@
 /* =========================
-   AWTAD LIGHT MODE THEME
+   AWTAD GLOBAL THEME.CSS
+   Dark mode stays original.
+   Light mode applies only when body has .light-mode
 ========================= */
 
-/* THEME TOGGLE BUTTON */
+/* =========================
+   THEME TOGGLE BUTTON
+========================= */
 #themeToggle,
 .theme-toggle {
   position: fixed;
   top: 20px;
   right: 20px;
   left: auto;
-
   width: 52px;
   height: 52px;
-  border: none;
   border-radius: 50%;
+  border: none;
   cursor: pointer;
   z-index: 9999;
 
@@ -21,48 +24,8 @@
   align-items: center;
   justify-content: center;
 
-  transition: all 0.25s ease;
   font-size: 1.2rem;
-}
-
-/* DARK MODE BUTTON */
-body:not(.light-mode) #themeToggle,
-body:not(.light-mode) .theme-toggle {
-  background: linear-gradient(
-    135deg,
-    rgba(255,255,255,0.10),
-    rgba(255,255,255,0.04)
-  );
-
-  border: 1px solid rgba(255,255,255,0.14);
-  color: #ffd2c2;
-
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-
-  box-shadow:
-    0 10px 24px rgba(0,0,0,0.18),
-    inset 0 1px 0 rgba(255,255,255,0.08);
-}
-
-/* LIGHT MODE BUTTON */
-body.light-mode #themeToggle,
-body.light-mode .theme-toggle {
-  background: linear-gradient(
-    135deg,
-    rgba(255,255,255,0.55),
-    rgba(236,228,240,0.38)
-  );
-
-  border: 1px solid rgba(75,58,87,0.14);
-  color: #4B3A57;
-
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-
-  box-shadow:
-    0 10px 26px rgba(75,58,87,0.10),
-    inset 0 1px 0 rgba(255,255,255,0.55);
+  transition: all 0.25s ease;
 }
 
 #themeToggle:hover,
@@ -70,38 +33,75 @@ body.light-mode .theme-toggle {
   transform: scale(1.08);
 }
 
-/* =========================
-   LIGHT MODE VARIABLES
-========================= */
-body.light-mode {
-  --bg-main: #f7efee;
-  --bg-secondary: #eee4ec;
+/* Dark toggle only */
+body:not(.light-mode) #themeToggle,
+body:not(.light-mode) .theme-toggle {
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.10),
+    rgba(255,255,255,0.04)
+  );
+  border: 1px solid rgba(255,255,255,0.14);
+  color: #ffd2c2;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 10px 24px rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
 
-  --card-bg: rgba(245, 239, 246, 0.58);
-  --card-strong: rgba(237, 228, 240, 0.72);
-
-  --glass-border: rgba(75,58,87,0.18);
-
-  --text-primary: #2f2438;
-  --text-secondary: rgba(47,36,56,0.72);
-
-  --accent: #4B3A57;
-  --accent-soft: #8b6f98;
-  --peach: #d89c86;
-
-  --success: #63b27f;
-  --danger: #d96c76;
-
-  background:
-    radial-gradient(circle at 15% 20%, rgba(255,214,201,0.55), transparent 38%),
-    radial-gradient(circle at 82% 72%, rgba(120,90,145,0.28), transparent 45%),
-    linear-gradient(135deg, #f8efee 0%, #efe5ec 45%, #e7ddea 100%);
-
-  color: var(--text-primary);
+/* Light toggle only */
+body.light-mode #themeToggle,
+body.light-mode .theme-toggle {
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.58),
+    rgba(238,228,242,0.42)
+  );
+  border: 1px solid rgba(75,58,87,0.16);
+  color: #4B3A57;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    0 10px 26px rgba(75,58,87,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.60);
 }
 
 /* =========================
-   TEXT
+   LIGHT MODE BASE
+========================= */
+body.light-mode {
+  --bg-main: #f8efee;
+  --bg-secondary: #eee4ec;
+
+  --text-primary: #2f2438;
+  --text-secondary: rgba(47,36,56,0.74);
+
+  --purple-main: #4B3A57;
+  --purple-soft: #7b5f88;
+  --purple-light: #8b6f98;
+
+  --peach-main: #d89c86;
+  --peach-soft: #ffd2c2;
+
+  --glass-border-light: rgba(75,58,87,0.16);
+  --glass-bg-light: rgba(255,255,255,0.56);
+  --glass-bg-strong-light: rgba(246,238,246,0.76);
+
+  --success: #5f9f77;
+  --danger: #c95d6b;
+  --warning: #b97f69;
+
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255,214,201,0.58), transparent 38%),
+    radial-gradient(circle at 82% 72%, rgba(120,90,145,0.30), transparent 45%),
+    linear-gradient(135deg, #f8efee 0%, #efe5ec 45%, #e7ddea 100%) !important;
+
+  color: var(--text-primary) !important;
+}
+
+/* =========================
+   LIGHT TEXT READABILITY
 ========================= */
 body.light-mode,
 body.light-mode p,
@@ -115,17 +115,23 @@ body.light-mode h4,
 body.light-mode h5,
 body.light-mode h6 {
   color: var(--text-primary) !important;
+  opacity: 1;
 }
 
 body.light-mode .muted,
 body.light-mode .subtitle,
 body.light-mode .description,
-body.light-mode .dashboard-subtitle {
+body.light-mode .dashboard-subtitle,
+body.light-mode .welcome-subtitle,
+body.light-mode .session-meta,
+body.light-mode .feedback-date,
+body.light-mode small {
   color: var(--text-secondary) !important;
+  opacity: 1 !important;
 }
 
 /* =========================
-   GLASS CARDS
+   LIGHT GLASS CARDS
 ========================= */
 body.light-mode .data-card,
 body.light-mode .details-card,
@@ -136,11 +142,11 @@ body.light-mode .connection-section,
 body.light-mode .signal-display,
 body.light-mode .athlete-header-card,
 body.light-mode .coach-mini,
+body.light-mode .user-mini-card,
 body.light-mode .sidebar,
 body.light-mode .modal-content,
 body.light-mode .metric-box,
 body.light-mode .step,
-body.light-mode .user-mini-card,
 body.light-mode .balance-analysis,
 body.light-mode .side-comparison,
 body.light-mode .saved-feedback-card,
@@ -148,144 +154,295 @@ body.light-mode .stat-card,
 body.light-mode .exercise-card,
 body.light-mode .progress-section,
 body.light-mode .imbalance-section,
-body.light-mode .stage-card {
+body.light-mode .stage-card,
+body.light-mode .glass-card,
+body.light-mode .feedback-item,
+body.light-mode .meta-box,
+body.light-mode .form-result-card,
+body.light-mode .signal-box,
+body.light-mode .empty-state,
+body.light-mode .meeting-status-card {
   background: linear-gradient(
     135deg,
-    rgba(255,255,255,0.54),
-    rgba(235,225,240,0.46)
+    rgba(255,255,255,0.58),
+    rgba(235,225,240,0.50)
   ) !important;
 
-  border: 1px solid rgba(75,58,87,0.16) !important;
+  border: 1px solid var(--glass-border-light) !important;
 
   backdrop-filter: blur(22px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
 
   box-shadow:
-    0 14px 34px rgba(75,58,87,0.10),
-    inset 0 1px 0 rgba(255,255,255,0.42) !important;
+    0 14px 34px rgba(75,58,87,0.11),
+    inset 0 1px 0 rgba(255,255,255,0.46) !important;
 }
 
-/* STRONG PANELS */
-body.light-mode .status-message,
-body.light-mode .form-result-card,
-body.light-mode .signal-box {
-  background: rgba(239,228,240,0.74) !important;
-  border: 1px solid rgba(75,58,87,0.12) !important;
+/* Inner cards slightly clearer */
+body.light-mode .metric-box,
+body.light-mode .meta-box,
+body.light-mode .feedback-text,
+body.light-mode .session-overview,
+body.light-mode .session-summary,
+body.light-mode .exercise-box {
+  background: rgba(255,255,255,0.48) !important;
+  border: 1px solid rgba(75,58,87,0.14) !important;
 }
 
 /* =========================
-   TITLES / NUMBERS
+   LIGHT TITLES / IMPORTANT VALUES
 ========================= */
-body.light-mode .metric-value,
-body.light-mode .stat-card-value,
-body.light-mode .stage-number,
-body.light-mode .stage-percentage {
-  color: #4B3A57 !important;
-  opacity: 1 !important;
-  font-weight: 600 !important;
-}
-
-body.light-mode .session-title,
-body.light-mode .section-title,
+body.light-mode .welcome-title,
 body.light-mode .dashboard-title,
+body.light-mode .section-title,
+body.light-mode .session-title,
 body.light-mode .analysis-title,
 body.light-mode .exercise-title,
 body.light-mode .sensor-title,
 body.light-mode .connection-title,
 body.light-mode .signal-title,
 body.light-mode .progress-title,
-body.light-mode .imbalance-title {
-  color: #4B3A57 !important;
+body.light-mode .imbalance-title,
+body.light-mode .feedback-top h4,
+body.light-mode .card-title,
+body.light-mode .form-result-title {
+  color: var(--purple-main) !important;
+  opacity: 1 !important;
+}
+
+body.light-mode .metric-value,
+body.light-mode .stat-card-value,
+body.light-mode .stage-number,
+body.light-mode .stage-percentage,
+body.light-mode .session-number,
+body.light-mode .duration-value,
+body.light-mode .reps-value,
+body.light-mode .total-value,
+body.light-mode [id*="Value"],
+body.light-mode [class*="value"] {
+  color: var(--purple-main) !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+}
+
+body.light-mode .metric-label,
+body.light-mode .stat-card-title,
+body.light-mode .stat-card-change,
+body.light-mode .stage-title,
+body.light-mode .stage-percentage-label,
+body.light-mode .meta-box span {
+  color: rgba(47,36,56,0.76) !important;
+  opacity: 1 !important;
+  font-weight: 500 !important;
+}
+
+body.light-mode .meta-box strong {
+  color: var(--purple-main) !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+}
+
+/* Icons in light */
+body.light-mode i,
+body.light-mode .stat-card-icon,
+body.light-mode .metric-icon,
+body.light-mode .card-icon {
+  color: var(--purple-soft) !important;
+  opacity: 1 !important;
 }
 
 /* =========================
-   SIDEBAR
+   LIGHT SIDEBAR
 ========================= */
 body.light-mode .nav-item {
-  color: rgba(75,58,87,0.78) !important;
+  color: rgba(75,58,87,0.80) !important;
 }
 
 body.light-mode .nav-item i {
-  color: #8b6f98 !important;
+  color: var(--purple-soft) !important;
 }
 
 body.light-mode .nav-item:hover,
 body.light-mode .nav-item.active {
-  background: rgba(139,111,152,0.12) !important;
-  border: 1px solid rgba(139,111,152,0.18) !important;
-  color: #4B3A57 !important;
+  background: rgba(139,111,152,0.13) !important;
+  border: 1px solid rgba(139,111,152,0.20) !important;
+  color: var(--purple-main) !important;
 }
 
 /* =========================
-   BUTTONS
+   LIGHT BUTTONS - DEFAULT
 ========================= */
 body.light-mode .action-btn,
-body.light-mode .btn-small,
 body.light-mode .modal-btn,
 body.light-mode .btn-secondary {
-  background: rgba(255,255,255,0.45) !important;
-  color: #4B3A57 !important;
-  border: 1px solid rgba(75,58,87,0.10) !important;
+  background: rgba(255,255,255,0.48) !important;
+  color: var(--purple-main) !important;
+  border: 1px solid rgba(75,58,87,0.13) !important;
+  box-shadow:
+    0 8px 18px rgba(75,58,87,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.42) !important;
 }
 
+body.light-mode .action-btn:hover,
+body.light-mode .modal-btn:hover,
+body.light-mode .btn-secondary:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.62) !important;
+}
+
+/* Main purple buttons in light mode */
 body.light-mode .action-btn.primary,
 body.light-mode .btn-primary,
 body.light-mode .exercise-btn,
 body.light-mode .learn-more-btn,
 body.light-mode .modal-btn.confirm {
-  background: linear-gradient(
-    135deg,
-    #4B3A57,
-    #7b5f88
-  ) !important;
-
-  color: white !important;
+  background: linear-gradient(135deg, #4B3A57, #7b5f88) !important;
+  color: #ffffff !important;
   border: none !important;
-
   box-shadow:
-    0 10px 24px rgba(75,58,87,0.20),
-    inset 0 1px 0 rgba(255,255,255,0.14);
+    0 10px 24px rgba(75,58,87,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.16) !important;
+}
+
+body.light-mode .action-btn.primary *,
+body.light-mode .btn-primary *,
+body.light-mode .exercise-btn *,
+body.light-mode .learn-more-btn *,
+body.light-mode .modal-btn.confirm * {
+  color: #ffffff !important;
 }
 
 /* =========================
-   INPUTS
+   MY ATHLETES BUTTONS
+   IMPORTANT: light mode only.
+   Dark mode will not be touched.
+========================= */
+body.light-mode .athlete-card .btn,
+body.light-mode .athlete-card .btn-primary,
+body.light-mode .athlete-card .btn-action,
+body.light-mode .athlete-card button,
+body.light-mode .client-card .btn,
+body.light-mode .client-card .btn-primary,
+body.light-mode .client-card .btn-action,
+body.light-mode .client-card button {
+  background: linear-gradient(135deg, #4B2E63, #2F1B45) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 10px 24px rgba(75,46,99,0.28) !important;
+}
+
+body.light-mode .athlete-card .btn *,
+body.light-mode .athlete-card .btn-primary *,
+body.light-mode .athlete-card .btn-action *,
+body.light-mode .athlete-card button *,
+body.light-mode .client-card .btn *,
+body.light-mode .client-card .btn-primary *,
+body.light-mode .client-card .btn-action *,
+body.light-mode .client-card button * {
+  color: #ffffff !important;
+}
+
+body.light-mode .athlete-card .btn:hover,
+body.light-mode .athlete-card .btn-primary:hover,
+body.light-mode .athlete-card .btn-action:hover,
+body.light-mode .athlete-card button:hover,
+body.light-mode .client-card .btn:hover,
+body.light-mode .client-card .btn-primary:hover,
+body.light-mode .client-card .btn-action:hover,
+body.light-mode .client-card button:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #5A3974, #351F4E) !important;
+  box-shadow: 0 14px 28px rgba(75,46,99,0.34) !important;
+}
+
+/* If your MyAthletes page uses .btn-action directly */
+body.light-mode .btn-action {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 14px;
+  font-weight: 700;
+  transition: 0.3s ease;
+  border: none;
+  cursor: pointer;
+
+  background: linear-gradient(135deg, #4B2E63, #2F1B45) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 22px rgba(75,46,99,0.28) !important;
+}
+
+/* =========================
+   LIGHT INPUTS
 ========================= */
 body.light-mode input,
 body.light-mode select,
 body.light-mode textarea {
-  background: rgba(255,255,255,0.62) !important;
-  color: #2f2438 !important;
-  border: 1px solid rgba(75,58,87,0.12) !important;
+  background: rgba(255,255,255,0.64) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid rgba(75,58,87,0.14) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.45) !important;
 }
 
 body.light-mode input::placeholder,
 body.light-mode textarea::placeholder {
-  color: rgba(75,58,87,0.45) !important;
+  color: rgba(75,58,87,0.48) !important;
+}
+
+body.light-mode input:focus,
+body.light-mode select:focus,
+body.light-mode textarea:focus {
+  border-color: rgba(75,58,87,0.32) !important;
+  box-shadow:
+    0 0 0 3px rgba(75,58,87,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.45) !important;
 }
 
 /* =========================
-   BADGES
+   LIGHT BADGES / STATUS
 ========================= */
 body.light-mode .status-badge,
-body.light-mode .feedback-chip {
-  background: rgba(99,178,127,0.12) !important;
+body.light-mode .feedback-chip,
+body.light-mode .stage-status.balanced,
+body.light-mode .status-pill.accepted {
+  background: rgba(99,178,127,0.14) !important;
   color: #4e8f66 !important;
-  border: 1px solid rgba(99,178,127,0.18) !important;
+  border: 1px solid rgba(99,178,127,0.22) !important;
+}
+
+body.light-mode .stage-status.imbalanced,
+body.light-mode .status-pill.rejected {
+  background: rgba(201,93,107,0.14) !important;
+  color: #a94150 !important;
+  border: 1px solid rgba(201,93,107,0.22) !important;
+}
+
+body.light-mode .status-pill.pending {
+  background: rgba(216,156,134,0.16) !important;
+  color: #9c6f5b !important;
+  border: 1px solid rgba(216,156,134,0.24) !important;
+}
+
+/* Progress fills keep visible */
+body.light-mode .stage-progress {
+  background: rgba(75,58,87,0.12) !important;
+}
+
+body.light-mode .stage-progress-fill.balanced {
+  background: linear-gradient(90deg, #63b27f, #8dd3a1) !important;
+}
+
+body.light-mode .stage-progress-fill.imbalanced {
+  background: linear-gradient(90deg, #c95d6b, #e48691) !important;
 }
 
 /* =========================
-   EMPTY
-========================= */
-body.light-mode .empty-state {
-  background: rgba(239,228,240,0.64) !important;
-  border: 1px dashed rgba(75,58,87,0.14) !important;
-}
-
-/* =========================
-   MODAL
+   LIGHT MODAL
 ========================= */
 body.light-mode .modal {
-  background: rgba(75,58,87,0.18);
+  background: rgba(75,58,87,0.20) !important;
 }
 
 /* =========================
@@ -305,11 +462,8 @@ body.light-mode .modal {
   width: 100%;
   padding: 18px 22px;
   border-radius: 20px;
-
-  border: 1px solid rgba(75,58,87,0.12);
-
-  background: rgba(255,255,255,0.52);
-
+  border: 1px solid rgba(75,58,87,0.14);
+  background: rgba(255,255,255,0.46);
   color: #2f2438;
 
   display: flex;
@@ -319,7 +473,6 @@ body.light-mode .modal {
 
   font-weight: 700;
   cursor: pointer;
-
   transition: 0.25s ease;
 
   backdrop-filter: blur(16px);
@@ -333,92 +486,40 @@ body.light-mode .modal {
 .user-type-option input[type="radio"]:checked + label {
   background: linear-gradient(
     135deg,
-    rgba(139,111,152,0.24),
-    rgba(255,255,255,0.45)
+    rgba(139,111,152,0.26),
+    rgba(255,255,255,0.44)
   );
-
-  border: 1px solid rgba(139,111,152,0.35);
-
+  border: 1px solid rgba(75,58,87,0.34);
   color: #4B3A57;
 
   box-shadow:
-    0 10px 22px rgba(139,111,152,0.10),
+    0 10px 22px rgba(75,58,87,0.12),
     inset 0 1px 0 rgba(255,255,255,0.55);
 }
 
 .user-type-option input[type="radio"]:checked + label i {
-  color: #7b5f88;
-}
-/* FIX: Light mode readability for numbers/cards */
-body.light-mode .stat-card,
-body.light-mode .session-card,
-body.light-mode .data-card,
-body.light-mode .metric-card,
-body.light-mode .summary-card {
-  background: rgba(255, 255, 255, 0.58) !important;
-  border: 1px solid rgba(75, 58, 87, 0.18) !important;
-  box-shadow: 0 12px 28px rgba(75, 58, 87, 0.12) !important;
+  color: #4B3A57;
 }
 
-/* Important numbers */
-body.light-mode .stat-card-value,
-body.light-mode .metric-value,
-body.light-mode .session-number,
-body.light-mode .duration-value,
-body.light-mode .reps-value,
-body.light-mode .total-value,
-body.light-mode [id*="Value"],
-body.light-mode [class*="value"] {
-  color: #4B3A57 !important;
-  opacity: 1 !important;
-  font-weight: 700 !important;
-}
-
-/* Card titles and labels */
-body.light-mode .stat-card-title,
-body.light-mode .metric-label,
-body.light-mode .session-title,
-body.light-mode .section-title,
-body.light-mode .card-title,
-body.light-mode h2,
-body.light-mode h3,
-body.light-mode h4 {
-  color: #2F2438 !important;
+/* =========================
+   MY COACH READABILITY FIX
+========================= */
+body.light-mode .feedback-text {
+  color: rgba(47,36,56,0.88) !important;
   opacity: 1 !important;
 }
 
-/* Small labels like Total Sessions / Avg Duration */
-body.light-mode .stat-card-change,
-body.light-mode .metric-label,
-body.light-mode .session-meta,
-body.light-mode .muted,
-body.light-mode small,
-body.light-mode p {
-  color: rgba(47, 36, 56, 0.78) !important;
+body.light-mode .feedback-date,
+body.light-mode .feedback-date strong {
+  color: rgba(47,36,56,0.78) !important;
   opacity: 1 !important;
 }
 
-/* Icons */
-body.light-mode .stat-card-icon,
-body.light-mode .metric-icon,
-body.light-mode .card-icon,
-body.light-mode i {
-  color: #7A5C8A !important;
+/* =========================
+   FOOTER
+========================= */
+body.light-mode footer,
+body.light-mode footer p {
+  color: rgba(47,36,56,0.68) !important;
   opacity: 1 !important;
-}
-
-/* Session cards inner boxes */
-body.light-mode .session-card .metric-box,
-body.light-mode .data-card .metric-box,
-body.light-mode .session-overview,
-body.light-mode .session-summary,
-body.light-mode .exercise-box {
-  background: rgba(255, 255, 255, 0.48) !important;
-  border: 1px solid rgba(75, 58, 87, 0.14) !important;
-}
-
-/* Peach numbers were disappearing, force them darker */
-body.light-mode .stat-card-value,
-body.light-mode .metric-value {
-  text-shadow: none !important;
 }
