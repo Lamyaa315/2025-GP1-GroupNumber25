@@ -1,0 +1,11 @@
+# AWTAD Dataset
+
+The dataset used in this project is available through the following Google Drive link:
+
+[AWTAD EMG Dataset – Google Drive] https://drive.google.com/drive/folders/1l5oBXmmqXwOdG2GRnSAq_6CVHw8Z61MT?usp=sharing
+
+## Dataset Description
+
+This dataset was collected by the AWTAD team using Delsys EMG sensors to support muscle activation imbalance analysis during barbell back squat performance. The dataset includes EMG recordings collected from female participants in a controlled gym environment, following the approved study protocol and participant consent process.
+
+The dataset was used for Model 2, which focuses on repetition-level squat analysis using the custom AWTAD EMG dataset.
