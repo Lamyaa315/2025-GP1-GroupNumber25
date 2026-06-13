@@ -796,18 +796,7 @@
       </section>
     </section>
 
-    <section class="glass-card my-coach-card">
-      <div class="card-header">
-        <h2>My Coach</h2>
-      </div>
-
-      <div id="myCoachContent">
-        <div class="coach-empty">
-          <i class="fa-solid fa-spinner fa-spin"></i>
-          <h3>Loading coach information...</h3>
-        </div>
-      </div>
-    </section>
+  
 
     <footer class="page-footer">
       <p>&copy; 2025 AWTAD Technologies. Advancing Human Performance Through EMG Innovation.</p>
@@ -1073,92 +1062,10 @@ document.getElementById("confirmLogoutBtn").addEventListener("click", async func
       renderProfile(data);
     }
 
-    async function loadMyCoach() {
-      const container = document.getElementById("myCoachContent");
 
-      try {
-        if (!currentUser) return;
 
-        const { data: relationship, error: relError } = await supa
-          .from("Client_Coach_Relationship")
-          .select("coach_id, status")
-          .eq("client_id", currentUser.id)
-          .eq("status", "accepted")
-          .maybeSingle();
 
-        if (relError) {
-          console.error("Relationship error:", relError.message);
-        }
-
-        if (!relationship || !relationship.coach_id) {
-          renderNoCoach(container);
-          return;
-        }
-
-        const { data: coach, error: coachError } = await supa
-          .from("Coach")
-          .select("coach_id, Fname, Lname, email, Phone_Number, Specialty, profile_pic_url")
-          .eq("coach_id", relationship.coach_id)
-          .single();
-
-        if (coachError || !coach) {
-          console.error("Coach error:", coachError);
-          renderNoCoach(container);
-          return;
-        }
-
-        renderCoach(container, coach);
-
-      } catch (err) {
-        console.error("Unexpected My Coach error:", err);
-        renderNoCoach(container);
-      }
-    }
-
-    function renderNoCoach(container) {
-      container.innerHTML = `
-        <div class="coach-empty">
-          <i class="fa-solid fa-user-tie"></i>
-          <h3>No Coach Connected Yet</h3>
-          <p>You are not currently connected to a coach. Find a coach to let them review your sessions and provide feedback.</p>
-          <a href="FindCoach.html" class="btn primary">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            Find a Coach
-          </a>
-        </div>
-      `;
-    }
-
-    function renderCoach(container, coach) {
-      const first = coach.Fname || "";
-      const last = coach.Lname || "";
-      const fullName = `${first} ${last}`.trim() || "Coach";
-      const initials = `${first.charAt(0)}${last.charAt(0)}` || "C";
-
-      const avatar = coach.profile_pic_url
-        ? `<img src="${coach.profile_pic_url}" alt="Coach Profile Picture">`
-        : initials;
-
-      container.innerHTML = `
-        <div class="coach-connected">
-          <div class="coach-avatar">
-            ${avatar}
-          </div>
-
-          <div class="coach-info">
-            <h3>${fullName}</h3>
-            <p><i class="fa-solid fa-dumbbell"></i>${coach.Specialty || "Specialty not provided"}</p>
-            <p><i class="fa-solid fa-envelope"></i>${coach.email || "Email not available"}</p>
-            <p><i class="fa-solid fa-phone"></i>${coach.Phone_Number || "Phone not provided"}</p>
-          </div>
-
-          <div class="coach-status">
-            <i class="fa-solid fa-circle-check"></i>
-            Connected
-          </div>
-        </div>
-      `;
-    }
+    
   </script>
   <script src="theme.js"></script>
 </body>

@@ -25,11 +25,7 @@
       --danger: #ff6b6b;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
@@ -60,7 +56,6 @@
       z-index: -1;
     }
 
-    /* Menu Button */
     .menu-btn {
       position: fixed;
       top: 20px;
@@ -92,11 +87,8 @@
       transition: all 0.3s ease;
     }
 
-    .menu-btn.active i {
-      transform: rotate(90deg);
-    }
+    .menu-btn.active i { transform: rotate(90deg); }
 
-    /* Sidebar */
     .sidebar {
       width: var(--sidebar-width);
       height: calc(100vh - 24px);
@@ -107,11 +99,7 @@
       display: flex;
       flex-direction: column;
       padding: 22px 16px;
-      background: linear-gradient(
-        180deg,
-        rgba(255,255,255,0.08) 0%,
-        rgba(255,255,255,0.04) 100%
-      );
+      background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
       border: 1px solid var(--glass-border);
       box-shadow: var(--shadow-soft), var(--shadow-glow);
       border-radius: 26px;
@@ -122,21 +110,14 @@
       transition: left 0.3s ease;
     }
 
-    .sidebar.active {
-      left: 0;
-    }
+    .sidebar.active { left: 0; }
 
     .sidebar::before {
       content: "";
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      background: linear-gradient(
-        135deg,
-        rgba(255,255,255,0.12) 0%,
-        rgba(255,255,255,0.02) 35%,
-        rgba(255,255,255,0.01) 100%
-      );
+      background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 35%, rgba(255,255,255,0.01) 100%);
       pointer-events: none;
     }
 
@@ -150,28 +131,6 @@
     .sidebar-brand img {
       width: 105px;
       filter: drop-shadow(0 0 14px rgba(255, 204, 187, 0.2));
-    }
-
-    .user-mini-card {
-      position: relative;
-      z-index: 1;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.09);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-      padding: 14px;
-      border-radius: 18px;
-      margin-bottom: 18px;
-    }
-
-    .user-mini-card h4 {
-      color: var(--primary-accent);
-      font-size: 0.92rem;
-      margin-bottom: 4px;
-    }
-
-    .user-mini-card p {
-      font-size: 0.76rem;
-      opacity: 0.72;
     }
 
     .sidebar-nav {
@@ -194,36 +153,19 @@
       overflow: hidden;
     }
 
-    .nav-item i {
-      width: 18px;
-      text-align: center;
-      font-size: 0.95rem;
-    }
+    .nav-item i { width: 18px; text-align: center; font-size: 0.95rem; }
 
     .nav-item:hover,
     .nav-item.active {
       color: #fff;
-      background: linear-gradient(
-        135deg,
-        rgba(255, 204, 187, 0.18),
-        rgba(255, 255, 255, 0.06)
-      );
+      background: linear-gradient(135deg, rgba(255, 204, 187, 0.18), rgba(255, 255, 255, 0.06));
       border: 1px solid rgba(255, 210, 194, 0.16);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.06),
-        0 0 18px rgba(255, 181, 156, 0.10);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 18px rgba(255, 181, 156, 0.10);
     }
 
-    .nav-item:hover {
-      transform: translateX(2px);
-    }
+    .nav-item:hover { transform: translateX(2px); }
+    .nav-item.active i, .nav-item:hover i { color: var(--primary-accent); }
 
-    .nav-item.active i,
-    .nav-item:hover i {
-      color: var(--primary-accent);
-    }
-
-    /* Main Content */
     .main-content {
       margin-left: 0;
       padding: 70px 34px 42px 80px;
@@ -231,13 +173,9 @@
       transition: margin-left 0.3s ease;
     }
 
-    .main-content.shifted {
-      margin-left: calc(var(--sidebar-width) + 20px);
-    }
+    .main-content.shifted { margin-left: calc(var(--sidebar-width) + 20px); }
 
-    .dashboard-header {
-      margin-bottom: 34px;
-    }
+    .dashboard-header { margin-bottom: 34px; }
 
     .dashboard-title {
       font-size: 2.35rem;
@@ -248,11 +186,7 @@
       margin-bottom: 8px;
     }
 
-    .dashboard-subtitle {
-      opacity: 0.78;
-      line-height: 1.7;
-      max-width: 820px;
-    }
+    .dashboard-subtitle { opacity: 0.78; line-height: 1.7; max-width: 820px; }
 
     .session-container {
       display: grid;
@@ -264,15 +198,9 @@
     .session-info,
     .exercise-selection,
     .selected-exercises {
-      background: linear-gradient(
-        180deg,
-        rgba(255,255,255,0.08) 0%,
-        rgba(255,255,255,0.05) 100%
-      );
+      background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.05) 100%);
       border: 1px solid var(--glass-border);
-      box-shadow:
-        var(--shadow-soft),
-        inset 0 1px 0 rgba(255,255,255,0.07);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.07);
       backdrop-filter: blur(16px) saturate(135%);
       -webkit-backdrop-filter: blur(16px) saturate(135%);
       border-radius: 24px;
@@ -287,17 +215,11 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-        135deg,
-        rgba(255,255,255,0.07) 0%,
-        transparent 42%
-      );
+      background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, transparent 42%);
       pointer-events: none;
     }
 
-    .info-title,
-    .selection-title,
-    .selected-title {
+    .info-title, .selection-title, .selected-title {
       font-size: 1.5rem;
       font-weight: 400;
       color: var(--primary-accent);
@@ -306,26 +228,16 @@
       z-index: 1;
     }
 
-    .info-description,
-    .selection-description {
+    .info-description, .selection-description {
       opacity: 0.9;
       line-height: 1.7;
       position: relative;
       z-index: 1;
     }
 
-    .info-steps {
-      margin-top: 28px;
-      position: relative;
-      z-index: 1;
-    }
+    .info-steps { margin-top: 28px; position: relative; z-index: 1; }
 
-    .step {
-      display: flex;
-      align-items: flex-start;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
+    .step { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; }
 
     .step-number {
       background: rgba(255, 182, 163, 0.25);
@@ -341,17 +253,8 @@
       color: white;
     }
 
-    .step-content h4 {
-      font-size: 1.05rem;
-      margin-bottom: 6px;
-      color: var(--primary-accent);
-    }
-
-    .step-content p {
-      opacity: 0.88;
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
+    .step-content h4 { font-size: 1.05rem; margin-bottom: 6px; color: var(--primary-accent); }
+    .step-content p { opacity: 0.88; font-size: 0.95rem; line-height: 1.6; }
 
     .exercise-grid {
       display: grid;
@@ -403,23 +306,10 @@
       transition: all 0.3s ease;
     }
 
-    .exercise-card.selected .exercise-icon {
-      background: rgba(255, 182, 163, 0.28);
-    }
+    .exercise-card.selected .exercise-icon { background: rgba(255, 182, 163, 0.28); }
 
-    .exercise-name {
-      font-size: 1.25rem;
-      font-weight: 500;
-      margin-bottom: 10px;
-      color: var(--primary-accent);
-    }
-
-    .exercise-description {
-      font-size: 0.92rem;
-      opacity: 0.88;
-      line-height: 1.6;
-      margin-bottom: 14px;
-    }
+    .exercise-name { font-size: 1.25rem; font-weight: 500; margin-bottom: 10px; color: var(--primary-accent); }
+    .exercise-description { font-size: 0.92rem; opacity: 0.88; line-height: 1.6; margin-bottom: 14px; }
 
     .exercise-muscles {
       font-size: 0.84rem;
@@ -431,9 +321,7 @@
       color: var(--primary-accent);
     }
 
-    .start-btn,
-    .exercise-btn,
-    .action-btn.primary {
+    .start-btn, .action-btn.primary {
       background: linear-gradient(135deg, #ffd7c8, #ffbfa9);
       color: #4B3A57;
       font-weight: 700;
@@ -450,6 +338,11 @@
       transition: all 0.22s ease;
       position: relative;
       z-index: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
     .start-btn:hover:not(:disabled) {
@@ -457,19 +350,9 @@
       transform: translateY(-2px);
     }
 
-    .start-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
+    .start-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .action-buttons {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-top: 28px;
-    }
+    .action-buttons { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 28px; }
 
     .action-btn {
       display: inline-flex;
@@ -486,27 +369,14 @@
       -webkit-backdrop-filter: blur(10px);
       transition: all 0.22s ease;
       cursor: pointer;
+      font-family: inherit;
     }
 
-    .action-btn:hover {
-      transform: translateY(-2px);
-      background: rgba(255,255,255,0.08);
-      border-color: rgba(255, 210, 194, 0.18);
-    }
+    .action-btn:hover { transform: translateY(-2px); background: rgba(255,255,255,0.08); border-color: rgba(255, 210, 194, 0.18); }
+    .action-btn.primary:hover { box-shadow: 0 12px 22px rgba(255, 181, 156, 0.24); transform: translateY(-2px); }
 
-    .action-btn.primary:hover {
-      box-shadow: 0 12px 22px rgba(255, 181, 156, 0.24);
-      transform: translateY(-2px);
-    }
-
-    .selected-exercises {
-      margin-bottom: 32px;
-      display: none;
-    }
-
-    .selected-exercises.active {
-      display: block;
-    }
+    .selected-exercises { margin-bottom: 32px; display: none; }
+    .selected-exercises.active { display: block; }
 
     .selected-header {
       display: flex;
@@ -519,13 +389,7 @@
       z-index: 1;
     }
 
-    .selected-list {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      position: relative;
-      z-index: 1;
-    }
+    .selected-list { display: flex; gap: 16px; flex-wrap: wrap; position: relative; z-index: 1; }
 
     .selected-item {
       background: rgba(255, 182, 163, 0.15);
@@ -538,101 +402,97 @@
       max-width: 650px;
     }
 
-    .selected-item i {
-      font-size: 1.2rem;
-      color: var(--primary-accent);
-      margin-top: 4px;
+    .selected-item i { font-size: 1.2rem; color: var(--primary-accent); margin-top: 4px; }
+
+    /* ===== LOGOUT MODAL ===== */
+    .logout-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
     }
 
-    footer {
+    .logout-modal.active { display: flex; }
+
+    .logout-modal-box {
+      background: var(--bg-darker);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 36px 32px;
       text-align: center;
-      padding: 10px 0 0;
-      opacity: 0.75;
-      font-size: 0.95rem;
+      color: white;
+      max-width: 340px;
+      width: 90%;
+      box-shadow: var(--shadow-soft);
     }
+
+    .logout-modal-box p { font-size: 1.05rem; opacity: 0.9; margin-bottom: 6px; }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 22px;
+      justify-content: center;
+    }
+    /* ======================== */
+
+    footer { text-align: center; padding: 10px 0 0; opacity: 0.75; font-size: 0.95rem; }
 
     @media (max-width: 1024px) {
-      :root {
-        --sidebar-width: 82px;
-      }
-
-      .sidebar {
-        padding: 18px 10px;
-        border-radius: 22px;
-      }
-
-      .sidebar-brand img,
-      .nav-text,
-      .user-mini-card {
-        display: none;
-      }
-
-      .nav-item {
-        justify-content: center;
-        padding: 12px;
-      }
-
-      .nav-item i {
-        width: auto;
-      }
-
-      .session-container {
-        grid-template-columns: 1fr;
-      }
+      :root { --sidebar-width: 82px; }
+      .sidebar { padding: 18px 10px; border-radius: 22px; }
+      .sidebar-brand img, .nav-text, .user-mini-card { display: none; }
+      .nav-item { justify-content: center; padding: 12px; }
+      .nav-item i { width: auto; }
+      .session-container { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 768px) {
-      .main-content {
-        padding: 20px 18px 30px;
-      }
-
-      .dashboard-title {
-        font-size: 2rem;
-      }
-
-      .action-buttons {
-        flex-direction: column;
-        width: 100%;
-      }
-
-      .action-btn {
-        justify-content: center;
-      }
-
-      .selected-list {
-        flex-direction: column;
-      }
+      .main-content { padding: 20px 18px 30px; }
+      .dashboard-title { font-size: 2rem; }
+      .action-buttons { flex-direction: column; width: 100%; }
+      .action-btn { justify-content: center; }
+      .selected-list { flex-direction: column; }
     }
 
     @media (max-width: 480px) {
-      .dashboard-title {
-        font-size: 1.75rem;
-      }
-
-      .session-info,
-      .exercise-selection,
-      .selected-exercises {
-        padding: 20px;
-      }
+      .dashboard-title { font-size: 1.75rem; }
+      .session-info, .exercise-selection, .selected-exercises { padding: 20px; }
     }
   </style>
 </head>
 <body>
+
   <button id="themeToggle" class="theme-toggle" type="button">
-  <i class="fas fa-moon"></i>
-</button>
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <!-- LOGOUT MODAL -->
+  <div id="logoutModal" class="logout-modal">
+    <div class="logout-modal-box">
+      <p>Are you sure you want to logout?</p>
+      <div class="modal-buttons">
+        <button id="cancelLogout" class="action-btn">Cancel</button>
+        <button id="confirmLogout" class="action-btn" style="background: linear-gradient(135deg, rgba(255,100,100,0.95), rgba(255,80,80,0.95)); border:none;">Logout</button>
+      </div>
+    </div>
+  </div>
+
   <div class="menu-btn" id="menuBtn">
     <i class="fas fa-bars"></i>
   </div>
 
-    <aside class="sidebar" id="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <img src="awtadlogo1.png" alt="AWTAD">
     </div>
 
-    <div class="coach-profile-mini">
-      <h4 id="sidebarUserName">Loading...</h4>
-      <p id="coachEmailSide"></p>
+    <div class="coach-profile-mini" style="position:relative;z-index:1;padding:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);border-radius:18px;margin-bottom:18px;">
+      <h4 id="sidebarUserName" style="color:var(--primary-accent);font-size:0.92rem;margin-bottom:4px;">Loading...</h4>
+      <p id="coachEmailSide" style="font-size:0.76rem;opacity:0.72;"></p>
     </div>
 
     <nav class="sidebar-nav">
@@ -640,16 +500,14 @@
         <i class="fas fa-th-large"></i>
         <span class="nav-text">Dashboard</span>
       </a>
-
       <a href="MyAthletes.html" class="nav-item active">
         <i class="fas fa-users"></i>
         <span class="nav-text">My Athletes</span>
       </a>
-
- <a href="coach-profile.html" class="nav-item">
-  <i class="fas fa-user"></i>
-  <span class="nav-text">Profile</span>
-</a>
+      <a href="coach-profile.html" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span class="nav-text">Profile</span>
+      </a>
     </nav>
 
     <a href="#" id="logoutBtn" class="nav-item" style="margin-top: auto;">
@@ -657,6 +515,7 @@
       <span class="nav-text">Logout</span>
     </a>
   </aside>
+
   <main class="main-content" id="mainContent">
     <section class="dashboard-header">
       <h1 class="dashboard-title">Start New Session</h1>
@@ -682,7 +541,6 @@
               <p>Select the movement you want to analyze.</p>
             </div>
           </div>
-
           <div class="step">
             <div class="step-number">2</div>
             <div class="step-content">
@@ -690,7 +548,6 @@
               <p>Place the EMG sensors correctly on the target muscles.</p>
             </div>
           </div>
-
           <div class="step">
             <div class="step-number">3</div>
             <div class="step-content">
@@ -698,7 +555,6 @@
               <p>Complete the movement while the system records the muscle activation signal.</p>
             </div>
           </div>
-
           <div class="step">
             <div class="step-number">4</div>
             <div class="step-content">
@@ -712,9 +568,7 @@
       <div class="exercise-selection">
         <div class="selection-header">
           <h2 class="selection-title">Select Exercise</h2>
-          <p class="selection-description">
-            Choose the exercise you want to start
-          </p>
+          <p class="selection-description">Choose the exercise you want to start</p>
         </div>
 
         <div class="exercise-grid">
@@ -742,7 +596,6 @@
     <section class="selected-exercises" id="selectedExercises">
       <div class="selected-header">
         <h2 class="selected-title">Selected Exercise</h2>
-
         <button class="action-btn" id="changeSelectionBtn">
           <i class="fas fa-edit"></i>
           Change Exercise
@@ -767,11 +620,11 @@
   <script>
     const pageParams = new URLSearchParams(window.location.search);
     const selectedClientId = pageParams.get("client_id");
+
     document.addEventListener('DOMContentLoaded', function () {
       const menuBtn = document.getElementById('menuBtn');
       const sidebar = document.getElementById('sidebar');
       const mainContent = document.getElementById('mainContent');
-
       const exerciseCards = document.querySelectorAll('.exercise-card');
       const startSessionBtn = document.getElementById('startSessionBtn');
       const changeSelectionBtn = document.getElementById('changeSelectionBtn');
@@ -780,8 +633,6 @@
       const proceedSessionBtn = document.getElementById('proceedSessionBtn');
 
       let selectedExercise = null;
-      const params = new URLSearchParams(window.location.search);
-      //const selectedClientId = params.get("client_id");
 
       const exerciseData = {
         squat: {
@@ -798,11 +649,7 @@
       });
 
       document.addEventListener('click', function (e) {
-        if (
-          !sidebar.contains(e.target) &&
-          !menuBtn.contains(e.target) &&
-          sidebar.classList.contains('active')
-        ) {
+        if (!sidebar.contains(e.target) && !menuBtn.contains(e.target) && sidebar.classList.contains('active')) {
           sidebar.classList.remove('active');
           mainContent.classList.remove('shifted');
           menuBtn.classList.remove('active');
@@ -811,19 +658,15 @@
 
       exerciseCards.forEach(card => {
         card.addEventListener('click', function () {
-          const exerciseType = this.getAttribute('data-exercise');
-
           exerciseCards.forEach(c => c.classList.remove('selected'));
           this.classList.add('selected');
-
-          selectedExercise = exerciseType;
+          selectedExercise = this.getAttribute('data-exercise');
           startSessionBtn.disabled = false;
         });
       });
 
       startSessionBtn.addEventListener('click', function () {
         if (!selectedExercise) return;
-
         selectedList.innerHTML = '';
         const exerciseItem = document.createElement('div');
         exerciseItem.className = 'selected-item';
@@ -831,12 +674,11 @@
           <i class="${exerciseData[selectedExercise].icon}"></i>
           <div>
             <strong>${exerciseData[selectedExercise].name}</strong>
-            <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 6px; line-height: 1.6;">
+            <div style="font-size:0.9rem;opacity:0.9;margin-top:6px;line-height:1.6;">
               ${exerciseData[selectedExercise].details}
             </div>
           </div>
         `;
-
         selectedList.appendChild(exerciseItem);
         selectedExercisesSection.classList.add('active');
         selectedExercisesSection.scrollIntoView({ behavior: 'smooth' });
@@ -854,105 +696,66 @@
         if (!selectedExercise) return;
         window.location.href = `connectionawtad.html?exercise=${selectedExercise}&client_id=${selectedClientId}`;
       });
+
+      // ===== LOGOUT MODAL =====
+      const logoutBtn = document.getElementById("logoutBtn");
+      const logoutModal = document.getElementById("logoutModal");
+      const cancelLogout = document.getElementById("cancelLogout");
+      const confirmLogout = document.getElementById("confirmLogout");
+
+      logoutBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        logoutModal.classList.add("active");
+      });
+
+      cancelLogout.addEventListener("click", function () {
+        logoutModal.classList.remove("active");
+      });
+
+      logoutModal.addEventListener("click", function (e) {
+        if (e.target === logoutModal) logoutModal.classList.remove("active");
+      });
+
+      confirmLogout.addEventListener("click", async function () {
+        confirmLogout.disabled = true;
+        confirmLogout.textContent = "Logging out...";
+        try {
+          if (window.supabase) await window.supabase.auth.signOut();
+          window.location.href = "loginawtad.html";
+        } catch (err) {
+          console.error(err);
+          alert("Logout failed. Please try again.");
+          confirmLogout.disabled = false;
+          confirmLogout.textContent = "Logout";
+        }
+      });
     });
+
+    // ===== SIDEBAR COACH NAME =====
     document.addEventListener("DOMContentLoaded", async function () {
-  try {
-    const supa = window.supabase;
+      try {
+        const { data: { user }, error: userError } = await window.supabase.auth.getUser();
+        if (userError || !user) { console.error("No logged-in coach found"); return; }
 
-    const {
-      data: { user },
-      error: userError
-    } = await supa.auth.getUser();
+        const { data: coach, error: coachError } = await window.supabase
+          .from("Coach")
+          .select("Fname, Lname, email")
+          .eq("email", user.email)
+          .maybeSingle();
 
-    if (userError || !user) {
-      console.error("No logged-in coach found");
-      return;
-    }
+        if (!coach) { console.error("Coach not found:", coachError?.message); return; }
 
-    const { data: coach, error: coachError } = await supa
-      .from("Coach")
-      .select("Fname, email")
-      .eq("email", user.email)
-      .single();
+        document.getElementById("sidebarUserName").textContent =
+          `${coach.Fname || ""} ${coach.Lname || ""}`.trim() || "Coach";
 
-    if (coachError || !coach) {
-      console.error("Error fetching coach:", coachError?.message);
-      return;
-    }
+        document.getElementById("coachEmailSide").textContent = coach.email || "";
 
-    document.getElementById("sidebarUserName").textContent =
-      coach.Fname || "Coach";
-
-    document.getElementById("sidebarCoachEmail").textContent =
-      coach.email || "";
-
-  } catch (err) {
-    console.error(err);
-  }
-});
-document.addEventListener("DOMContentLoaded", async function () {
-  const { data: { user }, error: userError } = await window.supabase.auth.getUser();
-
-  console.log("Logged user:", user?.email);
-
-  if (userError || !user) return;
-
-  const { data: coach, error: coachError } = await window.supabase
-    .from("Coach")
-    .select("Fname,Lname,email")
-    .eq("email", user.email)
-    .maybeSingle();
-
-  console.log("Coach data:", coach, coachError);
-
-  if (!coach) return;
-
-  document.getElementById("sidebarUserName").textContent =
-    `${coach.Fname || ""} ${coach.Lname || ""}`.trim() || "Coach";
-
-  document.getElementById("sidebarCoachEmail").textContent =
-    coach.email || "";
-});
-  </script>
-  <script>
-  const logoutBtn = document.getElementById("logoutBtn");
-  const logoutModal = document.getElementById("logoutModal");
-  const cancelLogout = document.getElementById("cancelLogout");
-  const confirmLogout = document.getElementById("confirmLogout");
-
-  logoutBtn.addEventListener("click", function (e) {
-    e.preventDefault();
-    logoutModal.classList.add("active");
-  });
-
-  cancelLogout.addEventListener("click", function () {
-    logoutModal.classList.remove("active");
-  });
-
-  logoutModal.addEventListener("click", function (e) {
-    if (e.target === logoutModal) {
-      logoutModal.classList.remove("active");
-    }
-  });
-
-  confirmLogout.addEventListener("click", async function () {
-    confirmLogout.disabled = true;
-    confirmLogout.textContent = "Logging out...";
-
-    try {
-      if (window.supabase) {
-        await window.supabase.auth.signOut();
+      } catch (err) {
+        console.error(err);
       }
+    });
+  </script>
 
-      window.location.href = "loginawtad.html";
-    } catch (err) {
-      console.error(err);
-      alert("Logout failed. Please try again.");
-      confirmLogout.disabled = false;
-      confirmLogout.textContent = "Logout";
-    }
-  });
-</script>
   <script src="theme.js"></script>
 </body>
 </html>
