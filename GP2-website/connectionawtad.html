@@ -1882,7 +1882,7 @@
           .from("Client")
           .select("Fname")
           .eq("client_id", user.id)
-          .single();
+          .maybeSingle();
 
         if (clientError) { console.error("Error fetching client name:", clientError.message); return; }
 
